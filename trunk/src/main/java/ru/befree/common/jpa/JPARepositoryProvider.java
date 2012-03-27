@@ -12,7 +12,7 @@ package ru.befree.common.jpa;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.inject.*;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.springframework.data.repository.Repository;
 
 import java.lang.reflect.Proxy;
@@ -30,7 +30,6 @@ public class JPARepositoryProvider<R extends Repository> implements Provider<R> 
 
     /*===========================================[ CLASS METHODS ]==============*/
 
-    @Override
     public R get() {
         /**
          * Injector Reverse lookup - find binding Key information for this Provider instance

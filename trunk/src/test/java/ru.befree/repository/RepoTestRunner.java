@@ -36,7 +36,6 @@ public class RepoTestRunner extends GuiceTestRunner {
                 };
                 //TODO: можно выпилить бинд на провайдер и сделать перехватчик на инжекцию
                 bindInterceptor(Matchers.annotatedWith(Repository.class), Matchers.any(), new MethodInterceptor() {
-                    @Override
                     public Object invoke(MethodInvocation invocation) throws Throwable {
                         System.out.println(String.format("[%s] [%s] [%s] [%s]", invocation.getClass(), invocation.getMethod().getName(), invocation.getArguments(), invocation.getStaticPart()));
                         return invocation.proceed();

@@ -38,7 +38,6 @@ class JPARepositoryProxy implements InvocationHandler {
         //TODO: Наполнить некий Map известными методами: method -> parameterclasses
     }
 
-    @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         try {
             //TODO: отслеживать отстуствие методов у делегата и делать магию: QueryExecutorMethodInterceptor обслуживает хитрые запросы
@@ -56,7 +55,6 @@ class JPARepositoryProxy implements InvocationHandler {
     private Class[] getParameterClasses(Object[] args) {
         if (args != null && args.length > 0) {
             return Collections2.transform(Arrays.asList(args), new Function<Object, Class>() {
-                @Override
                 public Class apply(Object input) {
                     return input.getClass();
                 }

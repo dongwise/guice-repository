@@ -24,7 +24,6 @@
         <version.guice>3.0</version.guice>
         <version.google-guava>11.0.2</version.google-guava>
         <version.guice-assisted-inject>2.0</version.guice-assisted-inject>
-        <version.cache4guice>1.0.7</version.cache4guice>
 
         <!-- Logging -->
 
@@ -41,31 +40,18 @@
 
         <!-- Commons -->
 
-        <version.commons-io>2.1</version.commons-io>
-        <version.commons-configuration>1.8</version.commons-configuration>
-        <version.commons-collections>3.2.1</version.commons-collections>
-        <version.commons-pool>1.6</version.commons-pool>
         <version.commons-lang>3.1</version.commons-lang>
-        <version.reflections>0.9.5</version.reflections>
         <version.hibernate>3.6.10.Final</version.hibernate>
         <version.h2>1.3.164</version.h2>
     </properties>
 
     <scm>
-        <connection>scm:svn:https://dev.i-free.ru/svn/common/commons-guice/trunk</connection>
-        <developerConnection>scm:svn:https://dev.i-free.ru/svn/common/commons-guice/trunk</developerConnection>
-        <url>https://dev.i-free.ru/svn/common/commons-guice/trunk</url>
+        <connection>scm:svn:https://guice-repository.googlecode.com/svn/trunk</connection>
+        <developerConnection>scm:svn:https://guice-repository.googlecode.com/svn/trunk</developerConnection>
+        <url>https://guice-repository.googlecode.com/svn/trunk</url>
     </scm>
 
     <dependencies>
-
-        <!-- i-free -->
-
-        <dependency>
-            <groupId>ru.befree.util</groupId>
-            <artifactId>converter-api</artifactId>
-            <version>${version.converter-api}</version>
-        </dependency>
 
         <!-- Logging -->
 
@@ -106,30 +92,6 @@
         </dependency>
 
         <!-- Commons -->
-
-        <dependency>
-            <groupId>commons-configuration</groupId>
-            <artifactId>commons-configuration</artifactId>
-            <version>${version.commons-configuration}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>${version.commons-collections}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>${version.commons-io}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>commons-pool</groupId>
-            <artifactId>commons-pool</artifactId>
-            <version>${version.commons-pool}</version>
-        </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -229,44 +191,6 @@
             <version>${version.google-guava}</version>
         </dependency>
 
-        <!-- Classpath search tools -->
-
-        <dependency>
-            <groupId>org.reflections</groupId>
-            <artifactId>reflections</artifactId>
-            <version>${version.reflections}</version>
-        </dependency>
-
-        <!-- EhCache and @Cached support -->
-
-        <dependency>
-            <groupId>org.slurry</groupId>
-            <artifactId>cache4guice</artifactId>
-            <version>${version.cache4guice}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>net.sf.ehcache</groupId>
-                    <artifactId>ehcache-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
         <!-- Testing stuff -->
 
         <dependency>
@@ -279,7 +203,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>${version.junit}</version>
+            <version>4.5</version>
             <scope>compile</scope>
         </dependency>
 

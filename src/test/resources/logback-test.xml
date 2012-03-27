@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<configuration>
+    <jmxConfigurator/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>%date [%thread] %-5level %logger{25} - %msg%n</Pattern>
+        </layout>
+    </appender>
+
+    <appender name="RUNTIME" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>Runtime.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!--&lt;!&ndash; daily rollover &ndash;&gt;-->
+            <fileNamePattern>Runtime.%d{yyyy-MM-dd}.log</fileNamePattern>
+
+            <!--&lt;!&ndash; keep 30 days worth of history &ndash;&gt;-->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%date [%thread] %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="RUNTIME"/>
+    </root>
+</configuration>

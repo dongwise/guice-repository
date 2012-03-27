@@ -18,7 +18,6 @@ public class JPACustomerRepository extends AbstractJPARepository<Customer, Long>
 /*===========================================[ INSTANCE VARIABLES ]=========*/
 /*===========================================[ CONSTRUCTORS ]===============*/
 
-    @Override
     public void getSome() {
         System.out.println("SOME");
     }

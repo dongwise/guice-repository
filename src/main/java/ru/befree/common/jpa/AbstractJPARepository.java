@@ -50,7 +50,6 @@ public abstract class AbstractJPARepository<T, ID extends Serializable> implemen
         this.entityManager = entityManager;
     }
 
-    @Override
     public void storeInBatch(Iterable<T> entities) {
         List<T> saved = save(entities);
         for (T entity : saved) {
@@ -78,7 +77,6 @@ public abstract class AbstractJPARepository<T, ID extends Serializable> implemen
         delegate.deleteInBatch(entities);
     }
 
-    @Override
     @Transactional
     public void deleteAll() {
         delegate.deleteAll();
@@ -92,17 +90,14 @@ public abstract class AbstractJPARepository<T, ID extends Serializable> implemen
         return delegate.exists(id);
     }
 
-    @Override
     public List<T> findAll() {
         return delegate.findAll();
     }
 
-    @Override
     public List<T> findAll(Sort sort) {
         return delegate.findAll(sort);
     }
 
-    @Override
     public Page<T> findAll(Pageable pageable) {
         return delegate.findAll(pageable);
     }
@@ -123,7 +118,6 @@ public abstract class AbstractJPARepository<T, ID extends Serializable> implemen
         return delegate.findAll(spec, sort);
     }
 
-    @Override
     public long count() {
         return delegate.count();
     }
@@ -147,7 +141,6 @@ public abstract class AbstractJPARepository<T, ID extends Serializable> implemen
         return delegate.save(entities);
     }
 
-    @Override
     @Transactional
     public void flush() {
         delegate.flush();

@@ -9,15 +9,9 @@
 
 package ru.befree.repository;
 
-import com.google.inject.TypeLiteral;
-import com.google.inject.matcher.Matchers;
-import org.aopalliance.intercept.MethodInterceptor;
-import org.aopalliance.intercept.MethodInvocation;
 import org.junit.runners.model.InitializationError;
-import org.springframework.stereotype.Repository;
-import ru.befree.common.jpa.AbstractJPARepository;
 import ru.befree.common.jpa.JPAPersistenceModule;
-import ru.befree.common.jpa.JPARepositoryProvider;
+import ru.befree.common.jpa.JPARepositoryProvider2;
 import ru.befree.common.test.GuiceTestRunner;
 
 
@@ -29,21 +23,23 @@ public class RepoTestRunner extends GuiceTestRunner {
         super(classToRun, new JPAPersistenceModule() {
             @Override
             protected void configureRepositories() {
-                bind(CustomerRepository.class).to(JPACustomerRepository.class);
+//                bind(CustomerRepository.class).to(JPACustomerRepository.class);
+//                bind(CustomerRepository.class).to(JPACustomerRepository.class);
                 //TODO: может быть на уровне Interceptor можно это отловить
                 //TODO: в прокси надо отлавливать все вызовы на @Transactional и @Query, вешать на них то, что висело в стандартном Spring-DATA
-                TypeLiteral<AbstractJPARepository<Account, Long>> mapType = new TypeLiteral<AbstractJPARepository<Account, Long>>() {
-                };
+
                 //TODO: можно выпилить бинд на провайдер и сделать перехватчик на инжекцию
+/*
                 bindInterceptor(Matchers.annotatedWith(Repository.class), Matchers.any(), new MethodInterceptor() {
                     public Object invoke(MethodInvocation invocation) throws Throwable {
                         System.out.println(String.format("[%s] [%s] [%s] [%s]", invocation.getClass(), invocation.getMethod().getName(), invocation.getArguments(), invocation.getStaticPart()));
                         return invocation.proceed();
                     }
                 });
+*/
 
-                bind(UserRepository.class).toProvider(new JPARepositoryProvider<UserRepository>());
-                bind(AccountRepository.class).toProvider(new JPARepositoryProvider<AccountRepository>());
+                bind(UserRepository.class).toProvider(new JPARepositoryProvider2<UserRepository>());
+                bind(AccountRepository.class).toProvider(new JPARepositoryProvider2<AccountRepository>());
 /*
                 bind(AccountRepository.class).toProvider(new Provider<AccountRepository>() {
                     @Inject

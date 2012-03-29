@@ -9,8 +9,11 @@
 package ru.befree.repository;
 
 import org.springframework.data.repository.PagingAndSortingRepository;
-import ru.befree.common.jpa.BatchStoreRepository;
+import org.springframework.stereotype.Repository;
 
-public interface AccountRepository extends PagingAndSortingRepository<Account, Long>, BatchStoreRepository<Account, Long> {
-    void generateAccount(String uuid);
+import java.util.UUID;
+
+@Repository
+public interface AccountRepository extends PagingAndSortingRepository<Account, Long>/*, BatchStoreRepository<Account, Long>*/ {
+    Account findAccountByUuid(UUID uuid);
 }

@@ -25,7 +25,6 @@ import javax.persistence.EntityManager;
 import java.io.Serializable;
 import java.util.List;
 
-@Repository
 public abstract class AbstractJPARepository<T, ID extends Serializable> implements JpaRepository<T, ID>,
         JpaSpecificationExecutor<T>, BatchStoreRepository<T, ID> {
 

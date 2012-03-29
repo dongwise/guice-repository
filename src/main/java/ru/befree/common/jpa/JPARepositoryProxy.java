@@ -12,12 +12,14 @@ package ru.befree.common.jpa;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.inject.Inject;
+import org.springframework.stereotype.Repository;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
+@Repository
 class JPARepositoryProxy implements InvocationHandler {
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/

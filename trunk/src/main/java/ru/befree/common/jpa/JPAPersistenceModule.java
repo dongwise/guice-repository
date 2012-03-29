@@ -10,12 +10,10 @@
 package ru.befree.common.jpa;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.matcher.Matchers;
 import com.google.inject.persist.jpa.JpaPersistModule;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 import java.lang.reflect.Method;
@@ -73,12 +71,23 @@ public abstract class JPAPersistenceModule extends AbstractModule {
         bind(JPAInitializer.class).asEagerSingleton();
 
 
-        MethodInterceptor interceptor = extractInterceptor(module);
-        bindInterceptor(Matchers.annotatedWith(Transactional.class), Matchers.any(), interceptor);
-        bindInterceptor(Matchers.any(), Matchers.annotatedWith(Transactional.class), interceptor);
+//        MethodInterceptor interceptor = extractInterceptor(module);
+//        bindInterceptor(Matchers.annotatedWith(Transactional.class), Matchers.any(), interceptor);
+//        bindInterceptor(Matchers.any(), Matchers.annotatedWith(Transactional.class), interceptor);
+/*
+        try {
+            bindInterceptor(Matchers.annotatedWith(Repository.class),
+                    Matchers.not(Matchers.identicalTo(JPARepositoryProxy2.class.getMethod("invoke", Object.class, Method.class, Object[].class))),
+                    new RepoMagicInterceptor(getProvider(EntityManager.class)));
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+*/
 //TODO: RepositoryFactorySupport.QueryExecutorMethodInterceptor
+
         bind(GenericJPARepository.class);
         bind(JPARepositoryProxy.class);
+        bind(JPARepositoryProxy2.class);
         configureRepositories();
         logger.info("Persistence configured");
     }

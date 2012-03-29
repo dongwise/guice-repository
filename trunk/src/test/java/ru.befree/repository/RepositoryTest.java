@@ -12,8 +12,6 @@ package ru.befree.repository;
 import com.google.inject.Inject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -28,8 +26,8 @@ public class RepositoryTest {
 /*===========================================[ CONSTRUCTORS ]===============*/
 /*===========================================[ CLASS METHODS ]==============*/
 
-    @Inject
-    private CustomerRepository customerRepository;
+//    @Inject
+//    private CustomerRepository customerRepository;
 
     @Inject
     private AccountRepository accountRepository;
@@ -39,12 +37,14 @@ public class RepositoryTest {
 
     @Test
     public void testRepo() {
+/*
         long count = customerRepository.count();
         customerRepository.save(new Customer("first", "second"));
         assertEquals(1, customerRepository.count());
 
         Page<Customer> all = customerRepository.findAll(new PageRequest(0, 100));
         assertEquals(1, all.getNumberOfElements());
+*/
 
         assertEquals(0, accountRepository.count());
         assertEquals(0, userRepository.count());
@@ -62,10 +62,9 @@ public class RepositoryTest {
         for (int i = 0; i < 10; i++) {
             accounts.add(new Account(String.valueOf(i)));
         }
-        accountRepository.storeInBatch(accounts);
-        assertEquals(10, accountRepository.count());
+//        accountRepository.storeInBatch(accounts);
+//        assertEquals(10, accountRepository.count());
 
-        accountRepository.generateAccount(UUID.randomUUID().toString());
-
+        accountRepository.findAccountByUuid(UUID.randomUUID());
     }
 }

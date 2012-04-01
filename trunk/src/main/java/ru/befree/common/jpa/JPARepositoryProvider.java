@@ -71,7 +71,8 @@ public class JPARepositoryProvider<R extends Repository> implements Provider<R> 
 
         context.registerBeanDefinition("entityManagerFactory",
                 BeanDefinitionBuilder.genericBeanDefinition(GuiceLocalEntityManagerFactoryBean.class).
-                        addConstructorArgValue(entityManagerFactoryProvider).getBeanDefinition());
+                        addConstructorArgValue(entityManagerFactoryProvider).
+                        addConstructorArgValue(entityManagerProvider).getBeanDefinition());
 
         context.registerBeanDefinition("transactionManager",
                 BeanDefinitionBuilder.genericBeanDefinition(JpaTransactionManager.class).getBeanDefinition());

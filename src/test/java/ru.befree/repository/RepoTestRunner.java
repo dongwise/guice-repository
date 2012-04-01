@@ -11,7 +11,7 @@ package ru.befree.repository;
 
 import org.junit.runners.model.InitializationError;
 import ru.befree.common.jpa.JPAPersistenceModule;
-import ru.befree.common.jpa.JPARepositoryProvider2;
+import ru.befree.common.jpa.JPARepositoryProvider;
 import ru.befree.common.test.GuiceTestRunner;
 
 
@@ -38,8 +38,8 @@ public class RepoTestRunner extends GuiceTestRunner {
                 });
 */
 
-                bind(UserRepository.class).toProvider(new JPARepositoryProvider2<UserRepository>());
-                bind(AccountRepository.class).toProvider(new JPARepositoryProvider2<AccountRepository>());
+                bind(UserRepository.class).toProvider(new JPARepositoryProvider<UserRepository>());
+                bind(AccountRepository.class).toProvider(new JPARepositoryProvider<AccountRepository>());
 /*
                 bind(AccountRepository.class).toProvider(new Provider<AccountRepository>() {
                     @Inject

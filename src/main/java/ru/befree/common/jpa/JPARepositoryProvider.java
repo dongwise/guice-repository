@@ -13,11 +13,16 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.inject.*;
 import org.apache.commons.lang3.Validate;
+import org.springframework.beans.factory.config.ConstructorArgumentValues;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
+import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
 import org.springframework.data.repository.Repository;
+import org.springframework.orm.jpa.JpaTransactionManager;
 
-import java.lang.reflect.Proxy;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 
-@Singleton
 public class JPARepositoryProvider<R extends Repository> implements Provider<R> {
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
@@ -26,7 +31,13 @@ public class JPARepositoryProvider<R extends Repository> implements Provider<R> 
     private Injector injector;
 
     private Class<? super R> repositoryClass;
-    private Class domainClass;
+
+    @Inject
+    private Provider<EntityManager> entityManagerProvider;
+
+
+    @Inject
+    private Provider<EntityManagerFactory> entityManagerFactoryProvider;
 
     /*===========================================[ CLASS METHODS ]==============*/
 
@@ -46,19 +57,53 @@ public class JPARepositoryProvider<R extends Repository> implements Provider<R> 
             }
             Validate.notNull(key, String.format("Unable to find provider binding for [%s]", toString()));
             repositoryClass = key.getTypeLiteral().getRawType();
-            domainClass = DomainClassExtractor.extact(repositoryClass);
         }
 
         System.out.println("repoClass = " + repositoryClass);
-        //TODO: сделать перехватчик отслеживающий все вызовы @Repository - если метода нет, то вызов соответствующего шаманства по генерации JPQL
-        //TODO:
-        /** TODO
-         * @Query
-         @Param
-         */
-        //TODO: assisted inject
-        JPARepositoryProxy proxy = injector.getInstance(JPARepositoryProxy.class);
-        proxy.configure(repositoryClass, domainClass);
-        return (R) Proxy.newProxyInstance(repositoryClass.getClassLoader(), new Class[]{repositoryClass}, proxy);
+
+//        JPARepositoryProxy2 proxy = injector.getInstance(JPARepositoryProxy2.class);
+//        proxy.configure(repositoryClass, domainClass);
+        //TODO: Caused by: java.lang.IllegalStateException: No persistence exception translators found in bean factory. Cannot perform exception translation.
+        //http://stackoverflow.com/questions/8434712/no-persistence-exception-translators-found-in-bean-factory-cannot-perform-excep
+
+        JpaRepositoryFactoryBean repoBean = new JpaRepositoryFactoryBean();
+        repoBean.setEntityManager(entityManagerProvider.get());
+        repoBean.setRepositoryInterface(repositoryClass);
+        GenericApplicationContext beanFactory = new GenericApplicationContext();
+        //TODO: for custom implementation
+//        bean.setCustomImplementation();
+
+        GenericBeanDefinition emBean = new GenericBeanDefinition();
+        emBean.setBeanClass(GuiceLocalEntityManagerFactoryBean.class);
+        emBean.setConstructorArgumentValues(new ConstructorArgumentValues() {
+            {
+                addGenericArgumentValue(entityManagerFactoryProvider);
+            }
+        });
+        beanFactory.registerBeanDefinition("entityManagerFactory", emBean);
+
+        GenericBeanDefinition tmBean = new GenericBeanDefinition();
+        tmBean.setBeanClass(JpaTransactionManager.class);
+        beanFactory.registerBeanDefinition("transactionManager", tmBean);
+
+        repoBean.setBeanFactory(beanFactory);
+        repoBean.afterPropertiesSet();
+
+//from doc
+//        Class<? extends R> repositoryClass = (Class<? extends R>) this.repositoryClass;
+//        RepositoryFactorySupport rfc = new JpaRepositoryFactory(entityManagerProvider.get());
+//        return rfc.getRepository(repositoryClass);
+
+/*
+
+        JpaRepositoryFactory jpaRepositoryFactory = new JpaRepositoryFactory(entityManagerProvider.get());
+        Class<? extends R> repositoryClass = (Class<? extends R>) this.repositoryClass;
+
+        R repository = jpaRepositoryFactory.getRepository(repositoryClass);
+//        return invocation.getMethod().invoke(repository, invocation.getArguments());
+
+*/
+        return (R) repoBean.getObject();
+//        return (R) Proxy.newProxyInstance(repositoryClass.getClassLoader(), new Class[]{repositoryClass}, proxy);
     }
 }

@@ -30,6 +30,9 @@ public class GuiceLocalEntityManagerFactoryBean extends LocalEntityManagerFactor
 
     @Override
     protected EntityManagerFactory createNativeEntityManagerFactory() throws PersistenceException {
-        return entityManagerFactory.get();
+        EntityManagerFactory emf = entityManagerFactory.get();
+        System.out.println(String.format("Accessing for emf: [%s], [%d], [%d]", Thread.currentThread().getName(), emf.hashCode(), emf.createEntityManager().hashCode()));
+        new Exception("BLABLAOUT").printStackTrace();
+        return emf;
     }
 }

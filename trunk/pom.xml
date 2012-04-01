@@ -19,6 +19,7 @@
 
         <version.converter-api>1.0.0</version.converter-api>
 
+        <spring.version>3.1.1.RELEASE</spring.version>
         <!-- Google stuff -->
 
         <version.guice>3.0</version.guice>
@@ -99,22 +100,24 @@
             <version>${version.commons-lang}</version>
         </dependency>
 
-        <dependency>
+      <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-jpa</artifactId>
             <version>${version.spring-data-jpa}</version>
-
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-jdbc</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-orm</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-orm</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
 
         <!-- JPA Stuff -->
 

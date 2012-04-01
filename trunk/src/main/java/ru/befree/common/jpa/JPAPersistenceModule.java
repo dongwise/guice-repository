@@ -69,38 +69,8 @@ public abstract class JPAPersistenceModule extends AbstractModule {
         install(module);
 
         bind(JPAInitializer.class).asEagerSingleton();
-
-
-//        MethodInterceptor interceptor = extractInterceptor(module);
-//        bindInterceptor(Matchers.annotatedWith(Transactional.class), Matchers.any(), interceptor);
-//        bindInterceptor(Matchers.any(), Matchers.annotatedWith(Transactional.class), interceptor);
-/*
-        try {
-            bindInterceptor(Matchers.annotatedWith(Repository.class),
-                    Matchers.not(Matchers.identicalTo(JPARepositoryProxy2.class.getMethod("invoke", Object.class, Method.class, Object[].class))),
-                    new RepoMagicInterceptor(getProvider(EntityManager.class)));
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-*/
-//TODO: RepositoryFactorySupport.QueryExecutorMethodInterceptor
-
-        bind(GenericJPARepository.class);
-        bind(JPARepositoryProxy.class);
-        bind(JPARepositoryProxy2.class);
         configureRepositories();
         logger.info("Persistence configured");
-    }
-
-    private MethodInterceptor extractInterceptor(JpaPersistModule module) {
-        try {
-            Class moduleClass = module.getClass();
-            Method method = moduleClass.getDeclaredMethod("getTransactionInterceptor");
-            method.setAccessible(true);
-            return (MethodInterceptor) method.invoke(module);
-        } catch (Exception e) {
-            throw new IllegalStateException("Unable to get transaction interceptor for JPAPersistenceModule instantiation", e);
-        }
     }
 
     protected abstract void configureRepositories();

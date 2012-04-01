@@ -13,6 +13,7 @@ import com.google.inject.Inject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import javax.persistence.EntityManager;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.UUID;
@@ -29,11 +30,13 @@ public class RepositoryTest {
 //    @Inject
 //    private CustomerRepository customerRepository;
 
-    @Inject
-    private AccountRepository accountRepository;
+//    @Inject
+//    private AccountRepository accountRepository;
 
     @Inject
     private UserRepository userRepository;
+    @Inject
+    private EntityManager entityManager;
 
     @Test
     public void testRepo() {
@@ -46,17 +49,23 @@ public class RepositoryTest {
         assertEquals(1, all.getNumberOfElements());
 */
 
-        assertEquals(0, accountRepository.count());
+//        assertEquals(0, accountRepository.count());
+        System.out.println("delete");
+        userRepository.deleteAll();
         assertEquals(0, userRepository.count());
 
         userRepository.save(new User(UUID.randomUUID().toString()));
+        userRepository.save(new User(UUID.randomUUID().toString()));
+        userRepository.save(new User(UUID.randomUUID().toString()));
+        //TODO: по каким то причинам не стартует транзакция
+        userRepository.deleteAll();
         assertEquals(1, userRepository.count());
 
-        accountRepository.save(new Account(UUID.randomUUID().toString()));
-        assertEquals(1, accountRepository.count());
+//        accountRepository.save(new Account(UUID.randomUUID().toString()));
+//        assertEquals(1, accountRepository.count());
 
-        accountRepository.deleteAll();
-        assertEquals(0, accountRepository.count());
+//        accountRepository.deleteAll();
+//        assertEquals(0, accountRepository.count());
 
         Collection<Account> accounts = new LinkedList<Account>();
         for (int i = 0; i < 10; i++) {
@@ -65,6 +74,6 @@ public class RepositoryTest {
 //        accountRepository.storeInBatch(accounts);
 //        assertEquals(10, accountRepository.count());
 
-        accountRepository.findAccountByUuid(UUID.randomUUID());
+//        accountRepository.findAccountByUuid(UUID.randomUUID());
     }
 }

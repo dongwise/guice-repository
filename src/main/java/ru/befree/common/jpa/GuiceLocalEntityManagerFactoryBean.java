@@ -12,7 +12,9 @@ package ru.befree.common.jpa;
 import com.google.inject.Provider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.orm.jpa.EntityManagerHolder;
 import org.springframework.orm.jpa.LocalEntityManagerFactoryBean;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import javax.persistence.*;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -45,7 +47,16 @@ public class GuiceLocalEntityManagerFactoryBean extends LocalEntityManagerFactor
         EntityManagerFactory emf = entityManagerFactoryProvider.get();
         EntityManager entityManager = entityManagerProvider.get();
         logger.info(String.format("Accessing: factory=[%d], em=[%d]", emf.hashCode(), entityManager.hashCode()));
+
+//        return entityManagerFactoryProvider.get();
         return new EntityManaderFactoryProxy(entityManagerFactoryProvider.get(), entityManagerProvider);
+    }
+
+    @Override
+    protected EntityManagerFactory createEntityManagerFactoryProxy(EntityManagerFactory emf) {
+        EntityManagerFactory entityManagerFactoryProxy = super.createEntityManagerFactoryProxy(emf);
+        TransactionSynchronizationManager.bindResource(entityManagerFactoryProxy, new EntityManagerHolder(entityManagerProvider.get()));
+        return entityManagerFactoryProxy;
     }
 
     private static class EntityManaderFactoryProxy implements EntityManagerFactory {

@@ -10,7 +10,6 @@
 package ru.befree.repository;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -34,7 +33,7 @@ public class RepositoryTest {
 //    private AccountRepository accountRepository;
 
     @Inject
-    private Provider<UserRepository> userRepository;
+    private UserRepository userRepository;
 
     @Test
     public void testRepo() {
@@ -49,16 +48,16 @@ public class RepositoryTest {
 
 //        assertEquals(0, accountRepository.count());
         System.out.println("delete");
-        userRepository.get().deleteAll();
+        userRepository.deleteAll();
         System.out.println("count");
-        assertEquals(0, userRepository.get().count());
+        assertEquals(0, userRepository.count());
 
-        userRepository.get().save(new User(UUID.randomUUID().toString()));
-        userRepository.get().save(new User(UUID.randomUUID().toString()));
-        userRepository.get().save(new User(UUID.randomUUID().toString()));
+        userRepository.save(new User(UUID.randomUUID().toString()));
+        userRepository.save(new User(UUID.randomUUID().toString()));
+        userRepository.save(new User(UUID.randomUUID().toString()));
         //TODO: по каким то причинам не стартует транзакция
-        userRepository.get().deleteAll();
-        assertEquals(1, userRepository.get().count());
+        userRepository.deleteAll();
+        assertEquals(1, userRepository.count());
 
 //        accountRepository.save(new Account(UUID.randomUUID().toString()));
 //        assertEquals(1, accountRepository.count());

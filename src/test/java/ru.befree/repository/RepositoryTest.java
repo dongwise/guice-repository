@@ -10,12 +10,18 @@
 package ru.befree.repository;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.junit.Assert.assertEquals;
 
@@ -33,10 +39,10 @@ public class RepositoryTest {
 //    private AccountRepository accountRepository;
 
     @Inject
-    private UserRepository userRepository;
+    private Provider<UserRepository> userRepositoryProvider;
 
     @Test
-    public void testRepo() {
+    public void testRepo() throws Exception {
 /*
         long count = customerRepository.count();
         customerRepository.save(new Customer("first", "second"));
@@ -46,18 +52,43 @@ public class RepositoryTest {
         assertEquals(1, all.getNumberOfElements());
 */
 
+        UserRepository userRepository = userRepositoryProvider.get();
 //        assertEquals(0, accountRepository.count());
-        System.out.println("delete");
         userRepository.deleteAll();
-        System.out.println("count");
         assertEquals(0, userRepository.count());
 
-        userRepository.save(new User(UUID.randomUUID().toString()));
-        userRepository.save(new User(UUID.randomUUID().toString()));
-        userRepository.save(new User(UUID.randomUUID().toString()));
-        //TODO: по каким то причинам не стартует транзакция
+        userRepository.save(new User("john", "smith", 42));
+        userRepository.save(new User("alex", "johns", 33));
+        userRepository.save(new User("sam", "brown", 22));
+        assertEquals(3, userRepositoryProvider.get().count());
+
+        Page<User> users = userRepository.findAll(new PageRequest(0, 100));
+        assertEquals(3, users.getNumberOfElements());
+
+
+
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.invokeAll(Arrays.asList(Executors.callable(new Runnable() {
+            public void run() {
+                try {
+                    System.out.println("Start concurrent thread");
+                    UserRepository anotherRepo = userRepositoryProvider.get();
+                    System.out.println("count");
+                    assertEquals(3, anotherRepo.count());
+                    System.out.println("save");
+                    anotherRepo.save(new User(UUID.randomUUID().toString(), UUID.randomUUID().toString(), 10));
+                    assertEquals(4, anotherRepo.count());
+                    System.out.println("Stored 4");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        })));
+
+        System.out.println("After");
+        assertEquals(4, userRepository.count());
         userRepository.deleteAll();
-        assertEquals(1, userRepository.count());
+        assertEquals(0, userRepository.count());
 
 //        accountRepository.save(new Account(UUID.randomUUID().toString()));
 //        assertEquals(1, accountRepository.count());

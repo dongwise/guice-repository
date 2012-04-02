@@ -89,13 +89,15 @@ public class JPARepositoryProvider<R extends Repository> implements Provider<R> 
 //        repoBean.setBeanFactory(beanFactory);
 //        return repoBean;
 
-
         return context;
     }
 
     public R get() {
+        System.out.println("GET & BIND");
         EntityManager entityManager = entityManagerProvider.get();
         EntityManagerFactory entityManagerFactory = entityManagerFactoryProvider.get();
+//        TransactionSynchronizationManager.bindResource(entityManagerFactory, new EntityManagerHolder(entityManagerProvider.get()));
+
         //TODO !!!DIFFERENT EMs - тут у нас разные EM - на этапе порождения ставим одного, а на этап для транзакции делается из GuiceLocalEM...Bean, там делается просто new а не инъекция
         logger.info(String.format("Accessing.get: factory=[%d], em=[%d]", entityManagerFactory.hashCode(), entityManager.hashCode()));
 

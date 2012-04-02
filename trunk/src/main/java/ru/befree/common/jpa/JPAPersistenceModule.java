@@ -11,12 +11,10 @@ package ru.befree.common.jpa;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.persist.jpa.JpaPersistModule;
-import org.aopalliance.intercept.MethodInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.util.Properties;
 
 public abstract class JPAPersistenceModule extends AbstractModule {
@@ -57,10 +55,11 @@ public abstract class JPAPersistenceModule extends AbstractModule {
             try {
                 props.load(fin);
             } catch (Exception e) {
-                throw new RuntimeException("Error reading properties file:" + propFileName);
+                logger.error("Error", e);
+                throw new RuntimeException("Error reading properties file: " + propFileName);
             }
         } else {
-            throw new RuntimeException("Properties file not found:" + propFileName);
+            throw new RuntimeException("Properties file not found: " + propFileName);
         }
 
         JpaPersistModule module = new JpaPersistModule(jpaUnitName);

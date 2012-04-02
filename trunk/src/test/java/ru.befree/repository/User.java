@@ -13,21 +13,56 @@ import javax.persistence.*;
 
 @Entity
 public class User {
-/*===========================================[ STATIC VARIABLES ]=============*/
-/*===========================================[ INSTANCE VARIABLES ]=========*/
-/*===========================================[ CONSTRUCTORS ]===============*/
-/*===========================================[ CLASS METHODS ]==============*/
-@Id
-@GeneratedValue(strategy = GenerationType.AUTO)
-private Long id;
+
+    /*===========================================[ INSTANCE VARIABLES ]=========*/
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
     @Column
-    private String uuid;
+    private int age;
 
-    public User(String uuid) {
-        this.uuid = uuid;
-    }
+    @Column
+    private String name;
+
+    @Column
+    private String surname;
+
+    /*===========================================[ CONSTRUCTORS ]===============*/
 
     public User() {
+    }
+
+    public User(String name, String surname, int age) {
+        this.name = name;
+        this.surname = surname;
+        this.age = age;
+    }
+
+    /*===========================================[ CLASS METHODS ]==============*/
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
     }
 }

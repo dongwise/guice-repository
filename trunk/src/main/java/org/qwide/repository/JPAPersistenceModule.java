@@ -7,7 +7,7 @@
  ****************************************************************************/
 
 
-package org.qwide.jpa;
+package org.qwide.repository;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.persist.jpa.JpaPersistModule;

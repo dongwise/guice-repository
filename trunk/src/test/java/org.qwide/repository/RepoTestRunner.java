@@ -10,8 +10,6 @@
 package org.qwide.repository;
 
 import org.junit.runners.model.InitializationError;
-import org.qwide.jpa.JPAPersistenceModule;
-import org.qwide.jpa.JPARepositoryProvider;
 import org.qwide.common.test.GuiceTestRunner;
 
 

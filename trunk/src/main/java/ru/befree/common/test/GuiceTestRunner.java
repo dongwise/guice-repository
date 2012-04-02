@@ -26,6 +26,7 @@ import java.util.List;
 public class GuiceTestRunner extends BlockJUnit4ClassRunner {
     private final Injector injector;
 
+
     /**
      * Creates a new GuiceTestRunner.
      *

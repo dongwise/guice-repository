@@ -7,12 +7,12 @@
  ****************************************************************************/
 
 
-package org.gwide.repository;
+package org.qwide.repository;
 
 import org.junit.runners.model.InitializationError;
-import org.gwide.jpa.JPAPersistenceModule;
-import org.gwide.jpa.JPARepositoryProvider;
-import org.gwide.common.test.GuiceTestRunner;
+import org.qwide.jpa.JPAPersistenceModule;
+import org.qwide.jpa.JPARepositoryProvider;
+import org.qwide.common.test.GuiceTestRunner;
 
 
 public class RepoTestRunner extends GuiceTestRunner {

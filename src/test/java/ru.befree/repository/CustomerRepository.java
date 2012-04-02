@@ -6,7 +6,7 @@
  __DESCRIPTION...:
  ****************************************************************************/
 
-package org.gwide.repository;
+package org.qwide.repository;
 
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.PagingAndSortingRepository;

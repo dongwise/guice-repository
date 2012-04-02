@@ -10,7 +10,7 @@
  ________________:31.01.12 Alexey Krylov AKA LexX: created.
  ****************************************************************************/
 
-package org.gwide.common.test;
+package org.qwide.common.test;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;

@@ -7,9 +7,9 @@
  ****************************************************************************/
 
 
-package org.gwide.repository;
+package org.qwide.repository;
 
-import org.gwide.jpa.JPAPersistenceModule;
+import org.qwide.jpa.JPAPersistenceModule;
 
 public class CustomPersistenceModule extends JPAPersistenceModule {
 /*===========================================[ STATIC VARIABLES ]=============*/

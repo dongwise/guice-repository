@@ -7,7 +7,7 @@
  ****************************************************************************/
 
 
-package org.gwide.repository;
+package org.qwide.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;

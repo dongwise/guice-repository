@@ -17,7 +17,7 @@
  */
 
 
-package org.gwide.jpa;
+package org.qwide.jpa;
 
 import com.google.inject.Provider;
 import org.springframework.orm.jpa.LocalEntityManagerFactoryBean;

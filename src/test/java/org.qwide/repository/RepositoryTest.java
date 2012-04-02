@@ -96,10 +96,7 @@ public class RepositoryTest {
 //        accountRepository.deleteAll();
 //        assertEquals(0, accountRepository.count());
 
-        Collection<Account> accounts = new LinkedList<Account>();
-        for (int i = 0; i < 10; i++) {
-            accounts.add(new Account(String.valueOf(i)));
-        }
+
 //        accountRepository.storeInBatch(accounts);
 //        assertEquals(10, accountRepository.count());
 

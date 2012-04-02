@@ -17,7 +17,7 @@
  */
 
 
-package ru.befree.common.jpa;
+package org.befree.common.jpa;
 
 import com.google.inject.Provider;
 import org.springframework.orm.jpa.LocalEntityManagerFactoryBean;

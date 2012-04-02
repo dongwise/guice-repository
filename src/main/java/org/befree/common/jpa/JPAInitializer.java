@@ -7,7 +7,7 @@
  ****************************************************************************/
 
 
-package ru.befree.common.jpa;
+package org.befree.common.jpa;
 
 import com.google.inject.Inject;
 import com.google.inject.persist.PersistService;

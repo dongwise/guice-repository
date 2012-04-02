@@ -35,31 +35,30 @@
         <module.encoding>UTF-8</module.encoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <spring.version>3.1.1.RELEASE</spring.version>
+
         <!-- Google stuff -->
 
         <version.guice>3.0</version.guice>
         <version.google-guava>11.0.2</version.google-guava>
-        <version.guice-assisted-inject>2.0</version.guice-assisted-inject>
 
         <!-- Logging -->
-
 
         <version.logback>1.0.0</version.logback>
         <version.slf4j>1.6.4</version.slf4j>
 
-        <!-- Test stuff -->
 
-        <version.mockito>1.9.0</version.mockito>
+        <!-- Spring stuff -->
 
-        <!-- JPA -->
-
+        <spring.version>3.1.1.RELEASE</spring.version>
         <version.spring-data-jpa>1.0.3.RELEASE</version.spring-data-jpa>
 
-        <!-- Commons -->
+        <!-- Persistence implementation API -->
 
-        <version.commons-lang>3.1</version.commons-lang>
         <version.hibernate>3.6.10.Final</version.hibernate>
+
+        <!-- Test stuff -->
+
+        <version.junit>4.5</version.junit>
         <version.h2>1.3.164</version.h2>
     </properties>
 
@@ -70,6 +69,26 @@
     </scm>
 
     <dependencies>
+
+        <!-- Google Stuff -->
+
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+            <version>${version.guice}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-persist</artifactId>
+            <version>${version.guice}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${version.google-guava}</version>
+        </dependency>
 
         <!-- Logging -->
 
@@ -91,31 +110,7 @@
             <version>${version.slf4j}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jul-to-slf4j</artifactId>
-            <version>${version.slf4j}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-            <version>${version.slf4j}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>log4j-over-slf4j</artifactId>
-            <version>${version.slf4j}</version>
-        </dependency>
-
-        <!-- Commons -->
-
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>${version.commons-lang}</version>
-        </dependency>
+        <!-- Spring stuff -->
 
       <dependency>
             <groupId>org.springframework.data</groupId>
@@ -135,8 +130,24 @@
             <version>${spring.version}</version>
         </dependency>
 
+        <!-- Persistence API -->
 
-        <!-- JPA Stuff -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>${version.hibernate}</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- Testing stuff -->
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${version.junit}</version>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -147,66 +158,10 @@
         </dependency>
 
         <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-entitymanager</artifactId>
-            <version>${version.hibernate}</version>
-            <type>jar</type>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <version>${version.h2}</version>
             <scope>test</scope>
-        </dependency>
-
-        <!-- Google Stuff -->
-
-        <dependency>
-            <groupId>com.google.inject</groupId>
-            <artifactId>guice</artifactId>
-            <version>${version.guice}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.inject.extensions</groupId>
-            <artifactId>guice-persist</artifactId>
-            <version>${version.guice}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.inject.extensions</groupId>
-            <artifactId>guice-jmx</artifactId>
-            <version>${version.guice}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.inject.extensions</groupId>
-            <artifactId>guice-servlet</artifactId>
-            <version>${version.guice}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.inject.extensions</groupId>
-            <artifactId>guice-assisted-inject</artifactId>
-            <version>${version.guice-assisted-inject}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${version.google-guava}</version>
-        </dependency>
-
-        <!-- Testing stuff -->
-
-
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.5</version>
-            <scope>compile</scope>
         </dependency>
 
     </dependencies>
@@ -215,6 +170,7 @@
         <plugins>
 
             <!-- Bundle sources -->
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>

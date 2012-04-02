@@ -7,9 +7,9 @@
  ****************************************************************************/
 
 
-package ru.befree.repository;
+package org.gwide.repository;
 
-import ru.befree.common.jpa.JPAPersistenceModule;
+import org.gwide.jpa.JPAPersistenceModule;
 
 public class CustomPersistenceModule extends JPAPersistenceModule {
 /*===========================================[ STATIC VARIABLES ]=============*/

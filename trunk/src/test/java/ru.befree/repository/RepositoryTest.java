@@ -7,7 +7,7 @@
  ****************************************************************************/
 
 
-package ru.befree.repository;
+package org.gwide.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;

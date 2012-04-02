@@ -28,6 +28,7 @@
 
         <!-- Logging -->
 
+
         <version.logback>1.0.0</version.logback>
         <version.slf4j>1.6.4</version.slf4j>
 

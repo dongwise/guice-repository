@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-
 package org.qwide.repository;
 
 import com.google.inject.Provider;

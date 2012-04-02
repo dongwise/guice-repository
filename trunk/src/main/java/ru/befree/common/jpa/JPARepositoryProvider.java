@@ -86,13 +86,14 @@ public class JPARepositoryProvider<R extends Repository> implements Provider<R> 
         System.out.println("GET & BIND");
         EntityManager entityManager = entityManagerProvider.get();
         EntityManagerFactory entityManagerFactory = entityManagerFactoryProvider.get();
-//        TransactionSynchronizationManager.bindResource(entityManagerFactory, new EntityManagerHolder(entityManagerProvider.get()));
 
+        // Setup new ThreadLocal entityManager instance
         GuiceLocalEntityManagerFactoryBean entityManagerFactoryBean = context.getBean(GuiceLocalEntityManagerFactoryBean.class);
         EntityManagerFactory proxiedEmf = entityManagerFactoryBean.getObject();
         if (TransactionSynchronizationManager.hasResource(proxiedEmf)) {
             TransactionSynchronizationManager.unbindResource(proxiedEmf);
         }
+
         TransactionSynchronizationManager.bindResource(proxiedEmf, new EntityManagerHolder(entityManagerProvider.get()));
 
 
@@ -102,6 +103,11 @@ public class JPARepositoryProvider<R extends Repository> implements Provider<R> 
 //        bean.setCustomImplementation();
 
         //TODO: EM закрывается по первой транзакции и не пересоздается....
+
+        /**
+         * Some instantiation example is here:
+         * https://jira.springsource.org/browse/DATAJPA-69
+         */
         JpaRepositoryFactoryBean factory = new JpaRepositoryFactoryBean();
         factory.setEntityManager(entityManager);
         factory.setRepositoryInterface(repositoryClass);

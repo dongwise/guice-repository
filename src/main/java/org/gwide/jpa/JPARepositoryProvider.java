@@ -7,7 +7,7 @@
  ****************************************************************************/
 
 
-package org.gwide.common.jpa;
+package org.gwide.jpa;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;

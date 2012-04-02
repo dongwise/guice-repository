@@ -7,7 +7,7 @@
  ****************************************************************************/
 
 
-package org.befree.common.jpa;
+package org.gwide.common.jpa;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.persist.jpa.JpaPersistModule;

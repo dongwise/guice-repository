@@ -8,7 +8,7 @@
     <packaging>jar</packaging>
     <name>Guice Repository</name>
     <version>1.0-SNAPSHOT</version>
-    <description>A Java framework to parse command line options with annotations.</description>
+    <description>Repository pattern implementation for Google Guice based on spring-data-jpa codebase.</description>
     <url>http://code.google.com/p/guice-repository</url>
     <licenses>
         <license>
@@ -321,22 +321,6 @@
             </plugin>
         </plugins>
     </build>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <version>6.1.1</version>
-            <type>jar</type>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <artifactId>jcommander</artifactId>
-                    <groupId>com.beust</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-    </dependencies>
 
     <profiles>
 

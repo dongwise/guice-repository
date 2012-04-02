@@ -14,7 +14,6 @@ import com.google.inject.Provider;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import javax.persistence.EntityManager;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.UUID;
@@ -51,6 +50,7 @@ public class RepositoryTest {
 //        assertEquals(0, accountRepository.count());
         System.out.println("delete");
         userRepository.get().deleteAll();
+        System.out.println("count");
         assertEquals(0, userRepository.get().count());
 
         userRepository.get().save(new User(UUID.randomUUID().toString()));

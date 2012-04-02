@@ -10,6 +10,8 @@
 package ru.befree.common.jpa;
 
 import com.google.inject.Provider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.orm.jpa.LocalEntityManagerFactoryBean;
 
 import javax.persistence.*;
@@ -18,39 +20,47 @@ import javax.persistence.metamodel.Metamodel;
 import java.util.Map;
 
 public class GuiceLocalEntityManagerFactoryBean extends LocalEntityManagerFactoryBean {
-    private static final long serialVersionUID = -3873649039969409357L;
+
     /*===========================================[ STATIC VARIABLES ]=============*/
-/*===========================================[ INSTANCE VARIABLES ]=========*/
+
+    private static final long serialVersionUID = -3873649039969409357L;
+    private static final Logger logger = LoggerFactory.getLogger(GuiceLocalEntityManagerFactoryBean.class);
+
+    /*===========================================[ INSTANCE VARIABLES ]=========*/
+
     private Provider<EntityManagerFactory> entityManagerFactoryProvider;
     private Provider<EntityManager> entityManagerProvider;
 
-/*===========================================[ CONSTRUCTORS ]===============*/
-/*===========================================[ CLASS METHODS ]==============*/
+    /*===========================================[ CONSTRUCTORS ]===============*/
 
     public GuiceLocalEntityManagerFactoryBean(Provider<EntityManagerFactory> entityManagerFactoryProvider, Provider<EntityManager> entityManagerProvider) {
         this.entityManagerFactoryProvider = entityManagerFactoryProvider;
         this.entityManagerProvider = entityManagerProvider;
     }
 
+    /*===========================================[ CLASS METHODS ]==============*/
+
     @Override
     protected EntityManagerFactory createNativeEntityManagerFactory() throws PersistenceException {
         EntityManagerFactory emf = entityManagerFactoryProvider.get();
-        System.out.println(String.format("Accessing for emf: [%s], [%d], [%d], new [%d]", Thread.currentThread().getName(), emf.hashCode(), emf.createEntityManager().hashCode(), entityManagerProvider.get().hashCode()));
-        return new EntityManaderFactoryProxy(entityManagerFactoryProvider.get(), entityManagerProvider.get());
+        EntityManager entityManager = entityManagerProvider.get();
+        logger.info(String.format("Accessing: factory=[%d], em=[%d]", emf.hashCode(), entityManager.hashCode()));
+        return new EntityManaderFactoryProxy(entityManagerFactoryProvider.get(), entityManagerProvider);
     }
 
-
-    private static class EntityManaderFactoryProxy implements EntityManagerFactory{
+    private static class EntityManaderFactoryProxy implements EntityManagerFactory {
         private EntityManagerFactory entityManagerFactory;
-        private EntityManager entityManager;
+        private Provider<EntityManager> entityManager;
 
-        private EntityManaderFactoryProxy(EntityManagerFactory entityManagerFactory, EntityManager entityManager) {
+        private EntityManaderFactoryProxy(EntityManagerFactory entityManagerFactory, Provider<EntityManager> entityManager) {
             this.entityManagerFactory = entityManagerFactory;
             this.entityManager = entityManager;
         }
 
         public EntityManager createEntityManager() {
-            return entityManager;
+            EntityManager em = entityManager.get();
+            logger.info("Create EM: "+em.hashCode());
+            return em;
         }
 
         public EntityManager createEntityManager(Map map) {
@@ -85,4 +95,11 @@ public class GuiceLocalEntityManagerFactoryBean extends LocalEntityManagerFactor
             return entityManagerFactory.getPersistenceUnitUtil();
         }
     }
+
+    @Override
+    public void destroy() {
+        super.destroy();
+        logger.info("Destroy called");
+    }
+
 }

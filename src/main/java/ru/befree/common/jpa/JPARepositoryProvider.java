@@ -13,6 +13,8 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.inject.*;
 import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
@@ -25,6 +27,8 @@ import javax.persistence.EntityManagerFactory;
 
 public class JPARepositoryProvider<R extends Repository> implements Provider<R> {
 
+    private static final Logger logger = LoggerFactory.getLogger(JPARepositoryProvider.class);
+
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
     private Class<? extends R> repositoryClass;
@@ -32,6 +36,7 @@ public class JPARepositoryProvider<R extends Repository> implements Provider<R> 
     private ApplicationContext context;
 //    private RepositoryFactoryBeanSupport repoBean;
     private Provider<EntityManager> entityManagerProvider;
+
 
 
     /*===========================================[ CLASS METHODS ]==============*/
@@ -90,10 +95,11 @@ public class JPARepositoryProvider<R extends Repository> implements Provider<R> 
 
     public R get() {
         EntityManager entityManager = entityManagerProvider.get();
-        EntityManager entityManager1 = entityManagerProvider.get();
-        System.out.println(String.format("em0: %d, em1: %d", entityManager.hashCode(), entityManager1.hashCode()));
+        EntityManagerFactory entityManagerFactory = entityManagerFactoryProvider.get();
         //TODO !!!DIFFERENT EMs - тут у нас разные EM - на этапе порождения ставим одного, а на этап для транзакции делается из GuiceLocalEM...Bean, там делается просто new а не инъекция
-        System.out.println(String.format("Accessing for emf2: [%s], [%d], [%d], new [%d]", Thread.currentThread().getName(), entityManagerFactoryProvider.get().hashCode(), entityManager.hashCode(), entityManagerFactoryProvider.get().createEntityManager().hashCode()));
+        logger.info(String.format("Accessing.get: factory=[%d], em=[%d]", entityManagerFactory.hashCode(), entityManager.hashCode()));
+
+        //TODO: EM закрывается по первой транзакции и не пересоздается....
         JpaRepositoryFactoryBean factory = new JpaRepositoryFactoryBean();
         factory.setEntityManager(entityManager);
         factory.setRepositoryInterface(repositoryClass);

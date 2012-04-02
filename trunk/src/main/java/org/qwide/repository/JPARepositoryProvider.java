@@ -96,7 +96,7 @@ public class JPARepositoryProvider<R extends Repository> implements Provider<R> 
     }
 
     public R get() {
-        System.out.println("GET & BIND "+ hashCode());
+//        System.out.println("GET & BIND "+ hashCode());
         EntityManager entityManager = entityManagerProvider.get();
         EntityManagerFactory entityManagerFactory = entityManagerFactoryProvider.get();
 
@@ -110,7 +110,7 @@ public class JPARepositoryProvider<R extends Repository> implements Provider<R> 
         TransactionSynchronizationManager.bindResource(proxiedEmf, new EntityManagerHolder(entityManagerProvider.get()));
 
 
-        logger.info(String.format("Accessing.get: factory=[%d], em=[%d]", entityManagerFactory.hashCode(), entityManager.hashCode()));
+//        logger.info(String.format("Accessing.get: factory=[%d], em=[%d]", entityManagerFactory.hashCode(), entityManager.hashCode()));
 
         //TODO: for custom implementation
 //        bean.setCustomImplementation();
@@ -122,9 +122,9 @@ public class JPARepositoryProvider<R extends Repository> implements Provider<R> 
          * https://jira.springsource.org/browse/DATAJPA-69
          */
         JpaRepositoryFactoryBean factory = new JpaRepositoryFactoryBean();
+        factory.setBeanFactory(context);
         factory.setEntityManager(entityManager);
         factory.setRepositoryInterface(repositoryClass);
-        factory.setBeanFactory(context);
         factory.afterPropertiesSet();
 
         return (R) factory.getObject();

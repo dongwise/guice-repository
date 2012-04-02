@@ -6,7 +6,7 @@
  __DESCRIPTION...:
  ****************************************************************************/
 
-package org.qwide.jpa;
+package org.qwide.repository;
 
 import org.springframework.data.repository.Repository;
 

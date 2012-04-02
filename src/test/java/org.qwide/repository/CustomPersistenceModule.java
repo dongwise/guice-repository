@@ -9,8 +9,6 @@
 
 package org.qwide.repository;
 
-import org.qwide.jpa.JPAPersistenceModule;
-
 public class CustomPersistenceModule extends JPAPersistenceModule {
 /*===========================================[ STATIC VARIABLES ]=============*/
 /*===========================================[ INSTANCE VARIABLES ]=========*/

@@ -6,7 +6,7 @@
  __DESCRIPTION...:
  ****************************************************************************/
 
-package ru.befree.common.jpa;
+package org.befree.common.jpa;
 
 import org.springframework.data.repository.Repository;
 

@@ -7,7 +7,7 @@
  ****************************************************************************/
 
 
-package ru.befree.common.jpa;
+package org.befree.common.jpa;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;

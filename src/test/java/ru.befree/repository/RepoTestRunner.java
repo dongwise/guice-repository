@@ -7,12 +7,12 @@
  ****************************************************************************/
 
 
-package ru.befree.repository;
+package org.gwide.repository;
 
 import org.junit.runners.model.InitializationError;
-import ru.befree.common.jpa.JPAPersistenceModule;
-import ru.befree.common.jpa.JPARepositoryProvider;
-import ru.befree.common.test.GuiceTestRunner;
+import org.gwide.jpa.JPAPersistenceModule;
+import org.gwide.jpa.JPARepositoryProvider;
+import org.gwide.common.test.GuiceTestRunner;
 
 
 public class RepoTestRunner extends GuiceTestRunner {

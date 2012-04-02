@@ -6,7 +6,7 @@
  __DESCRIPTION...:
  ****************************************************************************/
 
-package ru.befree.repository;
+package org.gwide.repository;
 
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.PagingAndSortingRepository;

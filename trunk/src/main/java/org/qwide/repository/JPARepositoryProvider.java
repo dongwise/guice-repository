@@ -21,7 +21,6 @@ package org.qwide.repository;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.inject.*;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -37,6 +36,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 public class JPARepositoryProvider<R extends Repository> implements Provider<R> {
+
+    /*===========================================[ STATIC VARIABLES ]=============*/
 
     private static final Logger logger = LoggerFactory.getLogger(JPARepositoryProvider.class);
 
@@ -69,7 +70,10 @@ public class JPARepositoryProvider<R extends Repository> implements Provider<R> 
             }
         }
 
-        Validate.notNull(key, String.format("Unable to find provider binding for [%s]", toString()));
+        if (key == null) {
+            throw new IllegalStateException(String.format("Unable to find provider binding for [%s]", toString()));
+        }
+
         repositoryClass = key.getTypeLiteral().getRawType();
         return repositoryClass;
     }
@@ -92,7 +96,7 @@ public class JPARepositoryProvider<R extends Repository> implements Provider<R> 
     }
 
     public R get() {
-        System.out.println("GET & BIND");
+        System.out.println("GET & BIND "+ hashCode());
         EntityManager entityManager = entityManagerProvider.get();
         EntityManagerFactory entityManagerFactory = entityManagerFactoryProvider.get();
 

@@ -31,20 +31,25 @@ public class ScanningJPAPersistenceModule extends JPAPersistenceModule {
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
-    private String scanTargetPackage;
+    private String targetScanPackage;
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
-    public ScanningJPAPersistenceModule(String scanTargetPackage, String... jpaUnitName) {
-        super(jpaUnitName);
-        this.scanTargetPackage =scanTargetPackage;
+    /**
+     *
+     * @param targetScanPackage package to scan for repositories.
+     * @param persistenceUnitName
+     */
+    public ScanningJPAPersistenceModule(String targetScanPackage, String... persistenceUnitName) {
+        super(persistenceUnitName);
+        this.targetScanPackage = targetScanPackage;
 
     }
     /*===========================================[ CLASS METHODS ]==============*/
 
     @Override
     protected void configureRepositories() {
-        Reflections reflections = new Reflections(scanTargetPackage);
+        Reflections reflections = new Reflections(targetScanPackage);
         Set<Class<?>> repositoryClasses = new HashSet<Class<?>>();
 
         repositoryClasses.addAll(reflections.getTypesAnnotatedWith(Repository.class));

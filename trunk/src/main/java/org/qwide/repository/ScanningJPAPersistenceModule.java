@@ -22,6 +22,7 @@ import org.reflections.Reflections;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -46,7 +47,7 @@ public class ScanningJPAPersistenceModule extends JPAPersistenceModule {
         Reflections reflections = new Reflections(scanTargetPackage);
         Set<Class<?>> repositoryClasses = new HashSet<Class<?>>();
 
-//        repositoryClasses.addAll(reflections.getTypesAnnotatedWith(Repository.class));
+        repositoryClasses.addAll(reflections.getTypesAnnotatedWith(Repository.class));
         repositoryClasses.addAll(reflections.getSubTypesOf(org.springframework.data.repository.Repository.class));
         repositoryClasses.addAll(reflections.getSubTypesOf(CrudRepository.class));
         repositoryClasses.addAll(reflections.getSubTypesOf(PagingAndSortingRepository.class));

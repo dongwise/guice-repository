@@ -18,16 +18,21 @@
 
 package org.qwide.repository;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
-@org.springframework.stereotype.Repository
-public class BatchStoreRepositoryImpl<T, ID extends Serializable> extends SimpleJpaRepository<T, ID> implements BatchStoreRepository<T> {
+public class SimpleBatchStoreJPARepository<T, ID extends Serializable> extends SimpleJpaRepository<T, ID> implements
+        BatchStoreRepository<T> {
+
+    private static final Logger logger = LoggerFactory.getLogger(SimpleBatchStoreJPARepository.class);
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
@@ -35,12 +40,12 @@ public class BatchStoreRepositoryImpl<T, ID extends Serializable> extends Simple
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
-    public BatchStoreRepositoryImpl(JpaEntityInformation<T, ?> entityInformation, EntityManager entityManager) {
+    public SimpleBatchStoreJPARepository(JpaEntityInformation<T, ?> entityInformation, EntityManager entityManager) {
         super(entityInformation, entityManager);
         em = entityManager;
     }
 
-    public BatchStoreRepositoryImpl(Class<T> domainClass, EntityManager em) {
+    public SimpleBatchStoreJPARepository(Class<T> domainClass, EntityManager em) {
         super(domainClass, em);
         this.em = em;
     }
@@ -54,8 +59,18 @@ public class BatchStoreRepositoryImpl<T, ID extends Serializable> extends Simple
         }
     }
 
-    @Transactional
     private List<T> doSave(Iterable<T> entities) {
-        return save(entities);
+        EntityTransaction transaction = em.getTransaction();
+        List<T> saved = new ArrayList<T>(0);
+        try {
+            transaction.begin();
+            saved = save(entities);
+            transaction.commit();
+        } catch (Exception e) {
+            logger.error("Error", e);
+            transaction.rollback();
+        }
+        return saved;
+
     }
 }

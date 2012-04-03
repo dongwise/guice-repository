@@ -7,7 +7,7 @@
  ****************************************************************************/
 
 
-package org.qwide.repository;
+package org.guice.repository;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;

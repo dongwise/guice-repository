@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.qwide.repository;
+package org.guice.repository;
 
 import com.google.inject.Provider;
 import org.springframework.orm.jpa.LocalEntityManagerFactoryBean;

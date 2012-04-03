@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.qwide.repository;
+package org.guice.repository;
 
 import org.reflections.Reflections;
 import org.springframework.data.jpa.repository.JpaRepository;

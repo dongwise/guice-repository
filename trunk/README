@@ -1,4 +1,3 @@
 TODO: JUnit test all possible spring-data-jpa features
 TODO: test for batch store
 TODO: remove batch repo
-TODO: @Repository implementations package autosearcher

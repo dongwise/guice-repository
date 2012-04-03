@@ -18,11 +18,7 @@
 
 package org.qwide.repository;
 
-import org.springframework.data.repository.Repository;
-
-import java.io.Serializable;
-
-public interface BatchStoreRepository<T,ID extends Serializable> extends Repository<T,ID>{
+public interface BatchStoreRepository<T>{
 
     /*===========================================[ INTERFACE METHODS ]==============*/
 
@@ -32,5 +28,5 @@ public interface BatchStoreRepository<T,ID extends Serializable> extends Reposit
      *
      * @param entities сохраняемые сущности.
      */
-    void storeInBatch(Iterable<T> entities);
+    void saveInBatch(Iterable<T> entities);
 }

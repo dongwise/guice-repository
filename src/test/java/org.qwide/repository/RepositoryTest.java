@@ -17,8 +17,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -66,7 +64,6 @@ public class RepositoryTest {
         assertEquals(3, users.getNumberOfElements());
 
 
-
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.invokeAll(Arrays.asList(Executors.callable(new Runnable() {
             public void run() {
@@ -89,17 +86,5 @@ public class RepositoryTest {
         assertEquals(4, userRepository.count());
         userRepository.deleteAll();
         assertEquals(0, userRepository.count());
-
-//        accountRepository.save(new Account(UUID.randomUUID().toString()));
-//        assertEquals(1, accountRepository.count());
-
-//        accountRepository.deleteAll();
-//        assertEquals(0, accountRepository.count());
-
-
-//        accountRepository.storeInBatch(accounts);
-//        assertEquals(10, accountRepository.count());
-
-//        accountRepository.findAccountByUuid(UUID.randomUUID());
     }
 }

@@ -35,31 +35,64 @@ public abstract class JPAPersistenceModule extends AbstractModule {
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
     private Logger logger;
-    private String jpaUnitName;
+    private String persistenceUnitName;
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
-    protected JPAPersistenceModule(String... jpaUnitName) {
-        if (jpaUnitName.length > 0) {
-            this.jpaUnitName = jpaUnitName[0];
+    protected JPAPersistenceModule(String... persistenceUnitName) {
+        logger = LoggerFactory.getLogger(getClass());
+        String pUnitName;
+        if (persistenceUnitName.length > 0) {
+            pUnitName = persistenceUnitName[0];
         } else {
-            this.jpaUnitName = System.getProperty(P_PERSISTENCE_UNIT_NAME);
-            if (this.jpaUnitName == null) {
-                throw new IllegalStateException("Unable to instantiate JPAPersistenceModule: no jpaUnitName specified");
+            pUnitName = getPersistenceUnitName();
+            if (pUnitName == null) {
+                pUnitName = System.getProperty(P_PERSISTENCE_UNIT_NAME);
+                if (pUnitName == null) {
+                    throw new IllegalStateException("Unable to instantiate JPAPersistenceModule: no jpaUnitName specified");
+                }
             }
         }
 
-        logger = LoggerFactory.getLogger(getClass());
+        this.persistenceUnitName = pUnitName;
     }
 
     /*===========================================[ CLASS METHODS ]==============*/
 
+    /**
+     * Your own customizable way to provide persistence-unit name.
+     * @return
+     */
+    protected String getPersistenceUnitName() {
+        return null;
+    }
+
     @Override
     protected void configure() {
-        logger.info(String.format("Configuring persistence with JPA unit name: [%s]", jpaUnitName));
+        String moduleName = getClass().getSimpleName();
+        logger.info(String.format("Configuring %s with persistence unit name: [%s]", moduleName, persistenceUnitName));
+        Properties props = getPersistenceUnitProperties();
 
+        JpaPersistModule module = new JpaPersistModule(persistenceUnitName);
+        if (props != null) {
+            // Передаем параметры инициализации Persistence-контекста
+            module.properties(props);
+        }
+        install(module);
+
+        bind(JPAInitializer.class).asEagerSingleton();
+        configureRepositories();
+        logger.info(String.format("%s configured", moduleName));
+    }
+
+    /**
+     * Custom persistence-unit properties - for example it can be Hibernate/EclipseLink specific parameters.
+     * By-default this properties loaded from file named ${persistenceUnitName}.properties.
+     * @return initialized java.util.Properties.
+     */
+    protected Properties getPersistenceUnitProperties() {
         Properties props = new Properties();
-        String propFileName = jpaUnitName + ".properties";
+        String propFileName = persistenceUnitName + ".properties";
 
         InputStream fin = getClass().getClassLoader().getResourceAsStream(propFileName);
         if (fin != null) {
@@ -72,15 +105,7 @@ public abstract class JPAPersistenceModule extends AbstractModule {
         } else {
             throw new RuntimeException("Properties file not found: " + propFileName);
         }
-
-        JpaPersistModule module = new JpaPersistModule(jpaUnitName);
-        // Передаем параметры инициализации Persistence-контекста
-        module.properties(props);
-        install(module);
-
-        bind(JPAInitializer.class).asEagerSingleton();
-        configureRepositories();
-        logger.info("Persistence configured");
+        return props;
     }
 
     protected abstract void configureRepositories();

@@ -47,6 +47,7 @@ public class JPARepositoryProvider<R extends Repository> implements Provider<R> 
     private Provider<EntityManagerFactory> entityManagerFactoryProvider;
     private ApplicationContext context;
     private Provider<EntityManager> entityManagerProvider;
+    private Class domainClass;
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
@@ -66,6 +67,7 @@ public class JPARepositoryProvider<R extends Repository> implements Provider<R> 
         if (repositoryClass == null) {
             repositoryClass = extractRepositoryClass(injector);
         }
+        domainClass = DomainClassExtractor.extact(repositoryClass);
         context = createSpringContext();
     }
 
@@ -136,6 +138,7 @@ public class JPARepositoryProvider<R extends Repository> implements Provider<R> 
         factory.setBeanFactory(context);
         factory.setEntityManager(entityManager);
         factory.setRepositoryInterface(repositoryClass);
+        factory.setCustomImplementation(new BatchStoreRepositoryImpl(domainClass, entityManager));
         factory.afterPropertiesSet();
 
         return (R) factory.getObject();

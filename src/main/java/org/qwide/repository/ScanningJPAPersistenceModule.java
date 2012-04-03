@@ -19,8 +19,11 @@
 package org.qwide.repository;
 
 import org.reflections.Reflections;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class ScanningJPAPersistenceModule extends JPAPersistenceModule {
@@ -41,7 +44,14 @@ public class ScanningJPAPersistenceModule extends JPAPersistenceModule {
     @Override
     protected void configureRepositories() {
         Reflections reflections = new Reflections(scanTargetPackage);
-        Set<Class<?>> repositoryClasses = reflections.getTypesAnnotatedWith(Repository.class);
+        Set<Class<?>> repositoryClasses = new HashSet<Class<?>>();
+
+//        repositoryClasses.addAll(reflections.getTypesAnnotatedWith(Repository.class));
+        repositoryClasses.addAll(reflections.getSubTypesOf(org.springframework.data.repository.Repository.class));
+        repositoryClasses.addAll(reflections.getSubTypesOf(CrudRepository.class));
+        repositoryClasses.addAll(reflections.getSubTypesOf(PagingAndSortingRepository.class));
+        repositoryClasses.addAll(reflections.getSubTypesOf(JpaRepository.class));
+
         for (Class<?> repositoryClass : repositoryClasses) {
             bind(repositoryClass).toProvider(new JPARepositoryProvider(repositoryClass));
             getLogger().info(String.format("Found repository: [%s]", repositoryClass.getName()));

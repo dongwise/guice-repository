@@ -7,7 +7,7 @@
  ****************************************************************************/
 
 
-package org.qwide.repository;
+package org.guice.repository;
 
 import com.google.inject.Inject;
 import org.junit.Test;

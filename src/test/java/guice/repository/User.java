@@ -7,7 +7,7 @@
  ****************************************************************************/
 
 
-package org.qwide.repository;
+package org.guice.repository;
 
 import javax.persistence.*;
 

@@ -5,9 +5,9 @@
 
     <persistence-unit name="test-h2" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
-        <class>org.qwide.repository.Customer</class>
-        <class>org.qwide.repository.User</class>
-        <class>org.qwide.repository.Account</class>
+        <class>org.guice.repository.Customer</class>
+        <class>org.guice.repository.User</class>
+        <class>org.guice.repository.Account</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
     </persistence-unit>

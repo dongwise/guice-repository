@@ -6,15 +6,10 @@
  __DESCRIPTION...:
  ****************************************************************************/
 
-package org.qwide.repository;
+package org.guice.repository;
 
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.PagingAndSortingRepository;
-import org.springframework.stereotype.Repository;
 
-public interface CustomerRepository extends PagingAndSortingRepository<Customer, Long>, JpaSpecificationExecutor<Customer> {
-
-    /*===========================================[ INTERFACE METHODS ]==============*/
-
-    void getSome();
+public interface UserRepository extends PagingAndSortingRepository<User, Long>, JpaSpecificationExecutor<User> {
 }

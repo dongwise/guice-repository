@@ -13,7 +13,7 @@
         <file>target/logs/runtime.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!--&lt;!&ndash; daily rollover &ndash;&gt;-->
-            <fileNamePattern>runtime.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>>target/logs/runtime.%d{yyyy-MM-dd}.log</fileNamePattern>
 
             <!--&lt;!&ndash; keep 30 days worth of history &ndash;&gt;-->
             <maxHistory>30</maxHistory>

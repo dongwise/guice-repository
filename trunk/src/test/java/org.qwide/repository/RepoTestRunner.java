@@ -18,12 +18,14 @@ public class RepoTestRunner extends GuiceTestRunner {
     /*===========================================[ CLASS METHODS ]==============*/
 
     public RepoTestRunner(Class<?> classToRun) throws InitializationError {
+/*
         super(classToRun, new JPAPersistenceModule() {
             @Override
             protected void configureRepositories() {
                 bind(UserRepository.class).toProvider(new JPARepositoryProvider<UserRepository>());
-                bind(AccountRepository.class).toProvider(new JPARepositoryProvider<AccountRepository>());
             }
         });
+*/
+        super(classToRun, new ScanningJPAPersistenceModule("org.qwide"));
     }
 }

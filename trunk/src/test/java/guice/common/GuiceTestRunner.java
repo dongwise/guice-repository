@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.qwide.common;
+package org.guice.common;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;

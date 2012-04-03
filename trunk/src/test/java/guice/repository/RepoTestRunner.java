@@ -7,10 +7,10 @@
  ****************************************************************************/
 
 
-package org.qwide.repository;
+package org.guice.repository;
 
 import org.junit.runners.model.InitializationError;
-import org.qwide.common.GuiceTestRunner;
+import org.guice.common.GuiceTestRunner;
 
 
 public class RepoTestRunner extends GuiceTestRunner {

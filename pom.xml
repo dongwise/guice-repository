@@ -40,6 +40,7 @@
 
         <version.guice>3.0</version.guice>
         <version.google-guava>11.0.2</version.google-guava>
+        <version.reflections>0.9.5</version.reflections>
 
         <!-- Logging -->
 
@@ -88,6 +89,12 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${version.google-guava}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+            <version>${version.reflections}</version>
         </dependency>
 
         <!-- Logging -->

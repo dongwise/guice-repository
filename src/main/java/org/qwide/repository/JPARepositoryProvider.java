@@ -48,13 +48,24 @@ public class JPARepositoryProvider<R extends Repository> implements Provider<R> 
     private ApplicationContext context;
     private Provider<EntityManager> entityManagerProvider;
 
+    /*===========================================[ CONSTRUCTORS ]===============*/
+
+    public JPARepositoryProvider(Class<? extends R> repositoryClass) {
+        this.repositoryClass = repositoryClass;
+    }
+
+    public JPARepositoryProvider() {
+    }
+
     /*===========================================[ CLASS METHODS ]==============*/
 
     @Inject
     public void init(Injector injector, Provider<EntityManagerFactory> entityManagerFactoryProvider, Provider<EntityManager> entityManagerProvider) {
         this.entityManagerFactoryProvider = entityManagerFactoryProvider;
         this.entityManagerProvider = entityManagerProvider;
-        repositoryClass = extractRepositoryClass(injector);
+        if (repositoryClass == null) {
+            repositoryClass = extractRepositoryClass(injector);
+        }
         context = createSpringContext();
     }
 

@@ -30,11 +30,11 @@ public abstract class JPAPersistenceModule extends AbstractModule {
 
     /*===========================================[ STATIC VARIABLES ]=============*/
 
-    private static final Logger logger = LoggerFactory.getLogger(JPAPersistenceModule.class);
     public static final String P_PERSISTENCE_UNIT_NAME = "persistence-unit-name";
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
+    private Logger logger;
     private String jpaUnitName;
 
     /*===========================================[ CONSTRUCTORS ]===============*/
@@ -48,6 +48,8 @@ public abstract class JPAPersistenceModule extends AbstractModule {
                 throw new IllegalStateException("Unable to instantiate JPAPersistenceModule: no jpaUnitName specified");
             }
         }
+
+        logger = LoggerFactory.getLogger(getClass());
     }
 
     /*===========================================[ CLASS METHODS ]==============*/
@@ -82,4 +84,8 @@ public abstract class JPAPersistenceModule extends AbstractModule {
     }
 
     protected abstract void configureRepositories();
+
+    protected Logger getLogger() {
+        return logger;
+    }
 }

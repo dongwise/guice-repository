@@ -147,7 +147,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
                 return new CustomJpaRepositoryFactory(entityManager);
             }
         };
-        //TODO не коммитятся транзакции
+        //TODO решить вопрос с custom repo
         factory.setBeanFactory(context);
         factory.setEntityManager(entityManager);
         factory.setRepositoryInterface(repositoryClass);
@@ -161,7 +161,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
         return (R) factory.getObject();
     }
 
-    private class CustomJpaRepositoryFactory extends JpaRepositoryFactory {
+    private static class CustomJpaRepositoryFactory extends JpaRepositoryFactory {
         private CustomJpaRepositoryFactory(EntityManager entityManager) {
             super(entityManager);
         }

@@ -23,15 +23,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
+@Repository
+@Transactional(readOnly = true)
 public class SimpleBatchStoreJpaRepository<T, ID extends Serializable> extends SimpleJpaRepository<T, ID> implements
         BatchStoreRepository<T>, LowLevelJpaRepository<T, ID> {
 
@@ -54,13 +56,12 @@ public class SimpleBatchStoreJpaRepository<T, ID extends Serializable> extends S
     }
 
     /*===========================================[ CLASS METHODS ]==============*/
-
     public void saveInBatch(Iterable<T> entities) {
         List<T> list = Lists.newArrayList(entities);
         Assert.notEmpty(list);
 
-        List<T> saved = save(list);
-//        List<T> saved = doSave(list);
+//        List<T> saved = save(list);
+        List<T> saved = doSave(list);
         for (T t : saved) {
             entityManager.detach(t);
         }
@@ -118,8 +119,10 @@ public class SimpleBatchStoreJpaRepository<T, ID extends Serializable> extends S
         return saved;
     }
 
+    @Transactional
     private List<T> doSave(List<T> entities) {
-        EntityTransaction transaction = entityManager.getTransaction();
+        return save(entities);
+        /*EntityTransaction transaction = entityManager.getTransaction();
         List<T> saved = new ArrayList<T>(0);
         try {
             transaction.begin();
@@ -130,7 +133,7 @@ public class SimpleBatchStoreJpaRepository<T, ID extends Serializable> extends S
             transaction.rollback();
         }
 
-        return saved;
+        return saved;*/
     }
 
     public EntityManager getEntityManager() {

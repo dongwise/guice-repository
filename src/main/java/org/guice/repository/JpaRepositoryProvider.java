@@ -144,10 +144,10 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
          */
         JpaRepositoryFactoryBean factory = new JpaRepositoryFactoryBean() {
             protected RepositoryFactorySupport createRepositoryFactory(EntityManager entityManager) {
-                return new CustomJpaRepositoryFactory(entityManagerProvider.get());
+                return new CustomJpaRepositoryFactory(entityManager);
             }
         };
-
+        //TODO не коммитятся транзакции
         factory.setBeanFactory(context);
         factory.setEntityManager(entityManager);
         factory.setRepositoryInterface(repositoryClass);

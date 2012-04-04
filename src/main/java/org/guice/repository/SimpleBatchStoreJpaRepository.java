@@ -28,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 import java.io.Serializable;
 import java.util.List;
 
@@ -56,6 +55,11 @@ public class SimpleBatchStoreJpaRepository<T, ID extends Serializable> extends S
     }
 
     /*===========================================[ CLASS METHODS ]==============*/
+
+    /**
+     *
+     * @param entities сохраняемые сущности.
+     */
     public void saveInBatch(Iterable<T> entities) {
         List<T> list = Lists.newArrayList(entities);
         Assert.notEmpty(list);
@@ -101,21 +105,6 @@ public class SimpleBatchStoreJpaRepository<T, ID extends Serializable> extends S
         }
 
         logger.info(String.format("batch for [%s] of [%d] stored", entityClassName, list.size()));
-    }
-
-    private T doSave(T entity) {
-        EntityTransaction transaction = entityManager.getTransaction();
-        T saved = null;
-        try {
-            transaction.begin();
-            saved = save(entity);
-            transaction.commit();
-        } catch (Exception e) {
-            logger.error("Error", e);
-            transaction.rollback();
-        }
-
-        return saved;
     }
 
     public EntityManager getEntityManager() {

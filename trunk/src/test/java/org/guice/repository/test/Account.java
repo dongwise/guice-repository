@@ -7,13 +7,13 @@
  ****************************************************************************/
 
 
-package org.guice.repository;
+package org.guice.repository.test;
 
 import javax.persistence.*;
 
 @Entity
-public class Customer {
-/*===========================================[ STATIC VARIABLES ]=============*/
+public class Account {
+    /*===========================================[ STATIC VARIABLES ]=============*/
 /*===========================================[ INSTANCE VARIABLES ]=========*/
 /*===========================================[ CONSTRUCTORS ]===============*/
 /*===========================================[ CLASS METHODS ]==============*/
@@ -22,15 +22,24 @@ public class Customer {
     private Long id;
 
     @Column
-    private String name;
-    @Column
-    private String surname;
+    private String uuid;
 
-    public Customer(String name, String surname) {
+    @Column
+    private String name;
+
+    public Account(String uuid, String name) {
+        this.uuid = uuid;
         this.name = name;
-        this.surname = surname;
     }
 
-    public Customer() {
+    public Account() {
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public String getName() {
+        return name;
     }
 }

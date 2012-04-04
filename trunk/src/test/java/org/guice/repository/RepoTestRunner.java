@@ -26,6 +26,6 @@ public class RepoTestRunner extends GuiceTestRunner {
             }
         });
 */
-        super(classToRun, new ScanningJPAPersistenceModule("org.qwide"));
+        super(classToRun, new ScanningJpaPersistenceModule("org.guice"));
     }
 }

@@ -86,5 +86,7 @@ public class RepositoryTest {
         assertEquals(4, userRepository.count());
         userRepository.deleteAll();
         assertEquals(0, userRepository.count());
+
+//        userRepository.someCustomMethod(new User("john", "smith", 42));
     }
 }

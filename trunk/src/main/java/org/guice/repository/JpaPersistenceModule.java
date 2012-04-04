@@ -19,6 +19,7 @@
 package org.guice.repository;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Scopes;
 import com.google.inject.persist.jpa.JpaPersistModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +50,7 @@ public abstract class JpaPersistenceModule extends AbstractModule {
             if (pUnitName == null) {
                 pUnitName = System.getProperty(P_PERSISTENCE_UNIT_NAME);
                 if (pUnitName == null) {
-                    throw new IllegalStateException("Unable to instantiate JPAPersistenceModule: no jpaUnitName specified");
+                    throw new IllegalStateException("Unable to instantiate JpaPersistenceModule: no persistence-unit-name specified");
                 }
             }
         }
@@ -70,7 +71,7 @@ public abstract class JpaPersistenceModule extends AbstractModule {
     @Override
     protected void configure() {
         String moduleName = getClass().getSimpleName();
-        logger.info(String.format("Configuring %s with persistence unit name: [%s]", moduleName, persistenceUnitName));
+        logger.info(String.format("Configuring %s with persistence-unit name: [%s]", moduleName, persistenceUnitName));
         Properties props = getPersistenceUnitProperties();
 
         JpaPersistModule module = new JpaPersistModule(persistenceUnitName);
@@ -81,6 +82,8 @@ public abstract class JpaPersistenceModule extends AbstractModule {
         install(module);
 
         bind(JpaInitializer.class).asEagerSingleton();
+        bind(DomainClassResolver.class).in(Scopes.SINGLETON);
+        bind(CustomRepositoryResolver.class).in(Scopes.SINGLETON);
         configureRepositories();
         logger.info(String.format("%s configured", moduleName));
     }

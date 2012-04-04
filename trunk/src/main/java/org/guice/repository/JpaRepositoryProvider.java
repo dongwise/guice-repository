@@ -26,14 +26,24 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.support.JpaEntityInformation;
+import org.springframework.data.jpa.repository.support.JpaRepositoryFactory;
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
+import org.springframework.data.jpa.repository.support.QueryDslJpaRepository;
+import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.Repository;
+import org.springframework.data.repository.core.RepositoryMetadata;
+import org.springframework.data.repository.core.support.RepositoryFactorySupport;
 import org.springframework.orm.jpa.EntityManagerHolder;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import java.io.Serializable;
+
+import static org.springframework.data.querydsl.QueryDslUtils.QUERY_DSL_PRESENT;
 
 public class JpaRepositoryProvider<R extends Repository> implements Provider<R> {
 
@@ -43,11 +53,12 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
-    private Class<? extends R> repositoryClass;
+    private Class<? extends Repository> repositoryClass;
     private Provider<EntityManagerFactory> entityManagerFactoryProvider;
     private ApplicationContext context;
     private Provider<EntityManager> entityManagerProvider;
     private Class domainClass;
+    private CustomRepositoryResolver customRepositoryResolver;
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
@@ -61,14 +72,19 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
     /*===========================================[ CLASS METHODS ]==============*/
 
     @Inject
-    public void init(Injector injector, Provider<EntityManagerFactory> entityManagerFactoryProvider, Provider<EntityManager> entityManagerProvider) {
+    public void init(Injector injector,
+                     Provider<EntityManagerFactory> entityManagerFactoryProvider,
+                     Provider<EntityManager> entityManagerProvider,
+                     CustomRepositoryResolver customRepositoryResolver,
+                     DomainClassResolver domainClassResolver) {
         this.entityManagerFactoryProvider = entityManagerFactoryProvider;
         this.entityManagerProvider = entityManagerProvider;
         if (repositoryClass == null) {
             repositoryClass = extractRepositoryClass(injector);
         }
-        domainClass = DomainClassExtractor.extact(repositoryClass);
+        domainClass = domainClassResolver.resolve(repositoryClass);
         context = createSpringContext();
+        this.customRepositoryResolver = customRepositoryResolver;
     }
 
     protected Class<? extends R> extractRepositoryClass(Injector injector) {
@@ -109,12 +125,12 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
     }
 
     public R get() {
-//        System.out.println("GET & BIND "+ hashCode());
         EntityManager entityManager = entityManagerProvider.get();
         EntityManagerFactory entityManagerFactory = entityManagerFactoryProvider.get();
 
         // Setup new ThreadLocal entityManager instance
         GuiceLocalEntityManagerFactoryBean entityManagerFactoryBean = context.getBean(GuiceLocalEntityManagerFactoryBean.class);
+
         EntityManagerFactory proxiedEmf = entityManagerFactoryBean.getObject();
         if (TransactionSynchronizationManager.hasResource(proxiedEmf)) {
             TransactionSynchronizationManager.unbindResource(proxiedEmf);
@@ -122,26 +138,57 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
 
         TransactionSynchronizationManager.bindResource(proxiedEmf, new EntityManagerHolder(entityManagerProvider.get()));
 
-
-//        logger.info(String.format("Accessing.get: factory=[%d], em=[%d]", entityManagerFactory.hashCode(), entityManager.hashCode()));
-
-        //TODO: for custom implementation
-//        bean.setCustomImplementation();
-
-        //TODO: EM закрывается по первой транзакции и не пересоздается....
-
         /**
          * Some instantiation example is here:
          * https://jira.springsource.org/browse/DATAJPA-69
          */
-        JpaRepositoryFactoryBean factory = new JpaRepositoryFactoryBean();
+        JpaRepositoryFactoryBean factory = new JpaRepositoryFactoryBean() {
+            protected RepositoryFactorySupport createRepositoryFactory(EntityManager entityManager) {
+                return new CustomJpaRepositoryFactory(entityManagerProvider.get());
+            }
+        };
+
         factory.setBeanFactory(context);
         factory.setEntityManager(entityManager);
         factory.setRepositoryInterface(repositoryClass);
-        //TODO: делать через Reflections и через контекст спринга
-        factory.setCustomImplementation(new SimpleBatchStoreJPARepository(domainClass, entityManager));
+        Object customImplementation = customRepositoryResolver.resolve(repositoryClass, domainClass);
+//        if (customImplementation != null) {
+//        factory.setCustomImplementation(new SimpleBatchStoreJpaRepository(domainClass, entityManager));
+//            factory.setCustomImplementation(customImplementation);
+//        }
         factory.afterPropertiesSet();
 
         return (R) factory.getObject();
+    }
+
+    private class CustomJpaRepositoryFactory extends JpaRepositoryFactory {
+        private CustomJpaRepositoryFactory(EntityManager entityManager) {
+            super(entityManager);
+        }
+
+        @Override
+        protected JpaRepository<?, ?> getTargetRepository(RepositoryMetadata metadata, EntityManager entityManager) {
+            Class<?> repositoryInterface = metadata.getRepositoryInterface();
+            JpaEntityInformation<?, Serializable> entityInformation = getEntityInformation(metadata.getDomainClass());
+
+            if (isQueryDslExecutor(repositoryInterface)) {
+                return new QueryDslJpaRepository(entityInformation, entityManager);
+            } else {
+                return new SimpleBatchStoreJpaRepository(entityInformation, entityManager);
+            }
+        }
+
+        @Override
+        protected Class<?> getRepositoryBaseClass(RepositoryMetadata metadata) {
+            if (isQueryDslExecutor(metadata.getRepositoryInterface())) {
+                return QueryDslJpaRepository.class;
+            } else {
+                return SimpleBatchStoreJpaRepository.class;
+            }
+        }
+
+        private boolean isQueryDslExecutor(Class<?> repositoryInterface) {
+            return QUERY_DSL_PRESENT && QueryDslPredicateExecutor.class.isAssignableFrom(repositoryInterface);
+        }
     }
 }

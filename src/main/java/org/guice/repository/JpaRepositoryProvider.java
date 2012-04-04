@@ -35,11 +35,11 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
-public class JPARepositoryProvider<R extends Repository> implements Provider<R> {
+public class JpaRepositoryProvider<R extends Repository> implements Provider<R> {
 
     /*===========================================[ STATIC VARIABLES ]=============*/
 
-    private static final Logger logger = LoggerFactory.getLogger(JPARepositoryProvider.class);
+    private static final Logger logger = LoggerFactory.getLogger(JpaRepositoryProvider.class);
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
@@ -51,11 +51,11 @@ public class JPARepositoryProvider<R extends Repository> implements Provider<R> 
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
-    public JPARepositoryProvider(Class<? extends R> repositoryClass) {
+    public JpaRepositoryProvider(Class<? extends R> repositoryClass) {
         this.repositoryClass = repositoryClass;
     }
 
-    public JPARepositoryProvider() {
+    public JpaRepositoryProvider() {
     }
 
     /*===========================================[ CLASS METHODS ]==============*/

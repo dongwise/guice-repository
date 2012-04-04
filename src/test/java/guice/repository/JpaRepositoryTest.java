@@ -17,11 +17,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-@RunWith(RepoTestRunner.class)
-public class JPARepositoryTest {
+@RunWith(org.guice.repository.RepoTestRunner.class)
+public class JpaRepositoryTest {
 /*===========================================[ STATIC VARIABLES ]=============*/
 /*===========================================[ INSTANCE VARIABLES ]=========*/
 /*===========================================[ CONSTRUCTORS ]===============*/
@@ -31,15 +30,15 @@ public class JPARepositoryTest {
 //    private CustomerRepository customerRepository;
 
     @Inject
-    private AccountRepository accountRepository;
+    private org.guice.repository.AccountRepository accountRepository;
 
 
     @Test
     public void testRepo() throws Exception {
-        List<Account> accounts = new LinkedList<Account>();
+        List<org.guice.repository.Account> accounts = new LinkedList<org.guice.repository.Account>();
         int count = 10;
         for (int i = 0; i < count; i++) {
-            accounts.add(new Account(UUID.randomUUID().toString(), String.valueOf(i)));
+            accounts.add(new org.guice.repository.Account(UUID.randomUUID().toString(), String.valueOf(i)));
         }
 
         accountRepository.save(accounts);

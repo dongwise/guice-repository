@@ -27,7 +27,7 @@ import org.springframework.stereotype.Repository;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ScanningJPAPersistenceModule extends JPAPersistenceModule {
+public class ScanningJpaPersistenceModule extends JpaPersistenceModule {
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
@@ -40,7 +40,7 @@ public class ScanningJPAPersistenceModule extends JPAPersistenceModule {
      * @param targetScanPackage package to scan for repositories.
      * @param persistenceUnitName
      */
-    public ScanningJPAPersistenceModule(String targetScanPackage, String... persistenceUnitName) {
+    public ScanningJpaPersistenceModule(String targetScanPackage, String... persistenceUnitName) {
         super(persistenceUnitName);
         this.targetScanPackage = targetScanPackage;
 
@@ -59,7 +59,7 @@ public class ScanningJPAPersistenceModule extends JPAPersistenceModule {
         repositoryClasses.addAll(reflections.getSubTypesOf(JpaRepository.class));
 
         for (Class<?> repositoryClass : repositoryClasses) {
-            bind(repositoryClass).toProvider(new JPARepositoryProvider(repositoryClass));
+            bind(repositoryClass).toProvider(new JpaRepositoryProvider(repositoryClass));
             getLogger().info(String.format("Found repository: [%s]", repositoryClass.getName()));
         }
     }

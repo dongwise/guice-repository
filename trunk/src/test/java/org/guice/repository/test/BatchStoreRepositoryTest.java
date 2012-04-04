@@ -67,7 +67,7 @@ public class BatchStoreRepositoryTest {
         assertEquals("Invalid stored entities count", iterationsCount * batchSize, accountRepository.count());
     }
 
-    @Test
+//    @Test
     public void testPartialBatchSave() throws Exception {
         AccountRepository accountRepository = accountRepositoryProvider.get();
 

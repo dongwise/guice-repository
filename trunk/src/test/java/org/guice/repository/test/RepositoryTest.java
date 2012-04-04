@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 
@@ -51,6 +52,10 @@ public class RepositoryTest {
 */
 
         UserRepository userRepository = userRepositoryProvider.get();
+        userRepository.deleteInactiveUsers();
+        userRepository.deleteOtherUsers();
+        TimeUnit.SECONDS.sleep(10);
+
 //        assertEquals(0, accountRepository.count());
         userRepository.deleteAll();
         assertEquals(0, userRepository.count());

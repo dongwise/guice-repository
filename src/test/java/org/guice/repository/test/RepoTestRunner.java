@@ -7,8 +7,9 @@
  ****************************************************************************/
 
 
-package org.guice.repository;
+package org.guice.repository.test;
 
+import org.guice.repository.ScanningJpaPersistenceModule;
 import org.junit.runners.model.InitializationError;
 import org.guice.common.GuiceTestRunner;
 

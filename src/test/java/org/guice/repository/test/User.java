@@ -7,7 +7,7 @@
  ****************************************************************************/
 
 
-package org.guice.repository;
+package org.guice.repository.test;
 
 import javax.persistence.*;
 

@@ -138,7 +138,7 @@ public class JPARepositoryProvider<R extends Repository> implements Provider<R> 
         factory.setBeanFactory(context);
         factory.setEntityManager(entityManager);
         factory.setRepositoryInterface(repositoryClass);
-        //TODO: делать через Reflections
+        //TODO: делать через Reflections и через контекст спринга
         factory.setCustomImplementation(new SimpleBatchStoreJPARepository(domainClass, entityManager));
         factory.afterPropertiesSet();
 

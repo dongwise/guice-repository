@@ -18,10 +18,12 @@
 
 package org.guice.repository;
 
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
+import org.springframework.util.Assert;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -53,13 +55,69 @@ public class SimpleBatchStoreJPARepository<T, ID extends Serializable> extends S
     /*===========================================[ CLASS METHODS ]==============*/
 
     public void saveInBatch(Iterable<T> entities) {
-        List<T> saved = doSave(entities);
+        List<T> list = Lists.newArrayList(entities);
+        Assert.notEmpty(list);
+
+        List<T> saved = doSave(list);
         for (T t : saved) {
             em.detach(t);
         }
     }
 
-    private List<T> doSave(Iterable<T> entities) {
+    public void saveInBatch(Iterable<T> entities, int batchSize) {
+        List<T> list = Lists.newArrayList(entities);
+        Assert.notEmpty(list);
+
+        String entityClassName = list.iterator().next().getClass().getSimpleName();
+        logger.debug(String.format("batch of [%d]: [%s]", list.size(), entityClassName));
+
+        int startIndex = 0;
+        int count = list.size();
+        while (startIndex < count) {
+            int endIndex = startIndex + batchSize;
+
+            if (endIndex > count) {
+                endIndex = count;
+            }
+
+            List<T> batch = list.subList(startIndex, endIndex);
+            try {
+                logger.info(String.format("Storing elements: [%d - %d]", startIndex, endIndex));
+                saveInBatch(batch);
+                logger.info(String.format("[%d - %d] stored", startIndex, endIndex));
+            } catch (Exception e) {
+                logger.error(String.format("Error while storing [%d - %d] of [%s], trying single store...", startIndex, endIndex, entityClassName), e);
+                for (T entity : batch) {
+                    T saved = doSave(entity);
+                    if (saved != null) {
+                        em.detach(entity);
+                    }
+                }
+            } finally {
+                startIndex += batchSize;
+            }
+        }
+
+        logger.info(String.format("batch of [%d]: [%s] stored", list.size(), entityClassName));
+    }
+
+    private T doSave(T entity) {
+        EntityTransaction transaction = em.getTransaction();
+        T saved = null;
+        try {
+            transaction.begin();
+            saved = save(entity);
+            transaction.commit();
+        } catch (Exception e) {
+            logger.error("Error", e);
+            transaction.rollback();
+        }
+
+        return saved;
+    }
+
+
+    private List<T> doSave(List<T> entities) {
         EntityTransaction transaction = em.getTransaction();
         List<T> saved = new ArrayList<T>(0);
         try {
@@ -70,7 +128,7 @@ public class SimpleBatchStoreJPARepository<T, ID extends Serializable> extends S
             logger.error("Error", e);
             transaction.rollback();
         }
-        return saved;
 
+        return saved;
     }
 }

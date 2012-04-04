@@ -29,4 +29,6 @@ public interface BatchStoreRepository<T>{
      * @param entities сохраняемые сущности.
      */
     void saveInBatch(Iterable<T> entities);
+
+    void saveInBatch(Iterable<T> entities, int batchSize);
 }

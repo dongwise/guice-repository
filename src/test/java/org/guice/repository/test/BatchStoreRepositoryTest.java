@@ -11,10 +11,11 @@ package org.guice.repository.test;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import javax.persistence.EntityManager;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -27,43 +28,55 @@ public class BatchStoreRepositoryTest {
 
     @Inject
     private Provider<AccountRepository> accountRepositoryProvider;
-
-    @Inject
-    private Provider<EntityManager> entityManagerProvider;
+    private Timer timer;
 
     /*===========================================[ CLASS METHODS ]==============*/
 
+    @Before
+    public void before() {
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                System.out.println(String.format("Current count: [%d], free memory: [%d] mb", accountRepositoryProvider.get().count(),
+                        Runtime.getRuntime().freeMemory() / (1024 * 1024)));
+            }
+        }, TimeUnit.SECONDS.toMillis(1), TimeUnit.SECONDS.toMillis(1));
+    }
+
+    @After
+    public void after() {
+        AccountRepository accountRepository = accountRepositoryProvider.get();
+        accountRepository.deleteAll();
+        assertEquals(0, accountRepository.count());
+        timer.cancel();
+    }
+
     @Test
-    public void testRepo() throws Exception {
+    public void testDefaultBatchSave() throws Exception {
 
         int batchSize = 1000;
         int iterationsCount = 1000;
 
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                AccountRepository accountRepository = accountRepositoryProvider.get();
-                System.out.println(String.format("Current count: [%d], free memory: [%d] mb", accountRepository.count(),
-                        Runtime.getRuntime().freeMemory() / (1024 * 1024)));
-            }
-        }, TimeUnit.SECONDS.toMillis(1), TimeUnit.SECONDS.toMillis(1));
-
         AccountRepository accountRepository = accountRepositoryProvider.get();
-        EntityManager entityManager = entityManagerProvider.get();
         for (int i = 0; i < iterationsCount; i++) {
             List<Account> accounts = generateBatch(batchSize);
-//            List<Account> saved = accountRepository.save(accounts);
             accountRepository.saveInBatch(accounts);
-/*
-            for (Account account : saved) {
-                entityManager.detach(account);
-            }
-*/
-//            accountRepository.flush();
         }
 
         assertEquals("Invalid stored entities count", iterationsCount * batchSize, accountRepository.count());
+    }
+
+    @Test
+    public void testPartialBatchSave() throws Exception {
+        AccountRepository accountRepository = accountRepositoryProvider.get();
+
+        int totalSize = 10000;
+
+        List<Account> accounts = generateBatch(totalSize);
+        accountRepository.saveInBatch(accounts, 100);
+
+        assertEquals("Invalid stored entities count", totalSize, accountRepository.count());
     }
 
     private List<Account> generateBatch(int batchSize) {

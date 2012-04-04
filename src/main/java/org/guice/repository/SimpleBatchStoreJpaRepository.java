@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import javax.persistence.EntityManager;
@@ -32,24 +33,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SimpleBatchStoreJpaRepository<T, ID extends Serializable> extends SimpleJpaRepository<T, ID> implements
-        BatchStoreRepository<T> {
+        BatchStoreRepository<T>, LowLevelJpaRepository<T, ID> {
 
     private static final Logger logger = LoggerFactory.getLogger(SimpleBatchStoreJpaRepository.class);
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
-    private EntityManager em;
+    private EntityManager entityManager;
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
-    public SimpleBatchStoreJpaRepository(JpaEntityInformation<T, ?> entityInformation, EntityManager entityManager) {
-        super(entityInformation, entityManager);
-        em = entityManager;
+    public SimpleBatchStoreJpaRepository(Class<T> domainClass, EntityManager entityManager) {
+        super(domainClass, entityManager);
+        this.entityManager = entityManager;
     }
 
-    public SimpleBatchStoreJpaRepository(Class<T> domainClass, EntityManager em) {
-        super(domainClass, em);
-        this.em = em;
+    public SimpleBatchStoreJpaRepository(JpaEntityInformation<T, ID> entityMetadata, EntityManager entityManager) {
+        super(entityMetadata, entityManager);
+        this.entityManager = entityManager;
     }
 
     /*===========================================[ CLASS METHODS ]==============*/
@@ -58,9 +59,10 @@ public class SimpleBatchStoreJpaRepository<T, ID extends Serializable> extends S
         List<T> list = Lists.newArrayList(entities);
         Assert.notEmpty(list);
 
-        List<T> saved = doSave(list);
+        List<T> saved = save(list);
+//        List<T> saved = doSave(list);
         for (T t : saved) {
-            em.detach(t);
+            entityManager.detach(t);
         }
     }
 
@@ -69,7 +71,7 @@ public class SimpleBatchStoreJpaRepository<T, ID extends Serializable> extends S
         Assert.notEmpty(list);
 
         String entityClassName = list.iterator().next().getClass().getSimpleName();
-        logger.debug(String.format("batch of [%d]: [%s]", list.size(), entityClassName));
+        logger.info(String.format("batch for [%s] of [%d]", entityClassName, list.size()));
 
         int startIndex = 0;
         int count = list.size();
@@ -88,9 +90,9 @@ public class SimpleBatchStoreJpaRepository<T, ID extends Serializable> extends S
             } catch (Exception e) {
                 logger.error(String.format("Error while storing [%d - %d] of [%s], trying single store...", startIndex, endIndex, entityClassName), e);
                 for (T entity : batch) {
-                    T saved = doSave(entity);
+                    T saved = save(entity);
                     if (saved != null) {
-                        em.detach(entity);
+                        entityManager.detach(entity);
                     }
                 }
             } finally {
@@ -98,11 +100,11 @@ public class SimpleBatchStoreJpaRepository<T, ID extends Serializable> extends S
             }
         }
 
-        logger.info(String.format("batch of [%d]: [%s] stored", list.size(), entityClassName));
+        logger.info(String.format("batch for [%s] of [%d] stored", entityClassName, list.size()));
     }
 
     private T doSave(T entity) {
-        EntityTransaction transaction = em.getTransaction();
+        EntityTransaction transaction = entityManager.getTransaction();
         T saved = null;
         try {
             transaction.begin();
@@ -116,9 +118,8 @@ public class SimpleBatchStoreJpaRepository<T, ID extends Serializable> extends S
         return saved;
     }
 
-
     private List<T> doSave(List<T> entities) {
-        EntityTransaction transaction = em.getTransaction();
+        EntityTransaction transaction = entityManager.getTransaction();
         List<T> saved = new ArrayList<T>(0);
         try {
             transaction.begin();
@@ -130,5 +131,9 @@ public class SimpleBatchStoreJpaRepository<T, ID extends Serializable> extends S
         }
 
         return saved;
+    }
+
+    public EntityManager getEntityManager() {
+        return entityManager;
     }
 }

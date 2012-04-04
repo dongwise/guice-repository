@@ -18,12 +18,20 @@
 
 package org.guice.repository;
 
+import com.google.common.collect.Lists;
 import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
+import org.reflections.util.FilterBuilder;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
+import java.net.URL;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -31,25 +39,53 @@ public class ScanningJpaPersistenceModule extends JpaPersistenceModule {
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
-    private String targetScanPackage;
+    private Iterable<String> targetScanPackages;
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
     /**
-     *
-     * @param targetScanPackage package to scan for repositories.
-     * @param persistenceUnitName
+     * @param targetScanPackage   package to scan for repositories.
+     * @param persistenceUnitName optional persistence-unit name, if not defined module will try to get it from the
+     *                            system property called "persistence-unit-name"
      */
     public ScanningJpaPersistenceModule(String targetScanPackage, String... persistenceUnitName) {
         super(persistenceUnitName);
-        this.targetScanPackage = targetScanPackage;
+        targetScanPackages = Arrays.asList(targetScanPackage);
+
+    }
+
+    /**
+     * @param targetScanPackage   package to scan for repositories.
+     * @param persistenceUnitName
+     */
+    public ScanningJpaPersistenceModule(Iterable<String> targetScanPackages, String... persistenceUnitName) {
+        super(persistenceUnitName);
+        this.targetScanPackages = Lists.newArrayList(targetScanPackages);
 
     }
     /*===========================================[ CLASS METHODS ]==============*/
 
     @Override
     protected void configureRepositories() {
-        Reflections reflections = new Reflections(targetScanPackage);
+        ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
+
+        FilterBuilder filterBuilder = new FilterBuilder();
+        Set<URL> urls = new HashSet<URL>();
+
+        for (String targetScanPackage : targetScanPackages) {
+            filterBuilder.include(FilterBuilder.prefix(targetScanPackage));
+            urls.addAll(ClasspathHelper.forPackage(targetScanPackage));
+        }
+
+        configurationBuilder.setUrls(urls);
+        configurationBuilder.filterInputsBy(filterBuilder);
+
+        configurationBuilder.setScanners(
+                new TypeAnnotationsScanner().filterResultsBy(filterBuilder),
+                new SubTypesScanner().filterResultsBy(filterBuilder));
+
+
+        Reflections reflections = new Reflections(configurationBuilder);
         Set<Class<?>> repositoryClasses = new HashSet<Class<?>>();
 
         repositoryClasses.addAll(reflections.getTypesAnnotatedWith(Repository.class));
@@ -59,8 +95,8 @@ public class ScanningJpaPersistenceModule extends JpaPersistenceModule {
         repositoryClasses.addAll(reflections.getSubTypesOf(JpaRepository.class));
 
         for (Class<?> repositoryClass : repositoryClasses) {
-            bind(repositoryClass).toProvider(new JpaRepositoryProvider(repositoryClass));
             getLogger().info(String.format("Found repository: [%s]", repositoryClass.getName()));
+            bind(repositoryClass).toProvider(new JpaRepositoryProvider(repositoryClass));
         }
     }
 }

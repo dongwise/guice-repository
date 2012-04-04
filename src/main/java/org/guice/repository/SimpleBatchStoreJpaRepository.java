@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
@@ -57,16 +56,11 @@ public class SimpleBatchStoreJpaRepository<T, ID extends Serializable> extends S
     }
 
     /*===========================================[ CLASS METHODS ]==============*/
-
     public void saveInBatch(Iterable<T> entities) {
         List<T> list = Lists.newArrayList(entities);
         Assert.notEmpty(list);
         List<T> saved = save(list);
-        cleanup(saved);
-    }
-
-    @Transactional(readOnly = true)
-    protected void cleanup(List<T> saved) {
+        flush();
         for (T t : saved) {
             entityManager.detach(t);
         }
@@ -96,7 +90,7 @@ public class SimpleBatchStoreJpaRepository<T, ID extends Serializable> extends S
             } catch (Exception e) {
                 logger.error(String.format("Error while storing [%d - %d] of [%s], trying single store...", startIndex, endIndex, entityClassName), e);
                 for (T entity : batch) {
-                    T saved = save(entity);
+                    T saved = saveAndFlush(entity);
                     if (saved != null) {
                         entityManager.detach(entity);
                     }
@@ -122,22 +116,6 @@ public class SimpleBatchStoreJpaRepository<T, ID extends Serializable> extends S
         }
 
         return saved;
-    }
-
-    private List<T> doSave(List<T> entities) {
-        return save(entities);
-        /*EntityTransaction transaction = entityManager.getTransaction();
-        List<T> saved = new ArrayList<T>(0);
-        try {
-            transaction.begin();
-            saved = save(entities);
-            transaction.commit();
-        } catch (Exception e) {
-            logger.error("Error", e);
-            transaction.rollback();
-        }
-
-        return saved;*/
     }
 
     public EntityManager getEntityManager() {

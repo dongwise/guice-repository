@@ -23,11 +23,11 @@ import com.google.inject.persist.PersistService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class JPAInitializer {
+class JpaInitializer {
 
     /*===========================================[ STATIC VARIABLES ]=============*/
 
-    private static final Logger logger = LoggerFactory.getLogger(JPAInitializer.class);
+    private static final Logger logger = LoggerFactory.getLogger(JpaInitializer.class);
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 

@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 import java.io.InputStream;
 import java.util.Properties;
 
-public abstract class JPAPersistenceModule extends AbstractModule {
+public abstract class JpaPersistenceModule extends AbstractModule {
 
     /*===========================================[ STATIC VARIABLES ]=============*/
 
@@ -39,7 +39,7 @@ public abstract class JPAPersistenceModule extends AbstractModule {
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
-    protected JPAPersistenceModule(String... persistenceUnitName) {
+    protected JpaPersistenceModule(String... persistenceUnitName) {
         logger = LoggerFactory.getLogger(getClass());
         String pUnitName;
         if (persistenceUnitName.length > 0) {
@@ -80,7 +80,7 @@ public abstract class JPAPersistenceModule extends AbstractModule {
         }
         install(module);
 
-        bind(JPAInitializer.class).asEagerSingleton();
+        bind(JpaInitializer.class).asEagerSingleton();
         configureRepositories();
         logger.info(String.format("%s configured", moduleName));
     }

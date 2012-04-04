@@ -31,10 +31,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SimpleBatchStoreJPARepository<T, ID extends Serializable> extends SimpleJpaRepository<T, ID> implements
+public class SimpleBatchStoreJpaRepository<T, ID extends Serializable> extends SimpleJpaRepository<T, ID> implements
         BatchStoreRepository<T> {
 
-    private static final Logger logger = LoggerFactory.getLogger(SimpleBatchStoreJPARepository.class);
+    private static final Logger logger = LoggerFactory.getLogger(SimpleBatchStoreJpaRepository.class);
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
@@ -42,12 +42,12 @@ public class SimpleBatchStoreJPARepository<T, ID extends Serializable> extends S
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
-    public SimpleBatchStoreJPARepository(JpaEntityInformation<T, ?> entityInformation, EntityManager entityManager) {
+    public SimpleBatchStoreJpaRepository(JpaEntityInformation<T, ?> entityInformation, EntityManager entityManager) {
         super(entityInformation, entityManager);
         em = entityManager;
     }
 
-    public SimpleBatchStoreJPARepository(Class<T> domainClass, EntityManager em) {
+    public SimpleBatchStoreJpaRepository(Class<T> domainClass, EntityManager em) {
         super(domainClass, em);
         this.em = em;
     }

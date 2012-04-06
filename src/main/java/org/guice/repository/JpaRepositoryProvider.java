@@ -35,6 +35,7 @@ import org.springframework.data.repository.core.support.RepositoryFactorySupport
 import org.springframework.orm.jpa.EntityManagerHolder;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 import javax.persistence.EntityManager;
@@ -56,18 +57,21 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
     private ApplicationContext context;
     private Provider<EntityManager> entityManagerProvider;
     private Class domainClass;
-    private CustomRepositoryImplementationResolver customRepositoryImplementationResolver;
-    private Class implementationClass;
+    private Class customRepositoryImplClass;
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
     public JpaRepositoryProvider(Class<? extends R> repositoryClass) {
+        Assert.notNull(repositoryClass);
         this.repositoryClass = repositoryClass;
     }
 
-    public JpaRepositoryProvider(Class<? extends Repository> repositoryClass, Class implementationClass) {
+    public JpaRepositoryProvider(Class<? extends R> repositoryClass, Class customRepositoryImplClass) {
+        this(repositoryClass);
+        Assert.notNull(customRepositoryImplClass);
         this.repositoryClass = repositoryClass;
-        this.implementationClass = implementationClass;
+        this.customRepositoryImplClass = customRepositoryImplClass;
+        logger.info(String.format("Custom repository implementation class for [%s] set to [%s]", repositoryClass.getName(), customRepositoryImplClass.getName()));
     }
 
     public JpaRepositoryProvider() {
@@ -89,7 +93,10 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
         }
         domainClass = domainClassResolver.resolve(repositoryClass);
         context = createSpringContext();
-        this.customRepositoryImplementationResolver = customRepositoryImplementationResolver;
+
+        if (customRepositoryImplClass == null) {
+            customRepositoryImplClass = customRepositoryImplementationResolver.resolve(repositoryClass, domainClass);
+        }
     }
 
     protected Class<? extends R> extractRepositoryClass(Injector injector) {
@@ -157,27 +164,32 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
         factory.setEntityManager(entityManager);
         factory.setRepositoryInterface(repositoryClass);
 
-        implementationClass = customRepositoryImplementationResolver.resolve(repositoryClass, domainClass);
-        if (implementationClass != null) {
-            Object customRepositoryImplementation = null;
-            //
-            try {
-                if (ClassUtils.isAssignable(SimpleJpaRepository.class, implementationClass)) {
-                    customRepositoryImplementation = implementationClass.getConstructor(Class.class, EntityManager.class).newInstance(domainClass, entityManager);
-                } else {
-                    customRepositoryImplementation = implementationClass.newInstance();
-                }
-            } catch (Throwable e) {
-                logger.error(String.format("Unable to instantiate custom repository implementation. Class is [%s]", implementationClass.getName()), e);
-            }
+        if (customRepositoryImplClass != null) {
+            Object customRepositoryImplementation = instantiateCustomRepository();
 
-            if (customRepositoryImplementation!=null){
+            if (customRepositoryImplementation != null) {
                 factory.setCustomImplementation(customRepositoryImplementation);
             }
         }
+
         factory.afterPropertiesSet();
 
         return (R) factory.getObject();
+    }
+
+    private Object instantiateCustomRepository() {
+        Object customRepositoryImplementation = null;
+        //
+        try {
+            if (ClassUtils.isAssignable(SimpleJpaRepository.class, customRepositoryImplClass)) {
+                customRepositoryImplementation = customRepositoryImplClass.getConstructor(Class.class, EntityManager.class).newInstance(domainClass, entityManagerProvider.get());
+            } else {
+                customRepositoryImplementation = customRepositoryImplClass.newInstance();
+            }
+        } catch (Throwable e) {
+            logger.error(String.format("Unable to instantiate custom repository implementation. Repository class is [%s]", customRepositoryImplClass.getName()), e);
+        }
+        return customRepositoryImplementation;
     }
 
     private static class CustomJpaRepositoryFactory extends JpaRepositoryFactory {

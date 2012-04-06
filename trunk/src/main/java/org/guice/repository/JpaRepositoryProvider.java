@@ -57,26 +57,22 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
     private ApplicationContext context;
     private Provider<EntityManager> entityManagerProvider;
     private Class domainClass;
-    private Class customRepositoryImplClass;
+    private Class implementationClass;
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
-    public JpaRepositoryProvider(Class<? extends R> repositoryClass) {
+    JpaRepositoryProvider(Class<? extends Repository> repositoryClass, String... options) {
         Assert.notNull(repositoryClass);
         this.repositoryClass = repositoryClass;
     }
 
-    public JpaRepositoryProvider(Class<? extends R> repositoryClass, Class customRepositoryImplClass) {
-        this(repositoryClass);
-        Assert.notNull(customRepositoryImplClass);
-        this.repositoryClass = repositoryClass;
-        this.customRepositoryImplClass = customRepositoryImplClass;
-        logger.info(String.format("Custom repository implementation class for [%s] set to [%s]", repositoryClass.getName(), customRepositoryImplClass.getName()));
+    public JpaRepositoryProvider(Class implementationClass) {
+        Assert.notNull(implementationClass);
+        this.implementationClass = implementationClass;
     }
 
     public JpaRepositoryProvider() {
     }
-    //TODO: возможность указания своего собственного customRepositoryClass
 
     /*===========================================[ CLASS METHODS ]==============*/
 
@@ -94,9 +90,10 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
         domainClass = domainClassResolver.resolve(repositoryClass);
         context = createSpringContext();
 
-        if (customRepositoryImplClass == null) {
-            customRepositoryImplClass = customRepositoryImplementationResolver.resolve(repositoryClass, domainClass);
+        if (implementationClass == null) {
+            implementationClass = customRepositoryImplementationResolver.resolve(repositoryClass, domainClass);
         }
+        logger.info(String.format("Custom repository implementation class for [%s] set to [%s]", repositoryClass.getName(), implementationClass.getName()));
     }
 
     protected Class<? extends R> extractRepositoryClass(Injector injector) {
@@ -164,7 +161,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
         factory.setEntityManager(entityManager);
         factory.setRepositoryInterface(repositoryClass);
 
-        if (customRepositoryImplClass != null) {
+        if (implementationClass != null) {
             Object customRepositoryImplementation = instantiateCustomRepository();
 
             if (customRepositoryImplementation != null) {
@@ -181,13 +178,13 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
         Object customRepositoryImplementation = null;
         //
         try {
-            if (ClassUtils.isAssignable(SimpleJpaRepository.class, customRepositoryImplClass)) {
-                customRepositoryImplementation = customRepositoryImplClass.getConstructor(Class.class, EntityManager.class).newInstance(domainClass, entityManagerProvider.get());
+            if (ClassUtils.isAssignable(SimpleJpaRepository.class, implementationClass)) {
+                customRepositoryImplementation = implementationClass.getConstructor(Class.class, EntityManager.class).newInstance(domainClass, entityManagerProvider.get());
             } else {
-                customRepositoryImplementation = customRepositoryImplClass.newInstance();
+                customRepositoryImplementation = implementationClass.newInstance();
             }
         } catch (Throwable e) {
-            logger.error(String.format("Unable to instantiate custom repository implementation. Repository class is [%s]", customRepositoryImplClass.getName()), e);
+            logger.error(String.format("Unable to instantiate custom repository implementation. Repository class is [%s]", implementationClass.getName()), e);
         }
         return customRepositoryImplementation;
     }

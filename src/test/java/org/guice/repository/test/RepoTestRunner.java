@@ -9,9 +9,10 @@
 
 package org.guice.repository.test;
 
-import org.guice.repository.ScanningJpaPersistenceModule;
-import org.junit.runners.model.InitializationError;
 import org.guice.common.GuiceTestRunner;
+import org.guice.repository.JpaPersistenceModule;
+import org.guice.repository.JpaRepositoryProvider;
+import org.junit.runners.model.InitializationError;
 
 
 public class RepoTestRunner extends GuiceTestRunner {
@@ -19,14 +20,13 @@ public class RepoTestRunner extends GuiceTestRunner {
     /*===========================================[ CLASS METHODS ]==============*/
 
     public RepoTestRunner(Class<?> classToRun) throws InitializationError {
-/*
-        super(classToRun, new JPAPersistenceModule() {
+        super(classToRun, new JpaPersistenceModule() {
             @Override
             protected void configureRepositories() {
-                bind(UserRepository.class).toProvider(new JPARepositoryProvider<UserRepository>());
+                bind(UserRepository.class).toProvider(new JpaRepositoryProvider<UserRepository>(UserRepositoryCustomImpl.class));
             }
         });
-*/
-        super(classToRun, new ScanningJpaPersistenceModule("org.guice.repository.test"));
+//        super(classToRun, new ScanningJpaPersistenceModule("org.guice.repository.test"));
+//        super(classToRun, new ScanningJpaPersistenceModule("org.guice.repository.test"));
     }
 }

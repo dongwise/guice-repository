@@ -83,7 +83,7 @@ public abstract class JpaPersistenceModule extends AbstractModule {
 
         bind(JpaInitializer.class).asEagerSingleton();
         bind(DomainClassResolver.class).in(Scopes.SINGLETON);
-        bind(CustomRepositoryResolver.class).in(Scopes.SINGLETON);
+        bind(CustomRepositoryImplementationResolver.class).in(Scopes.SINGLETON);
         configureRepositories();
         logger.info(String.format("%s configured", moduleName));
     }

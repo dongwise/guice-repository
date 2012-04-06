@@ -52,6 +52,8 @@ public class RepositoryTest {
 */
 
         UserRepository userRepository = userRepositoryProvider.get();
+        userRepository.someCustomMethod(new User("one", "two", 42));
+
         userRepository.deleteInactiveUsers();
         userRepository.deleteOtherUsers();
         TimeUnit.SECONDS.sleep(10);

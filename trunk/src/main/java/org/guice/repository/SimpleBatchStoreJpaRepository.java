@@ -34,7 +34,7 @@ import java.util.List;
 @Repository
 @Transactional(readOnly = true)
 public class SimpleBatchStoreJpaRepository<T, ID extends Serializable> extends SimpleJpaRepository<T, ID> implements
-        BatchStoreRepository<T>, LowLevelJpaRepository<T, ID> {
+        BatchStoreRepository<T>, EntityManagerProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(SimpleBatchStoreJpaRepository.class);
 

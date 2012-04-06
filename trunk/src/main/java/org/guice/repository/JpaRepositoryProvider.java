@@ -27,10 +27,7 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.support.JpaEntityInformation;
-import org.springframework.data.jpa.repository.support.JpaRepositoryFactory;
-import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
-import org.springframework.data.jpa.repository.support.QueryDslJpaRepository;
+import org.springframework.data.jpa.repository.support.*;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.core.RepositoryMetadata;
@@ -38,6 +35,7 @@ import org.springframework.data.repository.core.support.RepositoryFactorySupport
 import org.springframework.orm.jpa.EntityManagerHolder;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.util.ClassUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -58,7 +56,8 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
     private ApplicationContext context;
     private Provider<EntityManager> entityManagerProvider;
     private Class domainClass;
-    private CustomRepositoryResolver customRepositoryResolver;
+    private CustomRepositoryImplementationResolver customRepositoryImplementationResolver;
+    private Class implementationClass;
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
@@ -66,8 +65,14 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
         this.repositoryClass = repositoryClass;
     }
 
+    public JpaRepositoryProvider(Class<? extends Repository> repositoryClass, Class implementationClass) {
+        this.repositoryClass = repositoryClass;
+        this.implementationClass = implementationClass;
+    }
+
     public JpaRepositoryProvider() {
     }
+    //TODO: возможность указания своего собственного customRepositoryClass
 
     /*===========================================[ CLASS METHODS ]==============*/
 
@@ -75,7 +80,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
     public void init(Injector injector,
                      Provider<EntityManagerFactory> entityManagerFactoryProvider,
                      Provider<EntityManager> entityManagerProvider,
-                     CustomRepositoryResolver customRepositoryResolver,
+                     CustomRepositoryImplementationResolver customRepositoryImplementationResolver,
                      DomainClassResolver domainClassResolver) {
         this.entityManagerFactoryProvider = entityManagerFactoryProvider;
         this.entityManagerProvider = entityManagerProvider;
@@ -84,7 +89,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
         }
         domainClass = domainClassResolver.resolve(repositoryClass);
         context = createSpringContext();
-        this.customRepositoryResolver = customRepositoryResolver;
+        this.customRepositoryImplementationResolver = customRepositoryImplementationResolver;
     }
 
     protected Class<? extends R> extractRepositoryClass(Injector injector) {
@@ -147,15 +152,29 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
                 return new CustomJpaRepositoryFactory(entityManager);
             }
         };
-        //TODO решить вопрос с custom repo
+
         factory.setBeanFactory(context);
         factory.setEntityManager(entityManager);
         factory.setRepositoryInterface(repositoryClass);
-        Object customImplementation = customRepositoryResolver.resolve(repositoryClass, domainClass);
-//        if (customImplementation != null) {
-//        factory.setCustomImplementation(new SimpleBatchStoreJpaRepository(domainClass, entityManager));
-//            factory.setCustomImplementation(customImplementation);
-//        }
+
+        implementationClass = customRepositoryImplementationResolver.resolve(repositoryClass, domainClass);
+        if (implementationClass != null) {
+            Object customRepositoryImplementation = null;
+            //
+            try {
+                if (ClassUtils.isAssignable(SimpleJpaRepository.class, implementationClass)) {
+                    customRepositoryImplementation = implementationClass.getConstructor(Class.class, EntityManager.class).newInstance(domainClass, entityManager);
+                } else {
+                    customRepositoryImplementation = implementationClass.newInstance();
+                }
+            } catch (Throwable e) {
+                logger.error(String.format("Unable to instantiate custom repository implementation. Class is [%s]", implementationClass.getName()), e);
+            }
+
+            if (customRepositoryImplementation!=null){
+                factory.setCustomImplementation(customRepositoryImplementation);
+            }
+        }
         factory.afterPropertiesSet();
 
         return (R) factory.getObject();
@@ -187,6 +206,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
             }
         }
 
+        @SuppressWarnings({"MethodOverridesPrivateMethodOfSuperclass"})
         private boolean isQueryDslExecutor(Class<?> repositoryInterface) {
             return QUERY_DSL_PRESENT && QueryDslPredicateExecutor.class.isAssignableFrom(repositoryInterface);
         }

@@ -16,6 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import javax.persistence.EntityManager;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -38,6 +39,7 @@ public class BatchStoreRepositoryTest {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
+                EntityManager entityManager = accountRepositoryProvider.get().getEntityManager();
                 System.out.println(String.format("Current count: [%d], free memory: [%d] mb", accountRepositoryProvider.get().count(),
                         Runtime.getRuntime().freeMemory() / (1024 * 1024)));
             }

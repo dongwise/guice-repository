@@ -18,12 +18,9 @@
 
 package org.guice.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import javax.persistence.EntityManager;
-import java.io.Serializable;
 
-public interface LowLevelJpaRepository<T, ID extends Serializable> extends JpaRepository<T, ID>{
+public interface EntityManagerProvider {
 
     /*===========================================[ INTERFACE METHODS ]==============*/
 

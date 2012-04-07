@@ -1,23 +1,23 @@
 #summary One-sentence summary of this page.
 
-=Repository pattern support for Google Guice=
+= Repository pattern support for Google Guice =
 
 "*by Edward Hieatt and Rob Mee*
 
 _Mediates between the domain and data mapping layers using a collection-like interface for accessing domain objects._"
 
+[http://martinfowler.com/eaaCatalog/repository.html http://guice-repository.googlecode.com/svn/wiki/img/repository.png]
 <g:plusone size="medium"></g:plusone>
 
-based on spring-data-jpa project.
-Full description regarding to underlying API is here:
- * http://springsource.org/spring-data/jpa
- * http://design-pattern.ru/patterns/repository.html
+Some theory can be found here:
+ * http://martinfowler.com/eaaCatalog/repository.html
  * http://msdn.microsoft.com/en-us/library/ff649690.aspx
+ * http://design-pattern.ru/patterns/repository.html
 
-
+----
 = Details =
 
-Add your content here.  Format your content with:
-  * http://martinfowler.com/eaaCatalog/repository.html
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+This project is a *Guice-adapted* version of [http://www.springsource.org/spring-data/jpa spring-data-jpa].
+All reference documentation regarding to *spring-data-jpa* is
+[http://static.springsource.org/spring-data/data-jpa/docs/current/reference/html/ here].
+

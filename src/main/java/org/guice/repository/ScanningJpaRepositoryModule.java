@@ -38,7 +38,7 @@ import static com.google.common.collect.Collections2.filter;
 
 /**
  * Guice module with Repository support and auto Repository-scanning abilities.
- * With this module there is no need to manual binding of any Repositories:
+ * With this module there is no need to manual binding of any Repositories - just specify target repository package :
  * <pre>
  *     install(new ScanningJpaRepositoryModule("com.mycorp.repo"){
  *        protected String getPersistenceUnitName(){

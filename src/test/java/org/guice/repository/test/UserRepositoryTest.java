@@ -13,6 +13,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import org.guice.repository.test.model.User;
 import org.guice.repository.test.runner.ManualBindRepoTestRunner;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.data.domain.Page;
@@ -34,6 +35,12 @@ public class UserRepositoryTest {
     private Provider<UserRepository> userRepositoryProvider;
 
     /*===========================================[ CLASS METHODS ]==============*/
+
+    @Before
+    public void cleanup() {
+        userRepositoryProvider.get().deleteAll();
+    }
+
 
     @Test
     public void testRepo() throws Exception {

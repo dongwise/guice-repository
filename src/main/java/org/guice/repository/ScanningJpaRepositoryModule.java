@@ -18,6 +18,7 @@
 
 package org.guice.repository;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
@@ -31,9 +32,9 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 import java.net.URL;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+
+import static com.google.common.collect.Collections2.filter;
 
 public class ScanningJpaRepositoryModule extends JpaRepositoryModule {
 
@@ -94,12 +95,26 @@ public class ScanningJpaRepositoryModule extends JpaRepositoryModule {
         repositoryClasses.addAll(reflections.getSubTypesOf(PagingAndSortingRepository.class));
         repositoryClasses.addAll(reflections.getSubTypesOf(JpaRepository.class));
 
-        //TODO: do something with implementations
-        for (Class<?> repositoryClass : repositoryClasses) {
+        // Extraction of real Repository implementations (Classes)
+        Collection<Class<?>> implementations = filter(repositoryClasses, new Predicate<Class<?>>() {
+            public boolean apply(Class<?> input) {
+                return !input.isInterface();
+            }
+        });
+
+        for (final Class<?> repositoryClass : repositoryClasses) {
             // Autobind only for interfaces
             if (repositoryClass.isInterface()) {
+                Collection<Class<?>> repoImplementations = filter(implementations, new Predicate<Class<?>>() {
+                    public boolean apply(Class<?> input) {
+                        return repositoryClass.isAssignableFrom(input);
+                    }
+                });
+
+                Iterator<Class<?>> iterator = repoImplementations.iterator();
+                Class<?> implementation = iterator.hasNext() ? iterator.next() : null;
                 getLogger().info(String.format("Found repository: [%s]", repositoryClass.getName()));
-                bind(repositoryClass).toProvider(new JpaRepositoryProvider(repositoryClass, "internal"));
+                bind(repositoryClass).toProvider(new JpaRepositoryProvider(repositoryClass, implementation));
             }
         }
     }

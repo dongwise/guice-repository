@@ -55,6 +55,7 @@ public class BatchStoreRepositoryTest {
                         Runtime.getRuntime().freeMemory() / (1024 * 1024)));
             }
         }, TimeUnit.SECONDS.toMillis(1), TimeUnit.SECONDS.toMillis(1));
+        accountRepositoryProvider.get().deleteAll();
     }
 
     @After

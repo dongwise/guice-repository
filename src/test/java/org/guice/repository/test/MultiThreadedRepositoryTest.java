@@ -22,6 +22,7 @@ import com.google.inject.Injector;
 import org.guice.repository.test.model.User;
 import org.guice.repository.test.runner.ManualBindRepoTestRunner;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -31,13 +32,15 @@ import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 @RunWith(ManualBindRepoTestRunner.class)
 public class MultiThreadedRepositoryTest {
 
     /*===========================================[ STATIC VARIABLES ]=============*/
 
-    private static final int MAX_CONCURRENT_THREADS = 100;
+    private static final int MAX_CONCURRENT_THREADS = 50;
+    private static final int COUNT_PER_THREAD = 10;
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
@@ -46,6 +49,11 @@ public class MultiThreadedRepositoryTest {
 
     /*===========================================[ CLASS METHODS ]==============*/
 
+    @Before
+    public void cleanup() {
+        injector.getInstance(UserRepository.class).deleteAll();
+    }
+
     @Test
     public void testConcurrentAccess() throws InterruptedException {
         Collection<Callable<Object>> callables = new ArrayList<Callable<Object>>();
@@ -53,7 +61,9 @@ public class MultiThreadedRepositoryTest {
         Runnable repoExploiter = new Runnable() {
             public void run() {
                 UserRepository instance = injector.getInstance(UserRepository.class);
-                instance.save(new User(UUID.randomUUID().toString(), UUID.randomUUID().toString(), 1));
+                for (int i = 0; i < COUNT_PER_THREAD; i++) {
+                    instance.save(new User(UUID.randomUUID().toString(), UUID.randomUUID().toString(), i));
+                }
             }
         };
         for (int i = 0; i < MAX_CONCURRENT_THREADS; i++) {
@@ -61,7 +71,7 @@ public class MultiThreadedRepositoryTest {
         }
 
         Executors.newFixedThreadPool(MAX_CONCURRENT_THREADS).invokeAll(callables);
-
-        Assert.assertEquals("Invalid entities count", MAX_CONCURRENT_THREADS, injector.getInstance(UserRepository.class).count());
+        TimeUnit.SECONDS.sleep(5);
+        Assert.assertEquals("Invalid entities count", MAX_CONCURRENT_THREADS * COUNT_PER_THREAD, injector.getInstance(UserRepository.class).count());
     }
 }

@@ -25,9 +25,9 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceException;
 
 /**
- *
+ * Holder for EntityManagerFactory, it is for Spring-data integration.
  */
-public class GuiceLocalEntityManagerFactoryBean extends LocalEntityManagerFactoryBean {
+class GuiceLocalEntityManagerFactoryBean extends LocalEntityManagerFactoryBean {
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
@@ -35,7 +35,7 @@ public class GuiceLocalEntityManagerFactoryBean extends LocalEntityManagerFactor
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
-    public GuiceLocalEntityManagerFactoryBean(Provider<EntityManagerFactory> entityManagerFactoryProvider) {
+    GuiceLocalEntityManagerFactoryBean(Provider<EntityManagerFactory> entityManagerFactoryProvider) {
         this.entityManagerFactoryProvider = entityManagerFactoryProvider;
     }
 

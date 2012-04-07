@@ -66,6 +66,13 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
         this.repositoryClass = repositoryClass;
     }
 
+    JpaRepositoryProvider(Class<R> repositoryClass, Class implementationClass) {
+        Assert.notNull(repositoryClass);
+        this.repositoryClass = repositoryClass;
+        this.implementationClass = implementationClass;
+    }
+
+
     public JpaRepositoryProvider(Class implementationClass) {
         Assert.notNull(implementationClass);
         this.implementationClass = implementationClass;

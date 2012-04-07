@@ -19,7 +19,7 @@
 package org.guice.repository.test.runner;
 
 import org.guice.common.GuiceTestRunner;
-import org.guice.repository.ScanningJpaPersistenceModule;
+import org.guice.repository.ScanningJpaRepositoryModule;
 import org.junit.runners.model.InitializationError;
 
 public class AutoBindRepoTestRunner extends GuiceTestRunner {
@@ -27,6 +27,6 @@ public class AutoBindRepoTestRunner extends GuiceTestRunner {
     /*===========================================[ CLASS METHODS ]==============*/
 
     public AutoBindRepoTestRunner(Class<?> classToRun) throws InitializationError {
-        super(classToRun, new ScanningJpaPersistenceModule("org.guice.repository.test"));
+        super(classToRun, new ScanningJpaRepositoryModule("org.guice.repository.test"));
     }
 }

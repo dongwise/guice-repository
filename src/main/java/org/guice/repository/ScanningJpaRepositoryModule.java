@@ -36,6 +36,19 @@ import java.util.*;
 
 import static com.google.common.collect.Collections2.filter;
 
+/**
+ * Guice module with Repository support and auto Repository-scanning abilities.
+ * With this module there is no need to manual binding of any Repositories:
+ * <pre>
+ *     install(new ScanningJpaRepositoryModule("com.mycorp.repo"){
+ *        protected String getPersistenceUnitName(){
+ *            return "my-persistence-unit";
+ *        }
+ *     });
+ * </pre>
+ *
+ * @author Alexey Krylov AKA lexx
+ */
 public class ScanningJpaRepositoryModule extends JpaRepositoryModule {
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
@@ -45,19 +58,15 @@ public class ScanningJpaRepositoryModule extends JpaRepositoryModule {
     /*===========================================[ CONSTRUCTORS ]===============*/
 
     /**
-     * @param targetScanPackage   package to scan for repositories.
-     * @param persistenceUnitName optional persistence-unit name, if not defined module will try to get it from the
-     *                            system property called "persistence-unit-name"
+     * @param targetScanPackage package to scan for repositories.
      */
     public ScanningJpaRepositoryModule(String targetScanPackage, String... persistenceUnitName) {
         super(persistenceUnitName);
         targetScanPackages = Arrays.asList(targetScanPackage);
-
     }
 
     /**
-     * @param targetScanPackage   package to scan for repositories.
-     * @param persistenceUnitName
+     * @param targetScanPackage packages to scan for repositories.
      */
     public ScanningJpaRepositoryModule(Iterable<String> targetScanPackages, String... persistenceUnitName) {
         super(persistenceUnitName);
@@ -94,6 +103,7 @@ public class ScanningJpaRepositoryModule extends JpaRepositoryModule {
         repositoryClasses.addAll(reflections.getSubTypesOf(CrudRepository.class));
         repositoryClasses.addAll(reflections.getSubTypesOf(PagingAndSortingRepository.class));
         repositoryClasses.addAll(reflections.getSubTypesOf(JpaRepository.class));
+        repositoryClasses.addAll(reflections.getSubTypesOf(BatchStoreJpaRepository.class));
 
         // Extraction of real Repository implementations (Classes)
         Collection<Class<?>> implementations = filter(repositoryClasses, new Predicate<Class<?>>() {

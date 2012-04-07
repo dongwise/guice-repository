@@ -23,6 +23,11 @@ import com.google.inject.persist.PersistService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * PersistService starter, which is needed for Guice-Persist module.
+ *
+ * @author Alexey Krylov AKA lexx
+ */
 class JpaInitializer {
 
     /*===========================================[ STATIC VARIABLES ]=============*/
@@ -37,7 +42,6 @@ class JpaInitializer {
             service.start();
             logger.debug("PersistService started");
         } catch (Exception e) {
-            // Ошибка может возникнуть в случае некорректно указанных параметров
             logger.error("Error", e);
             throw new RuntimeException(e);
         }

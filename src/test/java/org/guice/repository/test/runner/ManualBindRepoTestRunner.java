@@ -32,9 +32,9 @@ public class ManualBindRepoTestRunner extends GuiceTestRunner {
         super(classToRun, new JpaRepositoryModule() {
             @Override
             protected void configureRepositories() {
-                bind(UserRepository.class).toProvider(new JpaRepositoryProvider<UserRepository>(UserRepositoryCustomImpl.class));
+                bind(UserRepository.class).toProvider(new JpaRepositoryProvider<UserRepository>());
                 bind(AccountRepository.class).toProvider(new JpaRepositoryProvider<AccountRepository>());
-                bind(CustomerRepository.class).toProvider(new JpaRepositoryProvider<CustomerRepositoryImpl>(CustomerRepositoryImpl.class));
+                bind(CustomerRepository.class).toProvider(new JpaRepositoryProvider<CustomerRepository>(CustomerRepositoryImpl.class));
             }
         });
     }

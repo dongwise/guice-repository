@@ -27,6 +27,38 @@ import org.slf4j.LoggerFactory;
 import java.io.InputStream;
 import java.util.Properties;
 
+/**
+ * Guice module with Repository support. Repository bindings should be made in <code>configureRepositories</code>
+ * method. Module uses JpaPersistModule from guice-persist, which is requires persistence-unit name as an input
+ * parameter. There is three options to specify persistence-unit name:
+ * <pre>
+ * <ol>
+ *     <li>
+ *         constructor parameter. For example: new JpaRepositoryModule("my-persistence-unit")
+ *     </li>
+ *     <li>
+ *         system property 'persistence-unit-name'. For example: launch an application with
+ * -Dpersistence-unit-name=my-persistence-unit
+ *     </li>
+ *     <li>override <code>getPersistenceUnitName</code> method. For example:
+ *        <pre>
+ *          new JpaRepositoryModule(){
+ *               protected String getPersistenceUnitName() {
+ *                    return "my-persistence-unit";
+ *               }
+ *          }
+ *       </pre>
+ *     </li>
+ * </ol>
+ * </pre>
+ * <p/>
+ * It is very useful to separate ORM specifics from persistence.xml. This technique gives you possibilities to pack your
+ * persistence.xml with mappings/specification-driven aspects to artifact. Module will look for this specifics in
+ * ${persistence-unit-name}.properties file placed in the classpath. Also you can define all ORM specifics in
+ * persistence.xml, there is no problem with it.
+ *
+ * @author Alexey Krylov AKA lexx
+ */
 public abstract class JpaRepositoryModule extends AbstractModule {
 
     /*===========================================[ STATIC VARIABLES ]=============*/
@@ -50,7 +82,7 @@ public abstract class JpaRepositoryModule extends AbstractModule {
             if (pUnitName == null) {
                 pUnitName = System.getProperty(P_PERSISTENCE_UNIT_NAME);
                 if (pUnitName == null) {
-                    throw new IllegalStateException("Unable to instantiate JpaPersistenceModule: no persistence-unit-name specified");
+                    throw new IllegalStateException("Unable to instantiate JpaRepositoryModule: no persistence-unit-name specified");
                 }
             }
         }
@@ -61,8 +93,9 @@ public abstract class JpaRepositoryModule extends AbstractModule {
     /*===========================================[ CLASS METHODS ]==============*/
 
     /**
-     * Your own customizable way to provide persistence-unit name.
-     * @return
+     * A way to provide persistence-unit name.
+     *
+     * @return persistence-unit name.
      */
     protected String getPersistenceUnitName() {
         return null;
@@ -72,9 +105,10 @@ public abstract class JpaRepositoryModule extends AbstractModule {
     protected void configure() {
         String moduleName = getClass().getSimpleName();
         logger.info(String.format("Configuring %s with persistence-unit name: [%s]", moduleName, persistenceUnitName));
-        Properties props = getPersistenceUnitProperties();
 
         JpaPersistModule module = new JpaPersistModule(persistenceUnitName);
+
+        Properties props = getPersistenceUnitProperties();
         if (props != null) {
             // Передаем параметры инициализации Persistence-контекста
             module.properties(props);
@@ -89,28 +123,30 @@ public abstract class JpaRepositoryModule extends AbstractModule {
     }
 
     /**
-     * Custom persistence-unit properties - for example it can be Hibernate/EclipseLink specific parameters.
-     * By-default this properties loaded from file named ${persistenceUnitName}.properties.
-     * @return initialized java.util.Properties.
+     * Custom persistence-unit properties - for example it can consist Hibernate/EclipseLink specific parameters.
+     * By-default this properties loaded from file named ${persistence-unit-name}.properties located in the classpath.
+     *
+     * @return initialized java.util.Properties or null.
      */
     protected Properties getPersistenceUnitProperties() {
-        Properties props = new Properties();
+        Properties props = null;
         String propFileName = persistenceUnitName + ".properties";
 
-        InputStream fin = getClass().getClassLoader().getResourceAsStream(propFileName);
-        if (fin != null) {
+        InputStream pStream = getClass().getClassLoader().getResourceAsStream(propFileName);
+        if (pStream != null) {
+            props = new Properties();
             try {
-                props.load(fin);
+                props.load(pStream);
             } catch (Exception e) {
-                logger.error("Error", e);
-                throw new RuntimeException("Error reading properties file: " + propFileName);
+                logger.error(String.format("Unable to load properties for persistence-unit: [%s]", persistenceUnitName), e);
             }
-        } else {
-            throw new RuntimeException("Properties file not found: " + propFileName);
         }
         return props;
     }
 
+    /**
+     * Bind your custom Repository
+     */
     protected abstract void configureRepositories();
 
     protected Logger getLogger() {

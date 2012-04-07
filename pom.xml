@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.sonatype.oss</groupId>
         <artifactId>oss-parent</artifactId>
-        <version>3</version>
+        <version>7</version>
     </parent>
 
     <groupId>org.guice-repository</groupId>
@@ -34,6 +34,12 @@
             <email>aleksey.krylov@gmail.com</email>
         </developer>
     </developers>
+
+    <scm>
+        <connection>scm:svn:https://guice-repository.googlecode.com/svn/trunk</connection>
+        <developerConnection>scm:svn:https://guice-repository.googlecode.com/svn/trunk</developerConnection>
+        <url>https://guice-repository.googlecode.com/svn/trunk</url>
+    </scm>
 
     <properties>
         <module.encoding>UTF-8</module.encoding>
@@ -82,12 +88,6 @@
         <version.maven-changelog-plugin>2.2</version.maven-changelog-plugin>
         <version.maven-gpg-plugin>1.4</version.maven-gpg-plugin>
     </properties>
-
-    <scm>
-        <connection>scm:svn:https://guice-repository.googlecode.com/svn/trunk</connection>
-        <developerConnection>scm:svn:https://guice-repository.googlecode.com/svn/trunk</developerConnection>
-        <url>https://guice-repository.googlecode.com/svn/trunk</url>
-    </scm>
 
     <dependencies>
 

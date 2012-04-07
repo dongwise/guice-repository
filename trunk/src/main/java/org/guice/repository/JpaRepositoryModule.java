@@ -145,7 +145,7 @@ public abstract class JpaRepositoryModule extends AbstractModule {
     }
 
     /**
-     * Bind your custom Repository
+     * Bind your repositories here.
      */
     protected abstract void configureRepositories();
 

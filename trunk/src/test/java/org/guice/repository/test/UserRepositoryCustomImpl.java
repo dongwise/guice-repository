@@ -9,26 +9,15 @@
 
 package org.guice.repository.test;
 
-import org.guice.repository.SimpleBatchStoreJpaRepository;
-import org.springframework.data.jpa.repository.support.JpaEntityInformation;
+import org.guice.repository.test.model.User;
+import org.junit.Assert;
 
-import javax.persistence.EntityManager;
+public class UserRepositoryCustomImpl implements  UserRepositoryCustom {
 
-public class UserRepositoryCustomImpl extends SimpleBatchStoreJpaRepository<User, Long> implements UserRepositoryCustom{
-/*===========================================[ STATIC VARIABLES ]=============*/
-/*===========================================[ INSTANCE VARIABLES ]=========*/
-/*===========================================[ CONSTRUCTORS ]===============*/
-
-    public UserRepositoryCustomImpl(Class<User> domainClass, EntityManager entityManager) {
-        super(domainClass, entityManager);
-    }
-
-    public UserRepositoryCustomImpl(JpaEntityInformation<User, Long> entityMetadata, EntityManager entityManager) {
-        super(entityMetadata, entityManager);
-    }
     /*===========================================[ CLASS METHODS ]==============*/
 
     public void someCustomMethod(User user) {
+        Assert.assertNotNull(user);
         System.out.println("user = " + user);
     }
 }

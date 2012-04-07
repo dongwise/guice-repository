@@ -7,7 +7,7 @@
     <artifactId>guice-repository</artifactId>
     <packaging>jar</packaging>
     <name>Guice Repository</name>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <description>Repository pattern implementation for Google Guice based on spring-data-jpa codebase.</description>
     <url>http://code.google.com/p/guice-repository</url>
     <licenses>

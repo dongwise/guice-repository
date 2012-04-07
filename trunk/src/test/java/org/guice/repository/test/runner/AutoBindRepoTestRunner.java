@@ -16,20 +16,17 @@
  * limitations under the License.
  */
 
-package org.guice.repository.test;
+package org.guice.repository.test.runner;
 
-import org.guice.repository.BatchStoreRepository;
-import org.guice.repository.EntityManagerProvider;
-import org.guice.repository.test.model.Account;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.guice.common.GuiceTestRunner;
+import org.guice.repository.ScanningJpaPersistenceModule;
+import org.junit.runners.model.InitializationError;
 
-public interface AccountRepository extends JpaRepository<Account, Long>, BatchStoreRepository<Account>,
-        EntityManagerProvider {
+public class AutoBindRepoTestRunner extends GuiceTestRunner {
 
-    Account findAccountByUuid(String uuid);
+    /*===========================================[ CLASS METHODS ]==============*/
 
-    @Query("select a from Account a where a.name = :name")
-    Account findAccountByName(@Param("name") String name);
+    public AutoBindRepoTestRunner(Class<?> classToRun) throws InitializationError {
+        super(classToRun, new ScanningJpaPersistenceModule("org.guice.repository.test"));
+    }
 }

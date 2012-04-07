@@ -18,18 +18,23 @@
 
 package org.guice.repository.test;
 
-import org.guice.repository.BatchStoreRepository;
-import org.guice.repository.EntityManagerProvider;
-import org.guice.repository.test.model.Account;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.guice.repository.test.model.Customer;
+import org.junit.Assert;
+import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 
-public interface AccountRepository extends JpaRepository<Account, Long>, BatchStoreRepository<Account>,
-        EntityManagerProvider {
+import javax.persistence.EntityManager;
 
-    Account findAccountByUuid(String uuid);
+public class CustomerRepositoryImpl extends SimpleJpaRepository<Customer,Long> implements CustomerRepository {
 
-    @Query("select a from Account a where a.name = :name")
-    Account findAccountByName(@Param("name") String name);
+    /*===========================================[ CONSTRUCTORS ]===============*/
+
+    public CustomerRepositoryImpl(Class<Customer> domainClass, EntityManager em) {
+        super(domainClass, em);
+    }
+    /*===========================================[ CLASS METHODS ]==============*/
+
+    public void sharedCustomMethod(Long customerID) {
+        Assert.assertNotNull(customerID);
+        System.out.println("customerID = " + customerID);
+    }
 }

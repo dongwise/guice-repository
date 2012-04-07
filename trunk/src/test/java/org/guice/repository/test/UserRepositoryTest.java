@@ -11,6 +11,8 @@ package org.guice.repository.test;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import org.guice.repository.test.model.User;
+import org.guice.repository.test.runner.ManualBindRepoTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.data.domain.Page;
@@ -20,45 +22,27 @@ import java.util.Arrays;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 
-@RunWith(RepoTestRunner.class)
-public class RepositoryTest {
-/*===========================================[ STATIC VARIABLES ]=============*/
-/*===========================================[ INSTANCE VARIABLES ]=========*/
-/*===========================================[ CONSTRUCTORS ]===============*/
-/*===========================================[ CLASS METHODS ]==============*/
+@RunWith(ManualBindRepoTestRunner.class)
+public class UserRepositoryTest {
 
-//    @Inject
-//    private CustomerRepository customerRepository;
-
-//    @Inject
-//    private AccountRepository accountRepository;
+    /*===========================================[ INSTANCE VARIABLES ]=========*/
 
     @Inject
     private Provider<UserRepository> userRepositoryProvider;
 
+    /*===========================================[ CLASS METHODS ]==============*/
+
     @Test
     public void testRepo() throws Exception {
-/*
-        long count = customerRepository.count();
-        customerRepository.save(new Customer("first", "second"));
-        assertEquals(1, customerRepository.count());
-
-        Page<Customer> all = customerRepository.findAll(new PageRequest(0, 100));
-        assertEquals(1, all.getNumberOfElements());
-*/
-
         UserRepository userRepository = userRepositoryProvider.get();
         userRepository.someCustomMethod(new User("one", "two", 42));
 
         userRepository.deleteInactiveUsers();
         userRepository.deleteOtherUsers();
-        TimeUnit.SECONDS.sleep(10);
 
-//        assertEquals(0, accountRepository.count());
         userRepository.deleteAll();
         assertEquals(0, userRepository.count());
 
@@ -69,7 +53,6 @@ public class RepositoryTest {
 
         Page<User> users = userRepository.findAll(new PageRequest(0, 100));
         assertEquals(3, users.getNumberOfElements());
-
 
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.invokeAll(Arrays.asList(Executors.callable(new Runnable() {

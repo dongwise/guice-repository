@@ -91,9 +91,13 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
         context = createSpringContext();
 
         if (implementationClass == null) {
-            implementationClass = customRepositoryImplementationResolver.resolve(repositoryClass, domainClass);
+            Class implementationClass = customRepositoryImplementationResolver.resolve(repositoryClass, domainClass);
+            if (implementationClass!=null){
+                this.implementationClass = implementationClass;
+                logger.info(String.format("Custom repository implementation class for [%s] set to [%s]", repositoryClass.getName(), implementationClass.getName()));
+            }
         }
-        logger.info(String.format("Custom repository implementation class for [%s] set to [%s]", repositoryClass.getName(), implementationClass.getName()));
+
     }
 
     protected Class<? extends R> extractRepositoryClass(Injector injector) {

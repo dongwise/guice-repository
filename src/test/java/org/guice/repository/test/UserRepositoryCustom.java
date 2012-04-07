@@ -9,6 +9,8 @@
 
 package org.guice.repository.test;
 
+import org.guice.repository.test.model.User;
+
 public interface UserRepositoryCustom {
     void someCustomMethod(User user);
 }

@@ -22,6 +22,7 @@ import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
+import org.springframework.data.jpa.repository.support.JpaEntityInformationSupport;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,12 +32,22 @@ import javax.persistence.EntityManager;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * JpaRepository with batch save support. It's a default implementation for all JPA repositories based on
+ * guice-repository.
+ *
+ * @author Alexey Krylov AKA lexx
+ * @see SimpleJpaRepository
+ */
+
 @Repository
 @Transactional(readOnly = true)
 public class SimpleBatchStoreJpaRepository<T, ID extends Serializable> extends SimpleJpaRepository<T, ID> implements
-        BatchStoreRepository<T>, EntityManagerProvider {
+        BatchStoreJpaRepository<T, ID>, EntityManagerProvider {
 
-    private static final Logger logger = LoggerFactory.getLogger(SimpleBatchStoreJpaRepository.class);
+    /*==========================================[ STATIC VARIABLES ]=============*/
+
+    private Logger logger;
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
@@ -45,19 +56,18 @@ public class SimpleBatchStoreJpaRepository<T, ID extends Serializable> extends S
     /*===========================================[ CONSTRUCTORS ]===============*/
 
     public SimpleBatchStoreJpaRepository(Class<T> domainClass, EntityManager entityManager) {
-        super(domainClass, entityManager);
-        this.entityManager = entityManager;
+        this(JpaEntityInformationSupport.getMetadata(domainClass, entityManager), entityManager);
     }
 
-    public SimpleBatchStoreJpaRepository(JpaEntityInformation<T, ID> entityMetadata, EntityManager entityManager) {
+    public SimpleBatchStoreJpaRepository(JpaEntityInformation<T, ?> entityMetadata, EntityManager entityManager) {
         super(entityMetadata, entityManager);
         this.entityManager = entityManager;
+        logger = LoggerFactory.getLogger(getClass());
     }
 
     /*===========================================[ CLASS METHODS ]==============*/
 
     /**
-     *
      * @param entities сохраняемые сущности.
      */
     public void saveInBatch(Iterable<T> entities) {
@@ -73,9 +83,10 @@ public class SimpleBatchStoreJpaRepository<T, ID extends Serializable> extends S
     public void saveInBatch(Iterable<T> entities, int batchSize) {
         List<T> list = Lists.newArrayList(entities);
         Assert.notEmpty(list);
+        Assert.isTrue(batchSize > 0);
 
         String entityClassName = list.iterator().next().getClass().getSimpleName();
-        logger.info(String.format("batch for [%s] of [%d]", entityClassName, list.size()));
+        logger.info(String.format("batch for [%d] of [%s]", list.size(), entityClassName ));
 
         int startIndex = 0;
         int count = list.size();
@@ -104,7 +115,7 @@ public class SimpleBatchStoreJpaRepository<T, ID extends Serializable> extends S
             }
         }
 
-        logger.info(String.format("batch for [%s] of [%d] stored", entityClassName, list.size()));
+        logger.info(String.format("batch for [%d] of [%s] stored", list.size(), entityClassName));
     }
 
     public EntityManager getEntityManager() {

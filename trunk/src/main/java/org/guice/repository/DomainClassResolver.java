@@ -21,6 +21,15 @@ package org.guice.repository;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
+/**
+ * Resolves Domain Class from class type parameter. For example: for repository like this
+ * <pre>
+ *      com.mycorp.repo.MyRepository&lt;com.mycorp.model.User&gt;
+ *  </pre>
+ * domain class will be resolved to <code>com.mycorp.model.User</code>
+ *
+ * @author Alexey Krylov AKA lexx
+ */
 class DomainClassResolver {
 
     /*===========================================[ CLASS METHODS ]==============*/

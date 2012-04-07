@@ -25,7 +25,9 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceException;
 
 /**
- * Holder for EntityManagerFactory, it is for Spring-data integration.
+ * Holder for EntityManagerFactory, it is needed for Spring-data integration.
+ *
+ * @author Alexey Krylov AKA lexx
  */
 class GuiceLocalEntityManagerFactoryBean extends LocalEntityManagerFactoryBean {
 

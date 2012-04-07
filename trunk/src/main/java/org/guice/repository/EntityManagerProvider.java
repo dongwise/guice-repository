@@ -21,7 +21,10 @@ package org.guice.repository;
 import javax.persistence.EntityManager;
 
 /**
- * Add this interface to your Repository if EntityManager instance is required for custom methods.
+ * Provides EntityManager for Repository. Extend your Repository from this interface if EntityManager instance is
+ * required for custom methods.
+ *
+ * @author Alexey Krylov AKA lexx
  */
 public interface EntityManagerProvider {
 

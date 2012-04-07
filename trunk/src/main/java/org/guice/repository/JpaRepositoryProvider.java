@@ -39,6 +39,33 @@ import javax.annotation.Nullable;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
+/**
+ * Creates an instance of JpaRepository. Bind all your repositories to this provider. Examples:
+ * <pre>
+ *  bind(UserRepository.class).toProvider(new JpaRepositoryProvider&lt;UserRepository&gt;());
+ *  bind(AccountRepository.class).toProvider(new JpaRepositoryProvider&lt;AccountRepository&gt;());
+ * </pre>
+ * In case when custom implementation class is a SimpleXXXRepository subclass - it should be passed as a constructor
+ * parameter.
+ * <pre>
+ *  bind(CustomerRepository.class).toProvider(new JpaRepositoryProvider&lt;CustomerRepository&gt;(CustomerRepositoryImpl.class));
+ * </pre>
+ * Note, that all Repositories is not thread-safe, because they works directly with EntityManager, which is also not
+ * thread-safe. Here is a valid example for concurrent Repository usage:
+ * <pre>
+ *     &#64;Inject
+ *     private Provider&lt;UserRepository&gt; userRepositoryProvider;
+ *     ...
+ *     // this method can be used concurrently
+ *     public void threadSafeRepoUsageMethod(){
+ *         UserRepository repo = userRepositoryProvider.get();
+ *         repo.save(new User("login", "password"));
+ *         repo.someOtherRepoMethod();
+ *     }
+ * </pre>
+ *
+ * @author Alexey Krylov AKA lexx
+ */
 public class JpaRepositoryProvider<R extends Repository> implements Provider<R> {
 
     /*===========================================[ STATIC VARIABLES ]=============*/
@@ -52,30 +79,35 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
     private ApplicationContext context;
     private Provider<EntityManager> entityManagerProvider;
     private Class domainClass;
-    private Class implementationClass;
-    private JpaRepositoryFactoryBean jpaRepositoryFactoryBean;
+    private Class customImplementationClass;
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
     /**
      * Constructor for auto-binding.
      *
-     * @param repositoryClass     class of Repository.
-     * @param implementationClass class of Repository implementation.
+     * @param repositoryClass           class of Repository.
+     * @param customImplementationClass custom implementation class of Repository.
      *
      * @see ScanningJpaRepositoryModule
      */
-    JpaRepositoryProvider(Class<R> repositoryClass, @Nullable Class implementationClass) {
+    JpaRepositoryProvider(Class<R> repositoryClass, @Nullable Class customImplementationClass) {
         Assert.notNull(repositoryClass);
         this.repositoryClass = repositoryClass;
-        this.implementationClass = implementationClass;
+        this.customImplementationClass = customImplementationClass;
     }
 
-    public JpaRepositoryProvider(Class implementationClass) {
-        Assert.notNull(implementationClass);
-        this.implementationClass = implementationClass;
+    /**
+     * @param customImplementationClass custom implementation class of Repository. Can't be null.
+     */
+    public JpaRepositoryProvider(Class customImplementationClass) {
+        Assert.notNull(customImplementationClass);
+        this.customImplementationClass = customImplementationClass;
     }
 
+    /**
+     * Default constructor.
+     */
     public JpaRepositoryProvider() {
     }
 
@@ -95,15 +127,22 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
         domainClass = domainClassResolver.resolve(repositoryClass);
         context = createSpringContext();
 
-        if (implementationClass == null) {
-            implementationClass = customRepositoryImplementationResolver.resolve(repositoryClass, domainClass);
+        if (customImplementationClass == null) {
+            customImplementationClass = customRepositoryImplementationResolver.resolve(repositoryClass);
         }
 
-        if (implementationClass != null) {
-            logger.info(String.format("Custom repository implementation class for [%s] set to [%s]", repositoryClass.getName(), implementationClass.getName()));
+        if (customImplementationClass != null) {
+            logger.info(String.format("Custom repository implementation class for [%s] set to [%s]", repositoryClass.getName(), customImplementationClass.getName()));
         }
     }
 
+    /**
+     * Extracts repository class from Guice-bindings (it's a type paramater).
+     *
+     * @param injector Google Guice injector.
+     *
+     * @return repository class.
+     */
     protected Class<R> extractRepositoryClass(Injector injector) {
         Class repositoryClass;
         Key<R> key = null;
@@ -124,6 +163,11 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
         return repositoryClass;
     }
 
+    /**
+     * Creates a Spring-context for spring-data-jpa.
+     *
+     * @return
+     */
     protected ApplicationContext createSpringContext() {
         GenericApplicationContext context = new GenericApplicationContext();
 
@@ -159,7 +203,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
         jpaRepositoryFactoryBean.setEntityManager(entityManager);
         jpaRepositoryFactoryBean.setRepositoryInterface(repositoryClass);
 
-        if (implementationClass != null) {
+        if (customImplementationClass != null) {
             Object customRepositoryImplementation = instantiateCustomRepository();
 
             if (customRepositoryImplementation != null) {
@@ -173,8 +217,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
     }
 
     /**
-     * Some instantiation example is here:
-     * https://jira.springsource.org/browse/DATAJPA-69
+     * Some instantiation example is <a href="https://jira.springsource.org/browse/DATAJPA-69">here</a>.
      */
     protected JpaRepositoryFactoryBean createJpaRepositoryFactoryBean() {
         return new JpaRepositoryFactoryBean() {
@@ -191,13 +234,13 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
          * we need to call a constructor with some parameters.
          */
         try {
-            if (SimpleJpaRepository.class.isAssignableFrom(implementationClass)) {
-                customRepositoryImplementation = implementationClass.getConstructor(Class.class, EntityManager.class).newInstance(domainClass, entityManagerProvider.get());
+            if (SimpleJpaRepository.class.isAssignableFrom(customImplementationClass)) {
+                customRepositoryImplementation = customImplementationClass.getConstructor(Class.class, EntityManager.class).newInstance(domainClass, entityManagerProvider.get());
             } else {
-                customRepositoryImplementation = implementationClass.newInstance();
+                customRepositoryImplementation = customImplementationClass.newInstance();
             }
         } catch (Throwable e) {
-            logger.error(String.format("Unable to instantiate custom repository implementation. Repository class is [%s]", implementationClass.getName()), e);
+            logger.error(String.format("Unable to instantiate custom repository implementation. Repository class is [%s]", customImplementationClass.getName()), e);
         }
         return customRepositoryImplementation;
     }

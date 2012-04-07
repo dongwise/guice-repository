@@ -18,13 +18,13 @@
 
 package org.guice.repository.test;
 
+import org.guice.repository.SimpleBatchStoreJpaRepository;
 import org.guice.repository.test.model.Customer;
 import org.junit.Assert;
-import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 
 import javax.persistence.EntityManager;
 
-public class CustomerRepositoryImpl extends SimpleJpaRepository<Customer,Long> implements CustomerRepository {
+public class CustomerRepositoryImpl extends SimpleBatchStoreJpaRepository<Customer,Long> implements CustomerRepository {
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 

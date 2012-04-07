@@ -96,7 +96,7 @@ public class ScanningJpaPersistenceModule extends JpaPersistenceModule {
 
         for (Class<?> repositoryClass : repositoryClasses) {
             getLogger().info(String.format("Found repository: [%s]", repositoryClass.getName()));
-            bind(repositoryClass).toProvider(new JpaRepositoryProvider(repositoryClass));
+            bind(repositoryClass).toProvider(new JpaRepositoryProvider(repositoryClass, "internal"));
         }
     }
 }

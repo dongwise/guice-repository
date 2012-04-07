@@ -52,7 +52,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
-    private Class<? extends Repository> repositoryClass;
+    private Class<R> repositoryClass;
     private Provider<EntityManagerFactory> entityManagerFactoryProvider;
     private ApplicationContext context;
     private Provider<EntityManager> entityManagerProvider;
@@ -61,7 +61,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
-    JpaRepositoryProvider(Class<? extends Repository> repositoryClass, String... options) {
+    JpaRepositoryProvider(Class<R> repositoryClass, String... options) {
         Assert.notNull(repositoryClass);
         this.repositoryClass = repositoryClass;
     }
@@ -100,7 +100,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
 
     }
 
-    protected Class<? extends R> extractRepositoryClass(Injector injector) {
+    protected Class<R> extractRepositoryClass(Injector injector) {
         Class repositoryClass;
         Key<R> key = null;
         BiMap<Key<?>, Binding<?>> biMap = ImmutableBiMap.copyOf(injector.getBindings());

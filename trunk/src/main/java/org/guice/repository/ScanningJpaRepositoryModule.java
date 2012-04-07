@@ -66,7 +66,7 @@ public class ScanningJpaRepositoryModule extends JpaRepositoryModule {
     }
 
     /**
-     * @param targetScanPackage packages to scan for repositories.
+     * @param targetScanPackages packages to scan for repositories.
      */
     public ScanningJpaRepositoryModule(Iterable<String> targetScanPackages, String... persistenceUnitName) {
         super(persistenceUnitName);

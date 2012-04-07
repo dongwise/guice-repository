@@ -36,9 +36,9 @@
     </developers>
 
     <scm>
-        <connection>scm:svn:https://guice-repository.googlecode.com/svn/trunk</connection>
-        <developerConnection>scm:svn:https://guice-repository.googlecode.com/svn/trunk</developerConnection>
-        <url>https://guice-repository.googlecode.com/svn/trunk</url>
+        <connection>scm:svn:https://guice-repository.googlecode.com/svn/trunk/</connection>
+        <developerConnection>scm:svn:https://guice-repository.googlecode.com/svn/trunk/</developerConnection>
+        <url>https://guice-repository.googlecode.com/svn/trunk/</url>
     </scm>
 
     <properties>

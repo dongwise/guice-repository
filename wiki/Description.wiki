@@ -17,7 +17,13 @@ Some theory can be found here:
 ----
 = Details =
 
-This project is a *Guice-adapted* version of [http://www.springsource.org/spring-data/jpa spring-data-jpa].
+This project is a *Guice-adapted* version of [http://www.springsource.org/spring-data/jpa spring-data-jpa] with some improvements.
 All reference documentation regarding to *spring-data-jpa* is
 [http://static.springsource.org/spring-data/data-jpa/docs/current/reference/html/ here].
 
+----
+= Features =
+ * Full support of points [http://static.springsource.org/spring-data/data-jpa/docs/current/reference/html/#repositories.core-concepts 1.1-1.4], [http://static.springsource.org/spring-data/data-jpa/docs/current/reference/html/#jpa.query-methods 2.2-2.4] from original *spring-data-jpa* documentation
+ * Support for batch store (see SimpleBatchStoreJpaRepository)
+ * Allow access for EntityManager (see EntityManagerProvider)
+ * 

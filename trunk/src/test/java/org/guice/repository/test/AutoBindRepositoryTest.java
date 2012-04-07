@@ -13,6 +13,7 @@ import org.guice.repository.test.model.Account;
 import org.guice.repository.test.model.Customer;
 import org.guice.repository.test.model.User;
 import org.guice.repository.test.runner.AutoBindRepoTestRunner;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -38,6 +39,13 @@ public class AutoBindRepositoryTest {
 
     /*===========================================[ CLASS METHODS ]==============*/
 
+    @Before
+    public void cleanup(){
+        userRepository.deleteAll();
+        accountRepository.deleteAll();
+        customerRepository.deleteAll();
+    }
+
     @Test
     public void testUserRepository(){
         userRepository.save(new User("name", "surname", 42));
@@ -48,6 +56,7 @@ public class AutoBindRepositoryTest {
 
     @Test
     public void testAccountRepository(){
+        accountRepository.deleteAll();
         String uuid = UUID.randomUUID().toString();
         accountRepository.save(new Account(uuid, "lexx"));
         assertEquals(1, accountRepository.count());

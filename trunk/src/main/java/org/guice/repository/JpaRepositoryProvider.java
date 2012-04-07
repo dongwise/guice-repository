@@ -26,23 +26,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.support.*;
-import org.springframework.data.querydsl.QueryDslPredicateExecutor;
+import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
+import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.data.repository.Repository;
-import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
 import org.springframework.orm.jpa.EntityManagerHolder;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
 
+import javax.annotation.Nullable;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import java.io.Serializable;
-
-import static org.springframework.data.querydsl.QueryDslUtils.QUERY_DSL_PRESENT;
 
 public class JpaRepositoryProvider<R extends Repository> implements Provider<R> {
 
@@ -58,20 +53,23 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
     private Provider<EntityManager> entityManagerProvider;
     private Class domainClass;
     private Class implementationClass;
+    private JpaRepositoryFactoryBean jpaRepositoryFactoryBean;
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
-    JpaRepositoryProvider(Class<R> repositoryClass, String... options) {
-        Assert.notNull(repositoryClass);
-        this.repositoryClass = repositoryClass;
-    }
-
-    JpaRepositoryProvider(Class<R> repositoryClass, Class implementationClass) {
+    /**
+     * Constructor for auto-binding.
+     *
+     * @param repositoryClass     class of Repository.
+     * @param implementationClass class of Repository implementation.
+     *
+     * @see ScanningJpaRepositoryModule
+     */
+    JpaRepositoryProvider(Class<R> repositoryClass, @Nullable Class implementationClass) {
         Assert.notNull(repositoryClass);
         this.repositoryClass = repositoryClass;
         this.implementationClass = implementationClass;
     }
-
 
     public JpaRepositoryProvider(Class implementationClass) {
         Assert.notNull(implementationClass);
@@ -98,13 +96,12 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
         context = createSpringContext();
 
         if (implementationClass == null) {
-            Class implementationClass = customRepositoryImplementationResolver.resolve(repositoryClass, domainClass);
-            if (implementationClass!=null){
-                this.implementationClass = implementationClass;
-                logger.info(String.format("Custom repository implementation class for [%s] set to [%s]", repositoryClass.getName(), implementationClass.getName()));
-            }
+            implementationClass = customRepositoryImplementationResolver.resolve(repositoryClass, domainClass);
         }
 
+        if (implementationClass != null) {
+            logger.info(String.format("Custom repository implementation class for [%s] set to [%s]", repositoryClass.getName(), implementationClass.getName()));
+        }
     }
 
     protected Class<R> extractRepositoryClass(Injector injector) {
@@ -146,11 +143,9 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
 
     public R get() {
         EntityManager entityManager = entityManagerProvider.get();
-        EntityManagerFactory entityManagerFactory = entityManagerFactoryProvider.get();
-
-        // Setup new ThreadLocal entityManager instance
         GuiceLocalEntityManagerFactoryBean entityManagerFactoryBean = context.getBean(GuiceLocalEntityManagerFactoryBean.class);
 
+        // Transaction support specifics
         EntityManagerFactory proxiedEmf = entityManagerFactoryBean.getObject();
         if (TransactionSynchronizationManager.hasResource(proxiedEmf)) {
             TransactionSynchronizationManager.unbindResource(proxiedEmf);
@@ -158,38 +153,45 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
 
         TransactionSynchronizationManager.bindResource(proxiedEmf, new EntityManagerHolder(entityManagerProvider.get()));
 
-        /**
-         * Some instantiation example is here:
-         * https://jira.springsource.org/browse/DATAJPA-69
-         */
-        JpaRepositoryFactoryBean factory = new JpaRepositoryFactoryBean() {
-            protected RepositoryFactorySupport createRepositoryFactory(EntityManager entityManager) {
-                return new CustomJpaRepositoryFactory(entityManager);
-            }
-        };
+        JpaRepositoryFactoryBean jpaRepositoryFactoryBean = createJpaRepositoryFactoryBean();
 
-        factory.setBeanFactory(context);
-        factory.setEntityManager(entityManager);
-        factory.setRepositoryInterface(repositoryClass);
+        jpaRepositoryFactoryBean.setBeanFactory(context);
+        jpaRepositoryFactoryBean.setEntityManager(entityManager);
+        jpaRepositoryFactoryBean.setRepositoryInterface(repositoryClass);
 
         if (implementationClass != null) {
             Object customRepositoryImplementation = instantiateCustomRepository();
 
             if (customRepositoryImplementation != null) {
-                factory.setCustomImplementation(customRepositoryImplementation);
+                jpaRepositoryFactoryBean.setCustomImplementation(customRepositoryImplementation);
             }
         }
 
-        factory.afterPropertiesSet();
+        jpaRepositoryFactoryBean.afterPropertiesSet();
 
-        return (R) factory.getObject();
+        return (R) jpaRepositoryFactoryBean.getObject();
     }
 
-    private Object instantiateCustomRepository() {
+    /**
+     * Some instantiation example is here:
+     * https://jira.springsource.org/browse/DATAJPA-69
+     */
+    protected JpaRepositoryFactoryBean createJpaRepositoryFactoryBean() {
+        return new JpaRepositoryFactoryBean() {
+            protected RepositoryFactorySupport createRepositoryFactory(EntityManager entityManager) {
+                return new CustomJpaRepositoryFactory(entityManager);
+            }
+        };
+    }
+
+    protected Object instantiateCustomRepository() {
         Object customRepositoryImplementation = null;
-        //
+        /**
+         * Watching a case when Repository implementation is a SimpleJpaRepository subclass -
+         * we need to call a constructor with some parameters.
+         */
         try {
-            if (ClassUtils.isAssignable(SimpleJpaRepository.class, implementationClass)) {
+            if (SimpleJpaRepository.class.isAssignableFrom(implementationClass)) {
                 customRepositoryImplementation = implementationClass.getConstructor(Class.class, EntityManager.class).newInstance(domainClass, entityManagerProvider.get());
             } else {
                 customRepositoryImplementation = implementationClass.newInstance();
@@ -198,37 +200,5 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
             logger.error(String.format("Unable to instantiate custom repository implementation. Repository class is [%s]", implementationClass.getName()), e);
         }
         return customRepositoryImplementation;
-    }
-
-    private static class CustomJpaRepositoryFactory extends JpaRepositoryFactory {
-        private CustomJpaRepositoryFactory(EntityManager entityManager) {
-            super(entityManager);
-        }
-
-        @Override
-        protected JpaRepository<?, ?> getTargetRepository(RepositoryMetadata metadata, EntityManager entityManager) {
-            Class<?> repositoryInterface = metadata.getRepositoryInterface();
-            JpaEntityInformation<?, Serializable> entityInformation = getEntityInformation(metadata.getDomainClass());
-
-            if (isQueryDslExecutor(repositoryInterface)) {
-                return new QueryDslJpaRepository(entityInformation, entityManager);
-            } else {
-                return new SimpleBatchStoreJpaRepository(entityInformation, entityManager);
-            }
-        }
-
-        @Override
-        protected Class<?> getRepositoryBaseClass(RepositoryMetadata metadata) {
-            if (isQueryDslExecutor(metadata.getRepositoryInterface())) {
-                return QueryDslJpaRepository.class;
-            } else {
-                return SimpleBatchStoreJpaRepository.class;
-            }
-        }
-
-        @SuppressWarnings({"MethodOverridesPrivateMethodOfSuperclass"})
-        private boolean isQueryDslExecutor(Class<?> repositoryInterface) {
-            return QUERY_DSL_PRESENT && QueryDslPredicateExecutor.class.isAssignableFrom(repositoryInterface);
-        }
     }
 }

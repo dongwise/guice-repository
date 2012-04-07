@@ -20,6 +20,7 @@ package org.guice.repository.test;
 
 import com.google.inject.Injector;
 import org.guice.repository.test.runner.ManualBindRepoTestRunner;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -46,6 +47,11 @@ public class MultiThreadedRepositoryInstantiationTest {
     private AtomicLong instanceCounter;
 
     /*===========================================[ CLASS METHODS ]==============*/
+
+    @Before
+    public void cleanup() {
+        injector.getInstance(UserRepository.class).deleteAll();
+    }
 
     @Test
     public void testConcurrentAccess() throws InterruptedException {

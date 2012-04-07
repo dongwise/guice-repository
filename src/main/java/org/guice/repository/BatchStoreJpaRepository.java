@@ -23,7 +23,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.io.Serializable;
 
 /**
- * Jpa Repository with batch save support. Some theory can be found <a href="http://www.objectdb.com/java/jpa/persistence/store#Batch_Store_">here</a>
+ * Jpa Repository with batch save support. Some theory can be found <a href="http://www.objectdb.com/java/jpa/persistence/store#Batch_Store_">here</a>.
  *
  * @param <T> entity type.
  *

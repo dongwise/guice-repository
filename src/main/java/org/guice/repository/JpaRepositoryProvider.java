@@ -166,7 +166,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
     /**
      * Creates a Spring-context for spring-data-jpa.
      *
-     * @return
+     * @return initialized Spring-context.
      */
     protected ApplicationContext createSpringContext() {
         GenericApplicationContext context = new GenericApplicationContext();

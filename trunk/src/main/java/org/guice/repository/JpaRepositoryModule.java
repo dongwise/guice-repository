@@ -31,28 +31,27 @@ import java.util.Properties;
  * Guice module with Repository support. Repository bindings should be made in <code>configureRepositories</code>
  * method. Module uses JpaPersistModule from guice-persist, which is requires persistence-unit name as an input
  * parameter. There is three options to specify persistence-unit name:
- * <pre>
  * <ol>
- *     <li>
- *         constructor parameter. For example: new JpaRepositoryModule("my-persistence-unit")
- *     </li>
- *     <li>
- *         system property 'persistence-unit-name'. For example: launch an application with
+ * <li>
+ * constructor parameter. For example: new JpaRepositoryModule("my-persistence-unit")
+ * </li>
+ * <li>
+ * system property 'persistence-unit-name'. For example: launch an application with
  * -Dpersistence-unit-name=my-persistence-unit
- *     </li>
- *     <li>override <code>getPersistenceUnitName</code> method. For example:
- *        <pre>
+ * </li>
+ * <li>override <code>getPersistenceUnitName</code> method. For example:
+ * <pre>
  *          new JpaRepositoryModule(){
  *               protected String getPersistenceUnitName() {
  *                    return "my-persistence-unit";
  *               }
  *          }
  *       </pre>
- *     </li>
+ * </li>
  * </ol>
- * </pre>
- * <p/>
- * It is very useful to separate ORM specifics from persistence.xml. This technique gives you possibilities to pack your
+ *
+ * It is very useful to separate ORM specifics from persistence.xml. This technique gives you possibilities to pack
+ * your
  * persistence.xml with mappings/specification-driven aspects to artifact. Module will look for this specifics in
  * ${persistence-unit-name}.properties file placed in the classpath. Also you can define all ORM specifics in
  * persistence.xml, there is no problem with it.

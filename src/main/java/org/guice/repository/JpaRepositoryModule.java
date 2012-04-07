@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 import java.io.InputStream;
 import java.util.Properties;
 
-public abstract class JpaPersistenceModule extends AbstractModule {
+public abstract class JpaRepositoryModule extends AbstractModule {
 
     /*===========================================[ STATIC VARIABLES ]=============*/
 
@@ -40,7 +40,7 @@ public abstract class JpaPersistenceModule extends AbstractModule {
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
-    protected JpaPersistenceModule(String... persistenceUnitName) {
+    protected JpaRepositoryModule(String... persistenceUnitName) {
         logger = LoggerFactory.getLogger(getClass());
         String pUnitName;
         if (persistenceUnitName.length > 0) {

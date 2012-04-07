@@ -25,7 +25,10 @@ import org.springframework.util.Assert;
 import java.util.Collection;
 import java.util.Set;
 
-public class CustomRepositoryImplementationResolver {
+/**
+ *
+ */
+class CustomRepositoryImplementationResolver {
 
     /*===========================================[ STATIC VARIABLES ]=============*/
 

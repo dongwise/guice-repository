@@ -35,7 +35,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ScanningJpaPersistenceModule extends JpaPersistenceModule {
+public class ScanningJpaRepositoryModule extends JpaRepositoryModule {
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
@@ -48,7 +48,7 @@ public class ScanningJpaPersistenceModule extends JpaPersistenceModule {
      * @param persistenceUnitName optional persistence-unit name, if not defined module will try to get it from the
      *                            system property called "persistence-unit-name"
      */
-    public ScanningJpaPersistenceModule(String targetScanPackage, String... persistenceUnitName) {
+    public ScanningJpaRepositoryModule(String targetScanPackage, String... persistenceUnitName) {
         super(persistenceUnitName);
         targetScanPackages = Arrays.asList(targetScanPackage);
 
@@ -58,7 +58,7 @@ public class ScanningJpaPersistenceModule extends JpaPersistenceModule {
      * @param targetScanPackage   package to scan for repositories.
      * @param persistenceUnitName
      */
-    public ScanningJpaPersistenceModule(Iterable<String> targetScanPackages, String... persistenceUnitName) {
+    public ScanningJpaRepositoryModule(Iterable<String> targetScanPackages, String... persistenceUnitName) {
         super(persistenceUnitName);
         this.targetScanPackages = Lists.newArrayList(targetScanPackages);
 
@@ -94,9 +94,13 @@ public class ScanningJpaPersistenceModule extends JpaPersistenceModule {
         repositoryClasses.addAll(reflections.getSubTypesOf(PagingAndSortingRepository.class));
         repositoryClasses.addAll(reflections.getSubTypesOf(JpaRepository.class));
 
+        //TODO: do something with implementations
         for (Class<?> repositoryClass : repositoryClasses) {
-            getLogger().info(String.format("Found repository: [%s]", repositoryClass.getName()));
-            bind(repositoryClass).toProvider(new JpaRepositoryProvider(repositoryClass, "internal"));
+            // Autobind only for interfaces
+            if (repositoryClass.isInterface()) {
+                getLogger().info(String.format("Found repository: [%s]", repositoryClass.getName()));
+                bind(repositoryClass).toProvider(new JpaRepositoryProvider(repositoryClass, "internal"));
+            }
         }
     }
 }

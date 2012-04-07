@@ -19,7 +19,7 @@
 package org.guice.repository.test.runner;
 
 import org.guice.common.GuiceTestRunner;
-import org.guice.repository.JpaPersistenceModule;
+import org.guice.repository.JpaRepositoryModule;
 import org.guice.repository.JpaRepositoryProvider;
 import org.guice.repository.test.*;
 import org.junit.runners.model.InitializationError;
@@ -29,12 +29,12 @@ public class ManualBindRepoTestRunner extends GuiceTestRunner {
     /*===========================================[ CLASS METHODS ]==============*/
 
     public ManualBindRepoTestRunner(Class<?> classToRun) throws InitializationError {
-        super(classToRun, new JpaPersistenceModule() {
+        super(classToRun, new JpaRepositoryModule() {
             @Override
             protected void configureRepositories() {
                 bind(UserRepository.class).toProvider(new JpaRepositoryProvider<UserRepository>(UserRepositoryCustomImpl.class));
-                bind(CustomerRepository.class).toProvider(new JpaRepositoryProvider<CustomerRepositoryImpl>(CustomerRepositoryImpl.class));
                 bind(AccountRepository.class).toProvider(new JpaRepositoryProvider<AccountRepository>());
+                bind(CustomerRepository.class).toProvider(new JpaRepositoryProvider<CustomerRepositoryImpl>(CustomerRepositoryImpl.class));
             }
         });
     }

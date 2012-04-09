@@ -16,14 +16,19 @@
  * limitations under the License.
  */
 
-package org.guice.repository.test;
+package com.googlecode.guicerepository.test;
 
-import org.guice.repository.test.model.Customer;
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.googlecode.guicerepository.EntityManagerProvider;
+import com.googlecode.guicerepository.BatchStoreJpaRepository;
+import com.googlecode.guicerepository.test.model.Account;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-public interface CustomerRepository extends JpaRepository<Customer, Long> {
+public interface AccountRepository extends BatchStoreJpaRepository<Account, Long>,
+        EntityManagerProvider {
 
-    /*===========================================[ INTERFACE METHODS ]==============*/
+    Account findAccountByUuid(String uuid);
 
-    void sharedCustomMethod(Long customerID);
+    @Query("select a from Account a where a.name = :name")
+    Account findAccountByName(@Param("name") String name);
 }

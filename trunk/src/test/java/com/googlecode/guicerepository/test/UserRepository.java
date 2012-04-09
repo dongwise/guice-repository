@@ -16,11 +16,11 @@
  * limitations under the License.
  */
 
-package org.guice.repository.test;
+package com.googlecode.guicerepository.test;
 
 import com.googlecode.guicerepository.EntityManagerProvider;
 import com.googlecode.guicerepository.BatchStoreJpaRepository;
-import org.guice.repository.test.model.User;
+import com.googlecode.guicerepository.test.model.User;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

@@ -16,35 +16,36 @@
  * limitations under the License.
  */
 
-package org.guice.repository.test;
+package com.googlecode.guicerepository.test;
 
 import com.google.inject.Inject;
-import org.guice.repository.test.model.Account;
-import org.guice.repository.test.runner.ManualBindRepoTestRunner;
+import com.googlecode.guicerepository.test.model.Account;
+import com.googlecode.guicerepository.test.model.Customer;
+import com.googlecode.guicerepository.test.runner.ManualBindRepoTestRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 @RunWith(ManualBindRepoTestRunner.class)
-public class AccountRepositoryTest {
+public class CustomerRepositoryTest {
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
     @Inject
-    private AccountRepository accountRepository;
+    private CustomerRepository customerRepository;
 
     /*===========================================[ CLASS METHODS ]==============*/
 
     @Before
     public void cleanup() {
-        accountRepository.deleteAll();
+        customerRepository.deleteAll();
     }
 
     @Test
@@ -55,9 +56,9 @@ public class AccountRepositoryTest {
             accounts.add(new Account(UUID.randomUUID().toString(), String.valueOf(i)));
         }
 
-        accountRepository.save(accounts);
-        assertEquals(count, accountRepository.count());
-        assertNotNull(accountRepository.findAccountByName(String.valueOf(1)));
-        assertNotNull(accountRepository.findAccountByUuid(accounts.get(0).getUuid()));
+        customerRepository.save(new Customer("name", "surname"));
+        customerRepository.sharedCustomMethod(new Long(42));
+        assertEquals(1, customerRepository.count());
+        assertEquals(1, customerRepository.findAll(new PageRequest(0, 10)).getContent().size());
     }
 }

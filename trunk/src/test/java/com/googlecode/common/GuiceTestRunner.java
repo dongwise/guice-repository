@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.guice.common;
+package com.googlecode.common;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;

@@ -16,10 +16,12 @@
  * limitations under the License.
  */
 
-package org.guice.repository.test;
+package com.googlecode.guicerepository.test;
 
 import com.google.inject.Injector;
-import org.guice.repository.test.runner.ManualBindRepoTestRunner;
+import com.googlecode.guicerepository.test.model.User;
+import com.googlecode.guicerepository.test.runner.ManualBindRepoTestRunner;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,24 +29,23 @@ import org.junit.runner.RunWith;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.UUID;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 
 @RunWith(ManualBindRepoTestRunner.class)
-public class MultiThreadedRepositoryInstantiationTest {
+public class MultiThreadedRepositoryTest {
 
     /*===========================================[ STATIC VARIABLES ]=============*/
 
-    private static final int MAX_CONCURRENT_THREADS = 1000;
+    private static final int MAX_CONCURRENT_THREADS = 50;
+    private static final int COUNT_PER_THREAD = 10;
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
     @Inject
     private Injector injector;
-    private AtomicLong instanceCounter;
 
     /*===========================================[ CLASS METHODS ]==============*/
 
@@ -55,28 +56,22 @@ public class MultiThreadedRepositoryInstantiationTest {
 
     @Test
     public void testConcurrentAccess() throws InterruptedException {
-        instanceCounter = new AtomicLong();
         Collection<Callable<Object>> callables = new ArrayList<Callable<Object>>();
 
-        Runnable repoCreator = new Runnable() {
+        Runnable repoExploiter = new Runnable() {
             public void run() {
-                while (!Thread.currentThread().isInterrupted()){
-                    UserRepository instance = injector.getInstance(UserRepository.class);
-                    instanceCounter.incrementAndGet();
+                UserRepository instance = injector.getInstance(UserRepository.class);
+                for (int i = 0; i < COUNT_PER_THREAD; i++) {
+                    instance.save(new User(UUID.randomUUID().toString(), UUID.randomUUID().toString(), i));
                 }
             }
         };
-
-        ExecutorService executorService = Executors.newFixedThreadPool(MAX_CONCURRENT_THREADS);
         for (int i = 0; i < MAX_CONCURRENT_THREADS; i++) {
-            executorService.execute(repoCreator);
+            callables.add(Executors.callable(repoExploiter));
         }
 
-        System.out.println("Awaiting for generation");
-
-        int testTimeSeconds = 10;
-        TimeUnit.SECONDS.sleep(testTimeSeconds);
-        executorService.shutdown();
-        System.out.println(String.format("Speed: [%d] instances/sec", instanceCounter.get()/testTimeSeconds));
+        Executors.newFixedThreadPool(MAX_CONCURRENT_THREADS).invokeAll(callables);
+        TimeUnit.SECONDS.sleep(5);
+        Assert.assertEquals("Invalid entities count", MAX_CONCURRENT_THREADS * COUNT_PER_THREAD, injector.getInstance(UserRepository.class).count());
     }
 }

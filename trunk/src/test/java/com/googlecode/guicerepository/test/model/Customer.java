@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-package org.guice.repository.test.model;
+package com.googlecode.guicerepository.test.model;
 
 import javax.persistence.*;
 
 @Entity
-public class Account {
+public class Customer {
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
@@ -30,28 +30,27 @@ public class Account {
     private Long id;
 
     @Column
-    private String uuid;
-
-    @Column
     private String name;
+    @Column
+    private String surname;
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
-    public Account(String uuid, String name) {
-        this.uuid = uuid;
+    public Customer(String name, String surname) {
         this.name = name;
+        this.surname = surname;
     }
 
-    public Account() {
+    public Customer() {
     }
 
     /*===========================================[ CLASS METHODS ]==============*/
 
-    public String getUuid() {
-        return uuid;
-    }
-
     public String getName() {
         return name;
+    }
+
+    public String getSurname() {
+        return surname;
     }
 }

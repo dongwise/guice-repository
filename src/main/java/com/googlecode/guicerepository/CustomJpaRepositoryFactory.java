@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.guice.repository;
+package com.googlecode.guicerepository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;

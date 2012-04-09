@@ -18,9 +18,9 @@
 
 package org.guice.repository.test.runner;
 
+import com.googlecode.guicerepository.JpaRepositoryModule;
+import com.googlecode.guicerepository.JpaRepositoryProvider;
 import org.guice.common.GuiceTestRunner;
-import org.guice.repository.JpaRepositoryModule;
-import org.guice.repository.JpaRepositoryProvider;
 import org.guice.repository.test.*;
 import org.junit.runners.model.InitializationError;
 

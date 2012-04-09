@@ -18,7 +18,7 @@
 
 package org.guice.repository.test;
 
-import org.guice.repository.SimpleBatchStoreJpaRepository;
+import com.googlecode.guicerepository.SimpleBatchStoreJpaRepository;
 import org.guice.repository.test.model.Customer;
 import org.junit.Assert;
 

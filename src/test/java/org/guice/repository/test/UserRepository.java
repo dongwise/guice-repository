@@ -18,8 +18,8 @@
 
 package org.guice.repository.test;
 
-import org.guice.repository.BatchStoreJpaRepository;
-import org.guice.repository.EntityManagerProvider;
+import com.googlecode.guicerepository.EntityManagerProvider;
+import com.googlecode.guicerepository.BatchStoreJpaRepository;
 import org.guice.repository.test.model.User;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;

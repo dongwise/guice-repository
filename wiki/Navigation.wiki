@@ -1,4 +1,4 @@
- * [http://javamelody.googlecode.com/ Home]
+  * [http://javamelody.googlecode.com/ Home]
   * [Demo Demo]
   * [Screenshots Screenshots]
   * ----

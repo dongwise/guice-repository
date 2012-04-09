@@ -16,17 +16,25 @@
  * limitations under the License.
  */
 
-package org.guice.repository.test.runner;
+package com.googlecode.guicerepository.test;
 
-import com.googlecode.guicerepository.ScanningJpaRepositoryModule;
-import org.guice.common.GuiceTestRunner;
-import org.junit.runners.model.InitializationError;
+import com.googlecode.guicerepository.SimpleBatchStoreJpaRepository;
+import com.googlecode.guicerepository.test.model.Customer;
+import org.junit.Assert;
 
-public class AutoBindRepoTestRunner extends GuiceTestRunner {
+import javax.persistence.EntityManager;
 
+public class CustomerRepositoryImpl extends SimpleBatchStoreJpaRepository<Customer,Long> implements CustomerRepository {
+
+    /*===========================================[ CONSTRUCTORS ]===============*/
+
+    public CustomerRepositoryImpl(Class<Customer> domainClass, EntityManager em) {
+        super(domainClass, em);
+    }
     /*===========================================[ CLASS METHODS ]==============*/
 
-    public AutoBindRepoTestRunner(Class<?> classToRun) throws InitializationError {
-        super(classToRun, new ScanningJpaRepositoryModule("org.guice.repository.test", "test-h2"));
+    public void sharedCustomMethod(Long customerID) {
+        Assert.assertNotNull(customerID);
+        System.out.println("customerID = " + customerID);
     }
 }

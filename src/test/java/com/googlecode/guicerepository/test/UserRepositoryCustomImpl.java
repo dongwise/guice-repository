@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-package org.guice.repository.test;
+package com.googlecode.guicerepository.test;
 
-import org.guice.repository.test.model.User;
+import com.googlecode.guicerepository.test.model.User;
 import org.junit.Assert;
 
 public class UserRepositoryCustomImpl implements  UserRepositoryCustom {

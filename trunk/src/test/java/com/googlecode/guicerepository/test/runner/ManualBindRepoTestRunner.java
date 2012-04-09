@@ -20,7 +20,7 @@ package com.googlecode.guicerepository.test.runner;
 
 import com.googlecode.guicerepository.JpaRepositoryModule;
 import com.googlecode.guicerepository.JpaRepositoryProvider;
-import com.googlecode.common.GuiceTestRunner;
+import com.googlecode.guicerepository.common.GuiceTestRunner;
 import com.googlecode.guicerepository.test.AccountRepository;
 import com.googlecode.guicerepository.test.CustomerRepository;
 import com.googlecode.guicerepository.test.CustomerRepositoryImpl;

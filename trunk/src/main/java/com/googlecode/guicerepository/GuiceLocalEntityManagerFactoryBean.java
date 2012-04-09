@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.guice.repository;
+package com.googlecode.guicerepository;
 
 import com.google.inject.Provider;
 import org.springframework.orm.jpa.LocalEntityManagerFactoryBean;

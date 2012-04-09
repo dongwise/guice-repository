@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.guice.repository;
+package com.googlecode.guicerepository;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;

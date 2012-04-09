@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.guice.repository;
+package com.googlecode.guicerepository;
 
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.guice.repository;
+package com.googlecode.guicerepository;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;

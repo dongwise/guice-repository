@@ -16,42 +16,17 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository.test.model;
+package com.google.code.guice.repository;
 
-import javax.persistence.*;
+import com.google.code.guice.repository.model.User;
+import org.junit.Assert;
 
-@Entity
-public class Account {
-
-    /*===========================================[ INSTANCE VARIABLES ]=========*/
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-
-    @Column
-    private String uuid;
-
-    @Column
-    private String name;
-
-    /*===========================================[ CONSTRUCTORS ]===============*/
-
-    public Account(String uuid, String name) {
-        this.uuid = uuid;
-        this.name = name;
-    }
-
-    public Account() {
-    }
+public class UserRepositoryCustomImpl implements  UserRepositoryCustom {
 
     /*===========================================[ CLASS METHODS ]==============*/
 
-    public String getUuid() {
-        return uuid;
-    }
-
-    public String getName() {
-        return name;
+    public void someCustomMethod(User user) {
+        Assert.assertNotNull(user);
+        System.out.println("user = " + user);
     }
 }

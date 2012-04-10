@@ -16,15 +16,15 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.test.runner;
+package com.google.code.guice.repository.test.runner;
 
 import com.google.code.guice.JpaRepositoryModule;
 import com.google.code.guice.JpaRepositoryProvider;
-import com.google.code.guice.common.GuiceTestRunner;
-import com.google.code.guice.test.AccountRepository;
-import com.google.code.guice.test.CustomerRepository;
-import com.google.code.guice.test.CustomerRepositoryImpl;
-import com.google.code.guice.test.UserRepository;
+import com.google.code.guice.repository.common.GuiceTestRunner;
+import com.google.code.guice.repository.test.AccountRepository;
+import com.google.code.guice.repository.test.CustomerRepository;
+import com.google.code.guice.repository.test.CustomerRepositoryImpl;
+import com.google.code.guice.repository.test.UserRepository;
 import org.junit.runners.model.InitializationError;
 
 public class ManualBindRepoTestRunner extends GuiceTestRunner {

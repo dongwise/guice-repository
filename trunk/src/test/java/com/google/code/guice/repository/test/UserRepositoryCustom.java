@@ -16,17 +16,10 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.test;
+package com.google.code.guice.repository.test;
 
-import com.google.code.guice.test.model.User;
-import org.junit.Assert;
+import com.google.code.guice.repository.test.model.User;
 
-public class UserRepositoryCustomImpl implements  UserRepositoryCustom {
-
-    /*===========================================[ CLASS METHODS ]==============*/
-
-    public void someCustomMethod(User user) {
-        Assert.assertNotNull(user);
-        System.out.println("user = " + user);
-    }
+public interface UserRepositoryCustom {
+    void someCustomMethod(User user);
 }

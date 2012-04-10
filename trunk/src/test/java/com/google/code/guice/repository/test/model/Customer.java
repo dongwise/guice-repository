@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.test.model;
+package com.google.code.guice.repository.test.model;
 
 import javax.persistence.*;
 
 @Entity
-public class User {
+public class Customer {
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
@@ -30,48 +30,27 @@ public class User {
     private Long id;
 
     @Column
-    private int age;
-
-    @Column
     private String name;
-
     @Column
     private String surname;
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
-    public User() {
-    }
-
-    public User(String name, String surname, int age) {
+    public Customer(String name, String surname) {
         this.name = name;
         this.surname = surname;
-        this.age = age;
+    }
+
+    public Customer() {
     }
 
     /*===========================================[ CLASS METHODS ]==============*/
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getSurname() {
         return surname;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
     }
 }

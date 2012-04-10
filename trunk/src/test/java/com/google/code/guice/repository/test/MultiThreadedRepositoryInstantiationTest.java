@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.test;
+package com.google.code.guice.repository.test;
 
 import com.google.inject.Injector;
-import com.google.code.guice.test.runner.ManualBindRepoTestRunner;
+import com.google.code.guice.repository.test.runner.ManualBindRepoTestRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

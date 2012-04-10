@@ -11,7 +11,7 @@
 
     <groupId>com.google.code.guice-repository</groupId>
     <artifactId>guice-repository</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Guice Repository</name>
@@ -35,9 +35,9 @@
     </developers>
 
     <scm>
-        <connection>scm:svn:https://guice-repository.googlecode.com/svn/tags/1.0.0</connection>
-        <developerConnection>scm:svn:https://guice-repository.googlecode.com/svn/tags/1.0.0</developerConnection>
-        <url>https://guice-repository.googlecode.com/svn/tags/1.0.0</url>
+        <connection>scm:svn:https://guice-repository.googlecode.com/svn/trunk/</connection>
+        <developerConnection>scm:svn:https://guice-repository.googlecode.com/svn/trunk/</developerConnection>
+        <url>https://guice-repository.googlecode.com/svn/trunk/</url>
     </scm>
 
     <properties>

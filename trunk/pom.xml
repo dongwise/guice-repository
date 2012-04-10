@@ -241,17 +241,8 @@
                 </configuration>
             </plugin>
 
-            <!-- Resource handling -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>${version.maven-resources-plugin}</version>
-                <configuration>
-                    <encoding>${module.encoding}</encoding>
-                </configuration>
-            </plugin>
-
             <!-- OSGi manifest creation -->
+
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
@@ -265,6 +256,7 @@
                         </goals>
                         <configuration>
                             <instructions>
+                                <Export-Package>com.google.code.guice.repository</Export-Package>
                                 <_versionpolicy>$(@)</_versionpolicy>
                             </instructions>
                         </configuration>
@@ -273,6 +265,7 @@
             </plugin>
 
             <!-- Add OSGi manifest in JAR -->
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -381,41 +374,6 @@
                                 <phase>verify</phase>
                                 <goals>
                                     <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <!-- Changelog attachment -->
-        <profile>
-            <id>changelog-generator</id>
-            <activation>
-                <property>
-                    <name>!release</name>
-                </property>
-            </activation>
-
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-changelog-plugin</artifactId>
-                        <version>${version.maven-changelog-plugin}</version>
-                        <configuration>
-                            <outputEncoding>${module.encoding}</outputEncoding>
-                            <range>365</range>
-                            <username>${maven-changelog-plugin.username}</username>
-                            <password>${maven-changelog-plugin.password}</password>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>generate-changelog</id>
-                                <phase>generate-resources</phase>
-                                <goals>
-                                    <goal>changelog</goal>
                                 </goals>
                             </execution>
                         </executions>

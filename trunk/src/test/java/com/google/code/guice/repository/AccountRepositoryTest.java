@@ -18,10 +18,10 @@
 
 package com.google.code.guice.repository;
 
-import com.google.code.guice.repository.repo.AccountRepository;
-import com.google.inject.Inject;
 import com.google.code.guice.repository.model.Account;
+import com.google.code.guice.repository.repo.AccountRepository;
 import com.google.code.guice.repository.runner.ManualBindRepoTestRunner;
+import com.google.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,6 +33,11 @@ import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+/**
+ * Simple Repo-interface test
+ *
+ * @author Alexey Krylov AKA lexx
+ */
 @RunWith(ManualBindRepoTestRunner.class)
 public class AccountRepositoryTest {
 

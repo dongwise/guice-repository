@@ -16,25 +16,17 @@
  * limitations under the License.
  */
 
-package com.google.guice.test;
+package com.google.code.guice.test;
 
-import com.google.guice.SimpleBatchStoreJpaRepository;
-import com.google.guice.test.model.Customer;
+import com.google.code.guice.test.model.User;
 import org.junit.Assert;
 
-import javax.persistence.EntityManager;
+public class UserRepositoryCustomImpl implements  UserRepositoryCustom {
 
-public class CustomerRepositoryImpl extends SimpleBatchStoreJpaRepository<Customer,Long> implements CustomerRepository {
-
-    /*===========================================[ CONSTRUCTORS ]===============*/
-
-    public CustomerRepositoryImpl(Class<Customer> domainClass, EntityManager em) {
-        super(domainClass, em);
-    }
     /*===========================================[ CLASS METHODS ]==============*/
 
-    public void sharedCustomMethod(Long customerID) {
-        Assert.assertNotNull(customerID);
-        System.out.println("customerID = " + customerID);
+    public void someCustomMethod(User user) {
+        Assert.assertNotNull(user);
+        System.out.println("user = " + user);
     }
 }

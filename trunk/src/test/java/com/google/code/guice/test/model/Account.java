@@ -16,17 +16,42 @@
  * limitations under the License.
  */
 
-package com.google.guice.test.runner;
+package com.google.code.guice.test.model;
 
-import com.google.guice.ScanningJpaRepositoryModule;
-import com.google.guice.common.GuiceTestRunner;
-import org.junit.runners.model.InitializationError;
+import javax.persistence.*;
 
-public class AutoBindRepoTestRunner extends GuiceTestRunner {
+@Entity
+public class Account {
+
+    /*===========================================[ INSTANCE VARIABLES ]=========*/
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    @Column
+    private String uuid;
+
+    @Column
+    private String name;
+
+    /*===========================================[ CONSTRUCTORS ]===============*/
+
+    public Account(String uuid, String name) {
+        this.uuid = uuid;
+        this.name = name;
+    }
+
+    public Account() {
+    }
 
     /*===========================================[ CLASS METHODS ]==============*/
 
-    public AutoBindRepoTestRunner(Class<?> classToRun) throws InitializationError {
-        super(classToRun, new ScanningJpaRepositoryModule("org.guice.repository.test", "test-h2"));
+    public String getUuid() {
+        return uuid;
+    }
+
+    public String getName() {
+        return name;
     }
 }

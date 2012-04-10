@@ -16,42 +16,25 @@
  * limitations under the License.
  */
 
-package com.google.guice.test.model;
+package com.google.code.guice.test;
 
-import javax.persistence.*;
+import com.google.code.guice.SimpleBatchStoreJpaRepository;
+import com.google.code.guice.test.model.Customer;
+import org.junit.Assert;
 
-@Entity
-public class Account {
+import javax.persistence.EntityManager;
 
-    /*===========================================[ INSTANCE VARIABLES ]=========*/
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-
-    @Column
-    private String uuid;
-
-    @Column
-    private String name;
+public class CustomerRepositoryImpl extends SimpleBatchStoreJpaRepository<Customer,Long> implements CustomerRepository {
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
-    public Account(String uuid, String name) {
-        this.uuid = uuid;
-        this.name = name;
+    public CustomerRepositoryImpl(Class<Customer> domainClass, EntityManager em) {
+        super(domainClass, em);
     }
-
-    public Account() {
-    }
-
     /*===========================================[ CLASS METHODS ]==============*/
 
-    public String getUuid() {
-        return uuid;
-    }
-
-    public String getName() {
-        return name;
+    public void sharedCustomMethod(Long customerID) {
+        Assert.assertNotNull(customerID);
+        System.out.println("customerID = " + customerID);
     }
 }

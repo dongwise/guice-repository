@@ -1,5 +1,5 @@
 #labels thread-safe,EntityManager
-Note, that all Repositories is not thread-safe, because they works directly with EntityManager, which is also not thread-safe. 
+Note, that all Repositories is not thread-safe, because they works directly with EntityManager instance, which is also not thread-safe. 
 
 Here is an example of concurrent Repository usage:
 {{{

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.google.code.repository;
+package com.google.code.guice.repository;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;

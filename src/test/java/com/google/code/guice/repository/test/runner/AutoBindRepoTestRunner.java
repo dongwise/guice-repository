@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.test.runner;
+package com.google.code.guice.repository.test.runner;
 
 import com.google.code.guice.ScanningJpaRepositoryModule;
-import com.google.code.guice.common.GuiceTestRunner;
+import com.google.code.guice.repository.common.GuiceTestRunner;
 import org.junit.runners.model.InitializationError;
 
 public class AutoBindRepoTestRunner extends GuiceTestRunner {

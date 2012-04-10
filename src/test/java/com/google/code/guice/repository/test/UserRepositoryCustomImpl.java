@@ -16,14 +16,17 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.test;
+package com.google.code.guice.repository.test;
 
-import com.google.code.guice.test.model.Customer;
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.google.code.guice.repository.test.model.User;
+import org.junit.Assert;
 
-public interface CustomerRepository extends JpaRepository<Customer, Long> {
+public class UserRepositoryCustomImpl implements  UserRepositoryCustom {
 
-    /*===========================================[ INTERFACE METHODS ]==============*/
+    /*===========================================[ CLASS METHODS ]==============*/
 
-    void sharedCustomMethod(Long customerID);
+    public void someCustomMethod(User user) {
+        Assert.assertNotNull(user);
+        System.out.println("user = " + user);
+    }
 }

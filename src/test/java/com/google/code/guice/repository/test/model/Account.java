@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.test.model;
+package com.google.code.guice.repository.test.model;
 
 import javax.persistence.*;
 

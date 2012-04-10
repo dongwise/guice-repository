@@ -1,3 +1,63 @@
-TODO: JUnit test all possible spring-data-jpa features
-TODO: release to maven repo
-TODO: wiki
+Overview
+
+Guice-repository is a Guice-adapted version of spring-data-jpa project with some additional features.
+
+Theory can be found here:
+- http://martinfowler.com/eaaCatalog/repository.html
+- http://msdn.microsoft.com/en-us/library/ff649690.aspx
+- http://design-pattern.ru/patterns/repository.html
+
+
+Features
+
+- Full support of 1.1-1.4, 2.2-2.4 origial spring-data-jpa documentation parts
+- Support for batch store (see SimpleBatchStoreJpaRepository?)
+- Allow access to EntityManager? (see EntityManagerProvider?)
+- Auto-binder possibilities - no need to do manual .bind() (see ScanningJpaRepositoryModule?)
+- Significant test coverage
+
+Quickstart
+
+1. Define your Repository interface
+public interface AccountRepository extends JpaRepository<Account, Long>,
+        EntityManagerProvider {
+
+    Account findAccountByUuid(String uuid);
+
+    @Query("select a from Account a where a.name = :name")
+    Account findAccountByName(@Param("name") String name);
+}
+
+2. Install a Guice-module
+install(new JpaRepositoryModule("my-persistence-unit") {
+            @Override
+            protected void configureRepositories() {
+                bind(AccountRepository.class).toProvider(new JpaRepositoryProvider<AccountRepository>());
+            }
+        });
+
+3. @Inject & use
+public class AccountService {
+
+    @Inject
+    private AccountRepository accountRepository;
+
+    public void registerUser(String login, String password) throws RegistrationException{
+     // ... some checks & etc
+     accountRepository.save(new Account(login, password));
+     // ... something else
+    }
+
+    public Account findAccount(String login) throws FinderException{
+     return accountRepository.findAccountByLogin(login);
+    }
+}
+
+Project on google-code:
+http://code.google.com/p/guice-repository/
+
+Project documentation:
+http://code.google.com/p/guice-repository/wiki/DevGuide
+
+
+

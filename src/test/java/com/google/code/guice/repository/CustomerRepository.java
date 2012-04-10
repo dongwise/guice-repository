@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository.test;
+package com.google.code.guice.repository;
 
-import com.google.code.guice.repository.test.model.Customer;
+import com.google.code.guice.repository.model.Customer;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CustomerRepository extends JpaRepository<Customer, Long> {

@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository.test;
+package com.google.code.guice.repository;
 
-import com.google.code.guice.repository.test.runner.AutoBindRepoTestRunner;
-import com.google.code.guice.repository.test.model.Account;
-import com.google.code.guice.repository.test.model.Customer;
-import com.google.code.guice.repository.test.model.User;
+import com.google.code.guice.repository.runner.AutoBindRepoTestRunner;
+import com.google.code.guice.repository.model.Account;
+import com.google.code.guice.repository.model.Customer;
+import com.google.code.guice.repository.model.User;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

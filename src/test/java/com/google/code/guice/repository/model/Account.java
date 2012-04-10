@@ -16,25 +16,42 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository.test;
+package com.google.code.guice.repository.model;
 
-import com.google.code.guice.SimpleBatchStoreJpaRepository;
-import com.google.code.guice.repository.test.model.Customer;
-import org.junit.Assert;
+import javax.persistence.*;
 
-import javax.persistence.EntityManager;
+@Entity
+public class Account {
 
-public class CustomerRepositoryImpl extends SimpleBatchStoreJpaRepository<Customer,Long> implements CustomerRepository {
+    /*===========================================[ INSTANCE VARIABLES ]=========*/
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    @Column
+    private String uuid;
+
+    @Column
+    private String name;
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
-    public CustomerRepositoryImpl(Class<Customer> domainClass, EntityManager em) {
-        super(domainClass, em);
+    public Account(String uuid, String name) {
+        this.uuid = uuid;
+        this.name = name;
     }
+
+    public Account() {
+    }
+
     /*===========================================[ CLASS METHODS ]==============*/
 
-    public void sharedCustomMethod(Long customerID) {
-        Assert.assertNotNull(customerID);
-        System.out.println("customerID = " + customerID);
+    public String getUuid() {
+        return uuid;
+    }
+
+    public String getName() {
+        return name;
     }
 }

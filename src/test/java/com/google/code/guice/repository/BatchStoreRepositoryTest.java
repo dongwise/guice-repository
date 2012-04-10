@@ -18,10 +18,11 @@
 
 package com.google.code.guice.repository;
 
+import com.google.code.guice.repository.model.Account;
+import com.google.code.guice.repository.repo.AccountRepository;
+import com.google.code.guice.repository.runner.ManualBindRepoTestRunner;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.google.code.guice.repository.model.Account;
-import com.google.code.guice.repository.runner.ManualBindRepoTestRunner;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,6 +33,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(ManualBindRepoTestRunner.class)
 public class BatchStoreRepositoryTest {
@@ -66,8 +68,11 @@ public class BatchStoreRepositoryTest {
         timer.cancel();
     }
 
+    @SuppressWarnings({"CallToSystemGC"})
     @Test
     public void testDefaultBatchSave() throws Exception {
+        long initialMemory = Runtime.getRuntime().freeMemory();
+        long percent = initialMemory / 100;
 
         int batchSize = 1000;
         int iterationsCount = 1000;
@@ -79,6 +84,10 @@ public class BatchStoreRepositoryTest {
         }
 
         assertEquals("Invalid stored entities count", iterationsCount * batchSize, accountRepository.count());
+        Runtime.getRuntime().gc();
+        long free = Runtime.getRuntime().freeMemory();
+        // Memory usage no more than 20% of initial
+        assertTrue("Memory leak detected", free >= initialMemory - 20 * percent);
     }
 
     @Test

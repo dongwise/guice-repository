@@ -18,6 +18,7 @@
 
 package com.google.code.guice.repository;
 
+import com.google.code.guice.repository.repo.UserRepository;
 import com.google.inject.Injector;
 import com.google.code.guice.repository.model.User;
 import com.google.code.guice.repository.runner.ManualBindRepoTestRunner;

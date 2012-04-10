@@ -20,6 +20,10 @@ package com.google.code.guice.repository.runner;
 
 import com.google.code.guice.repository.*;
 import com.google.code.guice.repository.common.GuiceTestRunner;
+import com.google.code.guice.repository.repo.CustomerRepositoryImpl;
+import com.google.code.guice.repository.repo.UserRepository;
+import com.google.code.guice.repository.repo.AccountRepository;
+import com.google.code.guice.repository.repo.CustomerRepository;
 import org.junit.runners.model.InitializationError;
 
 public class ManualBindRepoTestRunner extends GuiceTestRunner {

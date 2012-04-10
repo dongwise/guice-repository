@@ -16,8 +16,10 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository;
+package com.google.code.guice.repository.repo;
 
+import com.google.code.guice.repository.BatchStoreJpaRepository;
+import com.google.code.guice.repository.EntityManagerProvider;
 import com.google.code.guice.repository.model.Account;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

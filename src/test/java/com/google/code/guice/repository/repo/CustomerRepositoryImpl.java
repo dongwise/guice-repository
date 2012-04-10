@@ -16,9 +16,11 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository;
+package com.google.code.guice.repository.repo;
 
+import com.google.code.guice.repository.SimpleBatchStoreJpaRepository;
 import com.google.code.guice.repository.model.Customer;
+import com.google.code.guice.repository.repo.CustomerRepository;
 import org.junit.Assert;
 
 import javax.persistence.EntityManager;

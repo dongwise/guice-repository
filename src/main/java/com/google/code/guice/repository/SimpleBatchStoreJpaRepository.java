@@ -67,9 +67,6 @@ public class SimpleBatchStoreJpaRepository<T, ID extends Serializable> extends S
 
     /*===========================================[ CLASS METHODS ]==============*/
 
-    /**
-     * @param entities сохраняемые сущности.
-     */
     public void saveInBatch(Iterable<T> entities) {
         List<T> list = Lists.newArrayList(entities);
         Assert.notEmpty(list);

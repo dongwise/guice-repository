@@ -24,7 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * PersistService starter, which is needed for Guice-Persist module.
+ * PersistService starter which is needed for Guice-Persist module.
  *
  * @author Alexey Krylov AKA lexx
  */

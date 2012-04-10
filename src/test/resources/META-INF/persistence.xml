@@ -5,9 +5,9 @@
 
     <persistence-unit name="test-h2" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
-        <class>com.googlecode.guicerepository.test.model.Customer</class>
-        <class>com.googlecode.guicerepository.test.model.User</class>
-        <class>com.googlecode.guicerepository.test.model.Account</class>
+        <class>com.google.guice.test.model.Customer</class>
+        <class>com.google.guice.test.model.User</class>
+        <class>com.google.guice.test.model.Account</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
     </persistence-unit>
 </persistence>

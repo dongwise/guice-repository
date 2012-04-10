@@ -18,7 +18,7 @@
 
 package com.google.code.guice.repository.runner;
 
-import com.google.code.guice.ScanningJpaRepositoryModule;
+import com.google.code.guice.repository.ScanningJpaRepositoryModule;
 import com.google.code.guice.repository.common.GuiceTestRunner;
 import org.junit.runners.model.InitializationError;
 

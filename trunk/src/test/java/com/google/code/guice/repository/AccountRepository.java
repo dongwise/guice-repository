@@ -18,8 +18,6 @@
 
 package com.google.code.guice.repository;
 
-import com.google.code.guice.EntityManagerProvider;
-import com.google.code.guice.BatchStoreJpaRepository;
 import com.google.code.guice.repository.model.Account;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

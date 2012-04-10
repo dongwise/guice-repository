@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.code.repository;
+package com.google.code.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;

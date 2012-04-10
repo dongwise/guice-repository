@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.code.repository;
+package com.google.code.repository;
 
 import com.google.inject.Inject;
 import com.google.inject.persist.PersistService;

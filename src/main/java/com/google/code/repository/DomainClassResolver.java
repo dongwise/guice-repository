@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.code.repository;
+package com.google.code.repository;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;

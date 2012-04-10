@@ -16,26 +16,19 @@
  * limitations under the License.
  */
 
-package com.google.guice.test;
+package com.google.code.guice.test;
 
-import com.google.guice.EntityManagerProvider;
-import com.google.guice.BatchStoreJpaRepository;
-import com.google.guice.test.model.User;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Modifying;
+import com.google.code.guice.EntityManagerProvider;
+import com.google.code.guice.BatchStoreJpaRepository;
+import com.google.code.guice.test.model.Account;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.repository.query.Param;
 
-public interface UserRepository extends JpaSpecificationExecutor<User>,
-        BatchStoreJpaRepository<User, Long>, EntityManagerProvider, UserRepositoryCustom{
+public interface AccountRepository extends BatchStoreJpaRepository<Account, Long>,
+        EntityManagerProvider {
 
-    @Modifying
-    @Transactional
-    @Query("delete from User u where u.age >= 200")
-    void deleteInactiveUsers();
+    Account findAccountByUuid(String uuid);
 
-    @Modifying
-    @Transactional
-    @Query("delete from User u where u.age >= 1")
-    void deleteOtherUsers();
+    @Query("select a from Account a where a.name = :name")
+    Account findAccountByName(@Param("name") String name);
 }

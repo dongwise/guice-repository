@@ -16,10 +16,17 @@
  * limitations under the License.
  */
 
-package com.google.guice.test;
+package com.google.code.guice.test.runner;
 
-import com.google.guice.test.model.User;
+import com.google.code.guice.ScanningJpaRepositoryModule;
+import com.google.code.guice.common.GuiceTestRunner;
+import org.junit.runners.model.InitializationError;
 
-public interface UserRepositoryCustom {
-    void someCustomMethod(User user);
+public class AutoBindRepoTestRunner extends GuiceTestRunner {
+
+    /*===========================================[ CLASS METHODS ]==============*/
+
+    public AutoBindRepoTestRunner(Class<?> classToRun) throws InitializationError {
+        super(classToRun, new ScanningJpaRepositoryModule("org.guice.repository.test", "test-h2"));
+    }
 }

@@ -18,10 +18,13 @@
 
 package com.google.code.guice.repository;
 
+import com.google.code.guice.repository.repo.UserRepository;
 import com.google.code.guice.repository.runner.AutoBindRepoTestRunner;
 import com.google.code.guice.repository.model.Account;
 import com.google.code.guice.repository.model.Customer;
 import com.google.code.guice.repository.model.User;
+import com.google.code.guice.repository.repo.AccountRepository;
+import com.google.code.guice.repository.repo.CustomerRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -61,6 +64,7 @@ public class AutoBindRepositoryTest {
         assertEquals(1, userRepository.count());
         userRepository.deleteOtherUsers();
         assertEquals(0, userRepository.count());
+        userRepository.someCustomMethod(new User());
     }
 
     @Test

@@ -27,6 +27,6 @@ public class AutoBindRepoTestRunner extends GuiceTestRunner {
     /*===========================================[ CLASS METHODS ]==============*/
 
     public AutoBindRepoTestRunner(Class<?> classToRun) throws InitializationError {
-        super(classToRun, new ScanningJpaRepositoryModule("org.guice.repository.test", "test-h2"));
+        super(classToRun, new ScanningJpaRepositoryModule("com.google.code.guice.repository.repo", "test-h2"));
     }
 }

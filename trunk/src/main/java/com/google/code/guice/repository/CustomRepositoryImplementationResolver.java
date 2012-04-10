@@ -69,7 +69,7 @@ class CustomRepositoryImplementationResolver {
         Collection<? extends Class<?>> superTypes = ReflectionUtils.getAllSuperTypes(repositoryClass);
 
         /**
-         * Detect only custom repository/enhancements interfaces
+         * Detect only custom repository/enhancements interfaces - skip all from Spring and guice-repository project
          */
         Collection<? extends Class<?>> unbindedSupertypes = Collections2.filter(superTypes, new Predicate<Object>() {
             public boolean apply(Object input) {

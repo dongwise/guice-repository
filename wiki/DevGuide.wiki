@@ -1,6 +1,6 @@
 #labels Featured,Phase-Implementation
 ==Developer Guide==
-Welcome to the developer documentation of guice-repository project - a Google Guice adapted version of [Spring Data-JPA http://static.springsource.org/spring-data/data-jpa/docs/current/reference/html/#preface] project with some additional features.
+Welcome to the developer documentation of guice-repository project - a Google Guice adapted version of [http://static.springsource.org/spring-data/data-jpa/docs/current/reference/html/#preface Spring Data-JPA] project with some additional features.
 
 ==What are Spring Data-JPA==
 Here is description from Spring Data-JPA authors:

@@ -10,7 +10,7 @@ Here is description from Spring Data-JPA authors:
 For my opinion it is very useful project that helps developer to work hard on business logic and avoid writing boilerplate code around persistence layer.
 
 ==What are guice-repository?==
-Guice-repository is a bridge between _Spring Data-JPA_ and _[Guice-Persist http://code.google.com/p/google-guice/wiki/GuicePersist] with additional features:
+Guice-repository is a bridge between _Spring Data-JPA_ and _[http://code.google.com/p/google-guice/wiki/GuicePersist Guice-Persist] with additional features:
  * Support for [http://www.objectdb.com/java/jpa/persistence/store#Batch_Store_ batch store] (see [BatchStore this] page)
  * Allow access to EntityManager from Repository (see EntityManagerProvider)
  * Repository Auto-bind possibilities - no need to do manual .bind() for each Repository (see [AutoBind])

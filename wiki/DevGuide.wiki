@@ -51,6 +51,9 @@ install(new JpaRepositoryModule("my-persistence-unit") {
         });
 }}}
 
+
+JpaRepositoryProvider is a main "magic-maker" - it searches for Repository implementations, creates a Spring context, initialize all needed underlying Beans & Factories and so on.
+
 Example for ScanningJpaRepositoryModule:
 {{{
 install(new ScanningJpaRepositoryModule("com.mycorp.repo", "my-persistence-unit"));

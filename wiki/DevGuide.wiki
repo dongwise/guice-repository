@@ -4,6 +4,7 @@ Welcome to the developer documentation of guice-repository project - a Google Gu
 
 ==What are Spring Data-JPA?==
 Here is description from Spring Data-JPA authors:
+
 "_Spring JPA is part of the umbrella Spring Data project that makes it easy to easily implement JPA based repositories._"
 
 For my opinion it is very useful project that helps developer to work hard on business logic and avoid writing boilerplate code around persistence layer.

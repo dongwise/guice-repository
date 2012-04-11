@@ -1,3 +1,5 @@
+==Repository Auto-bind==
+
 If you don't want to follow Google Guice binding style, or you have too many Repositories, or you just lazy - you can delegate this binding job to guice-repository.
 
 All you need is to use _com.google.code.guice.repository.ScanningJpaRepositoryModule_ instead of _com.google.code.guice.repository.JpaRepositoryModule_.

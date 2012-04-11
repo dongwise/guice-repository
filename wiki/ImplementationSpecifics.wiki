@@ -1,5 +1,34 @@
 ==ORM Implementation Specifics==
 
+===Persistence-unit name===
+
+As you can see from documentation earlier there is an constructor parameter for JpaRepositoryModule named "my-persistence-unit", for example:
+{{{
+install(new JpaRepositoryModule("my-persistence-unit") {
+            protected void configureRepositories() {
+                bind(AccountRepository.class).toProvider(new JpaRepositoryProvider<AccountRepository>());
+            }
+        });
+}}}
+
+This parameter is a persistence-unit name which will be used for _EntityManagerFactory_ creation. This parameter is required by underlying _guice-persist_ module and it is mandatory to pass them to _JpaPersistModule_.
+
+In _guice-repository_ you have three options to specify persistence-unit name:
+ # Specify it directly during module instantiation
+ # Create your own persistence-unit resolving method, just override _getPersistenceUnitName_ of JpaRepositoryModule:
+ {{{
+   install(new JpaRepositoryModule() {
+            protected void configureRepositories() {
+                bind(UserRepository.class).toProvider(new JpaRepositoryProvider<UserRepository>());
+            }
+
+            protected String getPersistenceUnitName() {
+                // use your own detection mechanisms, but remember - Guice doesn't allow injection in modules during construction
+                return "my-persistence-unit";
+            }
+        });
+ }}}
+ # Specify system property named "persistence-unit-name" on/before application startup
 
 samples persistence.xml
 persistence.properties

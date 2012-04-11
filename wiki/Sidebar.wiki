@@ -1,1 +1,11 @@
- * [Concurrency]
+  * [http://guice-repository.googlecode.com/ Home]
+  * ----
+  * [ReleaseNotes Release notes]
+  * [DevGuide Developer's guide]
+  * ----
+  * [http://groups.google.com/group/guice-repository Guice-Repository users' group]
+  * [http://code.google.com/p/guice-repository/feeds Project feeds]
+  * ----
+  * [TODO To do]
+
+  * [Concurrency]

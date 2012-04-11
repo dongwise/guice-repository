@@ -1,0 +1,15 @@
+If you don't want to follow Google Guice binding style, or you have too many Repositories, or you just lazy - you can delegate this binding job to guice-repository.
+
+All you need is to use _com.google.code.guice.repository.ScanningJpaRepositoryModule_ instead of _com.google.code.guice.repository.JpaRepositoryModule_.
+
+ScanningJpaRepositoryModule will need a package(s) name(s) as a constructor parameters. This packages will be scanned and all found Repositories will be binded.
+
+Single scan package example:
+{{{
+install(new ScanningJpaRepositoryModule("com.mycorp.repo", "my-persistence-unit"));
+}}}
+
+Multiple scan packages example:
+{{{
+install(new ScanningJpaRepositoryModule(Arrays.asList("com.mycorp.repo", "com.mycorp.common.repo", "org.another.repo"), "my-persistence-unit"));
+}}}

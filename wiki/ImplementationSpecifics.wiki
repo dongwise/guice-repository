@@ -1,0 +1,5 @@
+==ORM Implementation Specifics==
+
+
+samples persistence.xml
+persistence.properties

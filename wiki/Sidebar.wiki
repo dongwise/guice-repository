@@ -1,7 +1,7 @@
   * [http://guice-repository.googlecode.com/ Home]
   * ----
   * [ReleaseNotes Release notes]
-  * [DevGuide Developer's guide]
+  * [DevGuide Developer guide]
      * [Concurrency Repository and Concurrency aspects]
      * [BatchStore Batch Store]
      * [ImplementationSpecifics ORM Implementation Specifics]

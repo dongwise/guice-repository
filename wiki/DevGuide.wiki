@@ -2,6 +2,8 @@
 ==Developer Guide==
 Welcome to the developer documentation of guice-repository project - a Google Guice adapted version of [http://static.springsource.org/spring-data/data-jpa/docs/current/reference/html/#preface Spring Data-JPA] project with some additional features.
 
+Current project version is: *1.0.0*
+
 ==What are Spring Data-JPA?==
 Here is description from Spring Data-JPA authors:
 
@@ -85,3 +87,19 @@ My own best-reasons-list for this is:
  * Simplify understanding of Domain model and its lifecycle aspects between team members
  * Isolation from ORM-configuration vendor specifics (see [ImplementationSpecifics this] page) in EntityManager configuration
  * OOM-protected Batch-insert feature
+
+==Where i can get it?==
+
+Project is mavenized and published in Central Maven repository.
+
+{{{
+<dependency>
+    <groupId>com.google.code.guice-repository</groupId>
+    <artifactId>guice-repository</artifactId>
+    <version>${version.guice-repository}</version>
+</dependency>
+}}}
+
+This project is depends on many other 3rd party libraries which is required to work. So, _without_ Maven you should manually add actual version of this 3rd party libraries. Actual list of them can be viewed in _dependencies_ section of [http://code.google.com/p/guice-repository/source/browse/trunk/pom.xml pom.xml].
+
+Actual project version will be always on top of this page.

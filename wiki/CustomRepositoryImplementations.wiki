@@ -1,3 +1,5 @@
+==Custom Repository Implementations==
+
 This part of documentation dedicated to [http://static.springsource.org/spring-data/data-jpa/docs/current/reference/html/#repositories.custom-implementations part 1.4 of official Spring Data-JPA reference manual].
 
 In case of manual Repository binding via JpaRepositoryModule and feature 1.4.2 (Custom behavior to all repositories) from reference manual you should use this construction:

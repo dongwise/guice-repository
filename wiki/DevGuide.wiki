@@ -2,13 +2,13 @@
 ==Developer Guide==
 Welcome to the developer documentation of guice-repository project - a Google Guice adapted version of [http://static.springsource.org/spring-data/data-jpa/docs/current/reference/html/#preface Spring Data-JPA] project with some additional features.
 
-==What are Spring Data-JPA==
+==What are Spring Data-JPA?==
 Here is description from Spring Data-JPA authors:
 "_Spring JPA is part of the umbrella Spring Data project that makes it easy to easily implement JPA based repositories._"
 
 For my opinion it is very useful project that helps developer to work hard on business logic and avoid writing boilerplate code around persistence layer.
 
-==What are guice-repository==
+==What are guice-repository?==
 Guice-repository is a bridge between _Spring Data-JPA_ and _[Guice-Persist http://code.google.com/p/google-guice/wiki/GuicePersist] with additional features:
  * Support for [http://www.objectdb.com/java/jpa/persistence/store#Batch_Store_ batch store] (see [BatchStore this] page)
  * Allow access to EntityManager from Repository (see EntityManagerProvider)
@@ -75,8 +75,7 @@ public class AccountService {
      return accountRepository.findAccountByLogin(login);
     }
 }
-
+}}}
 
 ==Why not just use pure Guice-Persist?==
 Answer is simple - if you don't need and don't see a place for Repository in your project and - then you don't
-todo

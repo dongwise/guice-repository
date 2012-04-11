@@ -6,6 +6,7 @@
      * [BatchStore Batch Store]
      * [ImplementationSpecifics ORM Implementation Specifics]
      * [CustomRepositoryImplementations Custom Repository Implementations]
+     * [AutoBind Repository Auto-bind]
   * ----
   * [http://groups.google.com/group/guice-repository Guice-Repository users' group]
   * [http://code.google.com/p/guice-repository/feeds Project feeds]

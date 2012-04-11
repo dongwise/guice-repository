@@ -1,3 +1,5 @@
+==Batch Store==
+
 To use power of batches you should extend your Repository interface from _com.google.code.guice.repository.BatchStoreJpaRepository_.
 
 For example:
@@ -28,4 +30,3 @@ After that you will have an access to methods:
 }}}
 
 Remember, that after batch store all stored entities became to detached state.
-

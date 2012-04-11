@@ -13,7 +13,7 @@ install(new JpaRepositoryModule("my-persistence-unit") {
 
 This parameter is a persistence-unit name which will be used for _EntityManagerFactory_ creation. This parameter is required by underlying _guice-persist_ module and it is mandatory to pass them to _JpaPersistModule_.
 
-In _guice-repository_ you have three options to specify persistence-unit name:
+_guice-repository_ allows you three options to specify persistence-unit name:
  # Specify it directly during module instantiation
  # Create your own persistence-unit resolving method, just override _getPersistenceUnitName_ of JpaRepositoryModule:
  {{{
@@ -30,5 +30,13 @@ In _guice-repository_ you have three options to specify persistence-unit name:
  }}}
  # Specify system property named "persistence-unit-name" on/before application startup
 
-samples persistence.xml
-persistence.properties
+For all options you should have *META-INF/persistence.xml* in your classpath. This configuration file should contain persistence-unit used by your application.
+
+===ORM Implemenation Specifics Separation===
+
+_guice-repository_ allows you to separate ORM-specific properties from *persistence.xml* configuration file. 
+
+This is very useful approach in situations where you don't know your application consumer ORM-vendor and/or physical database type and/or location. In this case you provide two artifacts to your customer:
+ * application artifact with generic _persistence.xml_ which contains mappings only
+ * artifact with possible database configurations and configuration manual
+

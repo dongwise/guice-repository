@@ -83,6 +83,5 @@ public class AccountService {
 My own best-reasons-list for this is:
  * Reduce boilerplate code around persistence layer
  * Simplify understanding of Domain model and its lifecycle aspects between team members
- * Isolation from ORM-configuration vendor specifics (see [ImplementationSpecifics 
-this] page) in EntityManager configuration
+ * Isolation from ORM-configuration vendor specifics (see [ImplementationSpecifics this] page) in EntityManager configuration
  * OOM-protected Batch-insert feature

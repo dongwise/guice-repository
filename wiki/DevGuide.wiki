@@ -44,7 +44,6 @@ You can select between manual Repository binding in JpaRepositoryModule and auto
 Example for JpaRepositoryModule:
 {{{
 install(new JpaRepositoryModule("my-persistence-unit") {
-            @Override
             protected void configureRepositories() {
                 bind(AccountRepository.class).toProvider(new JpaRepositoryProvider<AccountRepository>());
             }

@@ -1,18 +1,82 @@
 #labels Featured,Phase-Implementation
 ==Developer Guide==
-Welcome to the developer documentation of guice-repository project - a Google Guice adapted version of spring-data-jpa project with some additional features.
+Welcome to the developer documentation of guice-repository project - a Google Guice adapted version of [Spring Data-JPA http://static.springsource.org/spring-data/data-jpa/docs/current/reference/html/#preface] project with some additional features.
 
-==What are spring-data-jpa==
-For my point of view it's very ...
-TODO:
+==What are Spring Data-JPA==
+Here is description from Spring Data-JPA authors:
+"_Spring JPA is part of the umbrella Spring Data project that makes it easy to easily implement JPA based repositories._"
+
+For my opinion it is very useful project that helps developer to work hard on business logic and avoid writing boilerplate code around persistence layer.
 
 ==What are guice-repository==
-
+Guice-repository is a bridge between _Spring Data-JPA_ and _[Guice-Persist http://code.google.com/p/google-guice/wiki/GuicePersist] with additional features:
+ * Support for [http://www.objectdb.com/java/jpa/persistence/store#Batch_Store_ batch store] (see [BatchStore this] page)
+ * Allow access to EntityManager from Repository (see EntityManagerProvider)
+ * Repository Auto-bind possibilities - no need to do manual .bind() for each Repository (see [AutoBind])
 
 ==How did this work?==
 
-todo
+There is a three main steps:
 
-==Why not just use native JPA?==
----
+1. Define a [http://static.springsource.org/spring-data/data-jpa/docs/current/api/org/springframework/data/jpa/repository/JpaRepository.html Repository] interface
+
+{{{
+public interface AccountRepository extends JpaRepository<Account, Long>,
+        EntityManagerProvider {
+
+    Account findAccountByUuid(String uuid);
+
+    @Query("select a from Account a where a.name = :name")
+    Account findAccountByName(@Param("name") String name);
+}
+}}}
+
+This process is well described in the [http://static.springsource.org/spring-data/data-jpa/docs/current/reference/html/#repositories.definition original manual].
+All features described in 1.1-1.4 documentation parts is supported by _guice-repository_.
+
+2. Install a Guice-module
+
+You can select between manual Repository binding in JpaRepositoryModule and auto-binding with ScanningJpaRepositoryModule.
+
+Example for JpaRepositoryModule:
+{{{
+install(new JpaRepositoryModule("my-persistence-unit") {
+            @Override
+            protected void configureRepositories() {
+                bind(AccountRepository.class).toProvider(new JpaRepositoryProvider<AccountRepository>());
+            }
+        });
+}}}
+
+Example for ScanningJpaRepositoryModule:
+{{{
+install(new ScanningJpaRepositoryModule("com.mycorp.repo", "my-persistence-unit"));
+}}}
+
+In this case "com.mycorp.repo" is a package where your Repository interfaces is located.
+
+3. @Inject & use
+
+Inject and use Repository in your services/business-logic modules:
+
+{{{
+public class AccountService {
+   
+    @Inject
+    private AccountRepository accountRepository;
+
+    public void registerUser(String login, String password) throws RegistrationException{
+     // ... some checks & etc
+     accountRepository.save(new Account(login, password));
+     // ... something else
+    }
+
+    public Account findAccount(String login) throws FinderException{
+     return accountRepository.findAccountByLogin(login);
+    }
+}
+
+
+==Why not just use pure Guice-Persist?==
+Answer is simple - if you don't need and don't see a place for Repository in your project and - then you don't
 todo

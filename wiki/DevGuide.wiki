@@ -79,4 +79,10 @@ public class AccountService {
 }}}
 
 ==Why not just use pure Guice-Persist?==
-Answer is simple - if you don't need and don't see a place for Repository in your project and - then you don't
+
+My own best-reasons-list for this is:
+* Reduce boilerplate code around persistence layer
+* Simplify understanding of Domain model and its lifecycle aspects between team members
+* Isolation from ORM-configuration vendor specifics (see [ImplementationSpecifics 
+this] page) in EntityManager configuration
+* OOM-protected Batch-insert feature

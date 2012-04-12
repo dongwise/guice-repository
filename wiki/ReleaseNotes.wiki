@@ -1,2 +1,7 @@
-12.04.2012
-Initial release and documentation
+=== Next release (trunk) ===
+ * think about
+
+=== 1.0.0 ===
+ 
+ * Initial release and documentation
+ * Maven repo sync

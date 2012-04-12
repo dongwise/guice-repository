@@ -36,7 +36,41 @@ For all options you should have *META-INF/persistence.xml* in your classpath. Th
 
 _guice-repository_ allows you to separate ORM-specific properties from *persistence.xml* configuration file. 
 
-This is very useful approach in situations where you don't know your application consumer ORM-vendor and/or physical database type and/or location. In this case you provide two artifacts to your customer:
+This is very useful approach in situations where you don't know your application consumer ORM-specifics and/or physical database type and/or location. In this case you provide two artifacts to your customer:
  * application artifact with generic _persistence.xml_ which contains mappings only
  * artifact with possible database configurations and configuration manual
 
+*persistence.xml example:*
+{{{
+<persistence version="2.0" xmlns="http://java.sun.com/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence       http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+
+    <persistence-unit name="myapp.oracle" transaction-type="RESOURCE_LOCAL">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <mapping-file>META-INF/mappings/sequence/User.orm.xml</mapping-file>
+        <mapping-file>META-INF/mappings/sequence/Entity.orm.xml</mapping-file>
+        <exclude-unlisted-classes>true</exclude-unlisted-classes>
+        <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
+    </persistence-unit>
+
+    <persistence-unit name="myapp.h2" transaction-type="RESOURCE_LOCAL">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <mapping-file>META-INF/mappings/identity/User.orm.xml</mapping-file>
+        <mapping-file>META-INF/mappings/identity/Entity.orm.xml</mapping-file>
+        <exclude-unlisted-classes>true</exclude-unlisted-classes>
+        <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
+    </persistence-unit>
+
+    <persistence-unit name="myapp.sql-server" transaction-type="RESOURCE_LOCAL">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <mapping-file>META-INF/mappings/identity/User.orm.xml</mapping-file>
+        <mapping-file>META-INF/mappings/identity/Entity.orm.xml</mapping-file>
+        <exclude-unlisted-classes>true</exclude-unlisted-classes>
+        <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
+    </persistence-unit>
+</persistence>
+}}}
+
+As you can see there is three persistence-unit defined with no DB specifics - only mappings. It's important thing - if you need better portability of your mappings you should not choose annotation-based mappings. For example - identity sequences 
+is only choice for Oracle, but it's not supported in Microsoft SQL Server.

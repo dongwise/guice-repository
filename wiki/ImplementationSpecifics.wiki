@@ -78,9 +78,10 @@ As you can see there is three persistence-unit defined with no DB specifics - on
 is only choice for Oracle, but it's not supported in Microsoft SQL Server.
 
 Second thing - you need to create set of ORM-specifics configuration files.
-By-default _guice-repository_ perform a classpath search of files named ${persistence-unit-name}.properties.
+By-default _guice-repository_ perform a classpath search of files named *${persistence-unit-name}.properties*.
 
 *Here is some examples of this files:*
+
 _myapp.h2.properties_:
 {{{
 hibernate.connection.driver_class=org.h2.Driver
@@ -122,3 +123,12 @@ hibernate.hbm2ddl.auto=update
 hibernate.jdbc.batch_size=500
 }}}
 
+Also you can define your own ORM-specifics separation by overriding _getPersistenceUnitProperties_ method in _JparepositoryModule_:
+{{{
+   install(new JpaRepositoryModule() {
+            protected Properties getPersistenceUnitProperties() {
+              // define your own Properties for JPA persistence provider
+            }
+   }
+
+}}}

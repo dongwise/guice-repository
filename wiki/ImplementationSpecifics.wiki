@@ -40,7 +40,9 @@ This is very useful approach in situations where you don't know your application
  * application artifact with generic _persistence.xml_ which contains mappings only
  * artifact with possible database configurations and configuration manual
 
-*persistence.xml example:*
+*How to begin?*
+
+First of all you should define your generic _persistence.xml_, here is an example:
 {{{
 <persistence version="2.0" xmlns="http://java.sun.com/xml/ns/persistence"
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -74,3 +76,49 @@ This is very useful approach in situations where you don't know your application
 
 As you can see there is three persistence-unit defined with no DB specifics - only mappings. It's important thing - if you need better portability of your mappings you should not choose annotation-based mappings. For example - identity sequences 
 is only choice for Oracle, but it's not supported in Microsoft SQL Server.
+
+Second thing - you need to create set of ORM-specifics configuration files.
+By-default _guice-repository_ perform a classpath search of files named ${persistence-unit-name}.properties.
+
+*Here is some examples of this files:*
+_myapp.h2.properties_:
+{{{
+hibernate.connection.driver_class=org.h2.Driver
+
+hibernate.dialect=org.hibernate.dialect.H2Dialect
+hibernate.connection.url=jdbc:h2:./target/test-db;MVCC=TRUE
+
+hibernate.show_sql=false
+hibernate.format_sql=false
+hibernate.hbm2ddl.auto=create
+}}}
+
+_myapp.oracle.properties_:
+{{{
+hibernate.connection.driver_class=oracle.jdbc.OracleDriver
+
+hibernate.dialect=org.hibernate.dialect.Oracle10gDialect
+hibernate.connection.url=jdbc:oracle:thin:@//localhost:1521/xe
+hibernate.connection.username=dev
+hibernate.connection.password=dev
+hibernate.connection.autocommit=true
+hibernate.show_sql=false
+hibernate.format_sql=false
+hibernate.hbm2ddl.auto=update
+
+hibernate.id.new_generator_mappings=true
+}}}
+
+_myapp.sql-server.properties_:
+{{{
+hibernate.connection.driver_class=net.sourceforge.jtds.jdbc.Driver
+
+hibernate.dialect=org.hibernate.dialect.SQLServerDialect
+hibernate.connection.url=jdbc:jtds:sqlserver://SRV-TEST-DB02:1433;databaseName=fastgate_qa;integratedSecurity=true;
+
+hibernate.show_sql=false
+hibernate.format_sql=false
+hibernate.hbm2ddl.auto=update
+hibernate.jdbc.batch_size=500
+}}}
+

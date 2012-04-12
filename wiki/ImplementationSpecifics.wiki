@@ -115,7 +115,7 @@ _myapp.sql-server.properties_:
 hibernate.connection.driver_class=net.sourceforge.jtds.jdbc.Driver
 
 hibernate.dialect=org.hibernate.dialect.SQLServerDialect
-hibernate.connection.url=jdbc:jtds:sqlserver://SRV-TEST-DB02:1433;databaseName=fastgate_qa;integratedSecurity=true;
+hibernate.connection.url=jdbc:jtds:sqlserver://SRV-TEST-DB:1433;databaseName=test_db;integratedSecurity=true;
 
 hibernate.show_sql=false
 hibernate.format_sql=false

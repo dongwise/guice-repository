@@ -20,9 +20,14 @@ package com.google.code.guice.repository;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
+import com.google.inject.matcher.Matchers;
 import com.google.inject.persist.jpa.JpaPersistModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.AnnotationTransactionAttributeSource;
+import org.springframework.transaction.annotation.SpringTransactionAnnotationParser;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionInterceptor;
 
 import java.io.InputStream;
 import java.util.Properties;
@@ -30,16 +35,10 @@ import java.util.Properties;
 /**
  * Guice module with Repository support. Repository bindings should be made in <code>configureRepositories</code>
  * method. Module uses JpaPersistModule from guice-persist, which is requires persistence-unit name as an input
- * parameter. There is three options to specify persistence-unit name:
- * <ol>
- * <li>
- * constructor parameter. For example: new JpaRepositoryModule("my-persistence-unit")
- * </li>
- * <li>
- * system property 'persistence-unit-name'. For example: launch an application with
- * -Dpersistence-unit-name=my-persistence-unit
- * </li>
- * <li>override <code>getPersistenceUnitName</code> method. For example:
+ * parameter. There is three options to specify persistence-unit name: <ol> <li> constructor parameter. For example: new
+ * JpaRepositoryModule("my-persistence-unit") </li> <li> system property 'persistence-unit-name'. For example: launch an
+ * application with -Dpersistence-unit-name=my-persistence-unit </li> <li>override <code>getPersistenceUnitName</code>
+ * method. For example:
  * <pre>
  *          new JpaRepositoryModule(){
  *               protected String getPersistenceUnitName() {
@@ -47,11 +46,9 @@ import java.util.Properties;
  *               }
  *          }
  *       </pre>
- * </li>
- * </ol>
+ * </li> </ol>
  *
- * It is very useful to separate ORM specifics from persistence.xml. This technique gives you possibilities to pack
- * your
+ * It is very useful to separate ORM specifics from persistence.xml. This technique gives you possibilities to pack your
  * persistence.xml with mappings/specification-driven aspects to artifact. Module will look for this specifics in
  * ${persistence-unit-name}.properties file placed in the classpath. Also you can define all ORM specifics in
  * persistence.xml, there is no problem with it.
@@ -104,12 +101,14 @@ public abstract class JpaRepositoryModule extends AbstractModule {
     protected void configure() {
         String moduleName = getClass().getSimpleName();
         logger.info(String.format("Configuring %s with persistence-unit name: [%s]", moduleName, persistenceUnitName));
-
+        //TODO: add UnitOfWork support
+        //TODO: think about WS usecase and PersistFilter
+        //TODO: close EntityManager ?? when
         JpaPersistModule module = new JpaPersistModule(persistenceUnitName);
 
         Properties props = getPersistenceUnitProperties();
         if (props != null) {
-            // Передаем параметры инициализации Persistence-контекста
+            // Passing initialisation properties for Persistence context
             module.properties(props);
         }
         install(module);
@@ -117,6 +116,13 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         bind(JpaInitializer.class).asEagerSingleton();
         bind(DomainClassResolver.class).in(Scopes.SINGLETON);
         bind(CustomRepositoryImplementationResolver.class).in(Scopes.SINGLETON);
+
+        // Only Spring's @Transactional annotation is supported
+        AnnotationTransactionAttributeSource tas = new AnnotationTransactionAttributeSource(new SpringTransactionAnnotationParser());
+        // Transaction Manager will be set later
+        TransactionInterceptor transactionInterceptor = new TransactionInterceptor(null, tas);
+        bind(TransactionInterceptor.class).toInstance(transactionInterceptor);
+        bindInterceptor(Matchers.any(), Matchers.annotatedWith(Transactional.class), transactionInterceptor);
         configureRepositories();
         logger.info(String.format("%s configured", moduleName));
     }

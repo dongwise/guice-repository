@@ -30,12 +30,13 @@ import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
+import org.springframework.orm.jpa.EntityManagerFactoryUtils;
 import org.springframework.orm.jpa.EntityManagerHolder;
 import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.transaction.interceptor.TransactionInterceptor;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
-import javax.annotation.Nullable;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
@@ -76,10 +77,11 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
 
     private Class<R> repositoryClass;
     private Provider<EntityManagerFactory> entityManagerFactoryProvider;
-    private ApplicationContext context;
+    private volatile ApplicationContext context;
     private Provider<EntityManager> entityManagerProvider;
     private Class domainClass;
     private Class customImplementationClass;
+    private TransactionInterceptor transactionInterceptor;
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
@@ -91,7 +93,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
      *
      * @see ScanningJpaRepositoryModule
      */
-    JpaRepositoryProvider(Class<R> repositoryClass, @Nullable Class customImplementationClass) {
+    JpaRepositoryProvider(Class<R> repositoryClass, Class customImplementationClass) {
         Assert.notNull(repositoryClass);
         this.repositoryClass = repositoryClass;
         this.customImplementationClass = customImplementationClass;
@@ -113,19 +115,27 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
 
     /*===========================================[ CLASS METHODS ]==============*/
 
+    @SuppressWarnings({"MethodParameterNamingConvention"})
     @Inject
     public void init(Injector injector,
                      Provider<EntityManagerFactory> entityManagerFactoryProvider,
                      Provider<EntityManager> entityManagerProvider,
                      CustomRepositoryImplementationResolver customRepositoryImplementationResolver,
-                     DomainClassResolver domainClassResolver) {
+                     DomainClassResolver domainClassResolver,
+                     TransactionInterceptor transactionInterceptor) {
         this.entityManagerFactoryProvider = entityManagerFactoryProvider;
         this.entityManagerProvider = entityManagerProvider;
+
         if (repositoryClass == null) {
             repositoryClass = extractRepositoryClass(injector);
         }
+
         domainClass = domainClassResolver.resolve(repositoryClass);
-        context = createSpringContext();
+        this.transactionInterceptor = transactionInterceptor;
+
+        if (context == null) {
+            context = createSpringContext();
+        }
 
         if (customImplementationClass == null) {
             customImplementationClass = customRepositoryImplementationResolver.resolve(repositoryClass);
@@ -195,7 +205,27 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
             TransactionSynchronizationManager.unbindResource(proxiedEmf);
         }
 
-        TransactionSynchronizationManager.bindResource(proxiedEmf, new EntityManagerHolder(entityManagerProvider.get()));
+        EntityManagerHolder emHolder = new EntityManagerHolder(entityManagerProvider.get());
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.initSynchronization();
+        }
+        //TODO
+//        emHolder.setSynchronizedWithTransaction(true);
+        TransactionSynchronizationManager.bindResource(proxiedEmf, emHolder);
+        EntityManager transactionalEM = EntityManagerFactoryUtils.doGetTransactionalEntityManager(proxiedEmf, null);
+//        TransactionSynchronizationManager.unbindResource(proxiedEmf);
+
+//        EntityManagerHolder tEmHolder = new EntityManagerHolder(transactionalEM);
+//        EntityManagerHolder emHolder = new EntityManagerHolder(entityManagerProvider.get());
+//        emHolder.setSynchronizedWithTransaction(true);
+//        TransactionSynchronizationManager.bindResource(proxiedEmf, tEmHolder);
+
+        //todo unbind holder from the context
+        //Could not open JPA EntityManager for transaction; nested exception is java.lang.IllegalStateException:
+        // Already value [org.springframework.orm.jpa.EntityManagerHolder@17213f1a] for key
+        // [com.google.code.guice.repository.GuiceLocalEntityManagerFactoryBean@7b5cfd3] bound to thread [main]
+        JpaTransactionManager transactionManager = context.getBean(JpaTransactionManager.class);
+        transactionInterceptor.setTransactionManager(transactionManager);
 
         JpaRepositoryFactoryBean jpaRepositoryFactoryBean = createJpaRepositoryFactoryBean();
 

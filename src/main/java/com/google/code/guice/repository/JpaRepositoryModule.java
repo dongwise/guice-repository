@@ -19,9 +19,9 @@
 package com.google.code.guice.repository;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Provider;
 import com.google.inject.Scopes;
 import com.google.inject.matcher.Matchers;
-import com.google.inject.persist.jpa.JpaPersistModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.AnnotationTransactionAttributeSource;
@@ -29,6 +29,9 @@ import org.springframework.transaction.annotation.SpringTransactionAnnotationPar
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -101,19 +104,25 @@ public abstract class JpaRepositoryModule extends AbstractModule {
     protected void configure() {
         String moduleName = getClass().getSimpleName();
         logger.info(String.format("Configuring %s with persistence-unit name: [%s]", moduleName, persistenceUnitName));
-        //TODO: add UnitOfWork support
         //TODO: think about WS usecase and PersistFilter
         //TODO: close EntityManager ?? when
-        JpaPersistModule module = new JpaPersistModule(persistenceUnitName);
 
         Properties props = getPersistenceUnitProperties();
+        final EntityManagerFactory emFactory;
         if (props != null) {
-            // Passing initialisation properties for Persistence context
-            module.properties(props);
+            emFactory = Persistence.createEntityManagerFactory(persistenceUnitName, props);
+        } else {
+            emFactory = Persistence.createEntityManagerFactory(persistenceUnitName);
         }
-        install(module);
 
-        bind(JpaInitializer.class).asEagerSingleton();
+        bind(EntityManager.class).toProvider(new Provider<EntityManager>() {
+            @Override
+            public EntityManager get() {
+                return emFactory.createEntityManager();
+            }
+        });
+        bind(EntityManagerFactory.class).toInstance(emFactory);
+
         bind(DomainClassResolver.class).in(Scopes.SINGLETON);
         bind(CustomRepositoryImplementationResolver.class).in(Scopes.SINGLETON);
 
@@ -157,4 +166,45 @@ public abstract class JpaRepositoryModule extends AbstractModule {
     protected Logger getLogger() {
         return logger;
     }
+
+    /*private static class EntityManagerProvider implements Provider<EntityManager> {
+        private final ThreadLocal<EntityManager> entityManager = new ThreadLocal<EntityManager>();
+        private final EntityManagerFactory emFactory;
+
+        private EntityManagerProvider(EntityManagerFactory emFactory) {
+            this.emFactory = emFactory;
+        }
+
+        @Override
+        public EntityManager get() {
+            return emFactory.createEntityManager();
+        }
+
+        public EntityManager get() {
+            if (!isWorking()) {
+                begin();
+            }
+
+            EntityManager em = entityManager.get();
+            Preconditions.checkState(null != em, "Requested EntityManager outside work unit. "
+                    + "Try calling UnitOfWork.begin() first, or use a PersistFilter if you "
+                    + "are inside a servlet environment.");
+
+            return em;
+        }
+
+        public boolean isWorking() {
+            return entityManager.get() != null;
+        }
+
+        public void begin() {
+            Preconditions.checkState(null == entityManager.get(),
+                    "Work already begun on this thread. Looks like you have called UnitOfWork.begin() twice"
+                            + " without a balancing call to end() in between.");
+
+            entityManager.set(emFactory.createEntityManager());
+        }
+
+
+    }*/
 }

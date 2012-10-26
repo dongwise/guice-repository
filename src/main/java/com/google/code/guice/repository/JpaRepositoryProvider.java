@@ -31,10 +31,8 @@ import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
 import org.springframework.orm.jpa.EntityManagerFactoryUtils;
-import org.springframework.orm.jpa.EntityManagerHolder;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
 import javax.persistence.EntityManager;
@@ -196,34 +194,19 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
     }
 
     public R get() {
-        EntityManager entityManager = entityManagerProvider.get();
-        GuiceLocalEntityManagerFactoryBean entityManagerFactoryBean = context.getBean(GuiceLocalEntityManagerFactoryBean.class);
+        EntityManagerFactory emf = entityManagerFactoryProvider.get();
+        EntityManager entityManager = emf.createEntityManager();
+        //TODO:
+//        GuiceLocalEntityManagerFactoryBean entityManagerFactoryBean = context.getBean(GuiceLocalEntityManagerFactoryBean.class);
 
         // Transaction support specifics
-        EntityManagerFactory proxiedEmf = entityManagerFactoryBean.getObject();
-        if (TransactionSynchronizationManager.hasResource(proxiedEmf)) {
-            TransactionSynchronizationManager.unbindResource(proxiedEmf);
-        }
+//        EntityManagerFactory proxiedEmf = entityManagerFactoryBean.getObject();
+//        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+//            TransactionSynchronizationManager.initSynchronization();
+//        }
 
-        EntityManagerHolder emHolder = new EntityManagerHolder(entityManagerProvider.get());
-        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
-            TransactionSynchronizationManager.initSynchronization();
-        }
-        //TODO
-//        emHolder.setSynchronizedWithTransaction(true);
-        TransactionSynchronizationManager.bindResource(proxiedEmf, emHolder);
-        EntityManager transactionalEM = EntityManagerFactoryUtils.doGetTransactionalEntityManager(proxiedEmf, null);
-//        TransactionSynchronizationManager.unbindResource(proxiedEmf);
+        EntityManagerFactoryUtils.doGetTransactionalEntityManager(emf, null);
 
-//        EntityManagerHolder tEmHolder = new EntityManagerHolder(transactionalEM);
-//        EntityManagerHolder emHolder = new EntityManagerHolder(entityManagerProvider.get());
-//        emHolder.setSynchronizedWithTransaction(true);
-//        TransactionSynchronizationManager.bindResource(proxiedEmf, tEmHolder);
-
-        //todo unbind holder from the context
-        //Could not open JPA EntityManager for transaction; nested exception is java.lang.IllegalStateException:
-        // Already value [org.springframework.orm.jpa.EntityManagerHolder@17213f1a] for key
-        // [com.google.code.guice.repository.GuiceLocalEntityManagerFactoryBean@7b5cfd3] bound to thread [main]
         JpaTransactionManager transactionManager = context.getBean(JpaTransactionManager.class);
         transactionInterceptor.setTransactionManager(transactionManager);
 

@@ -20,6 +20,7 @@ package com.google.code.guice.repository.transaction;
 
 import com.google.code.guice.repository.model.User;
 import com.google.code.guice.repository.repo.UserRepository;
+import com.google.inject.Provider;
 import junit.framework.Assert;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,17 +35,39 @@ public class ComplexTransactionService {
     private UserRepository userRepository;
 
     @Inject
-    private EntityManager entityManager;
+    private Provider<EntityManager> entityManager;
 
     /*===========================================[ CLASS METHODS ]==============*/
 
     @Transactional(rollbackFor = Exception.class)
-    public void performComplexTransaction() throws Exception {
-        userRepository.deleteAll();
-        userRepository.save(new User("John", "Smith", 42));
-        userRepository.save(new User("Alex", "Johns", 22));
-        long count = userRepository.count();
-        Assert.assertEquals("Invalid repository size", 2, count);
-        throw new Exception("Flow breaker");
+    public void performFirstComplexTransaction() throws Exception {
+        try {
+            System.out.println("EM for performComplexTransaction: " + entityManager.get().hashCode());
+            System.out.println("Delete");
+
+            //TODO теряем транзакцию
+            userRepository.deleteAll();
+            System.out.println("Save1");
+            userRepository.save(new User("John", "Smith", 42));
+            System.out.println("Save2");
+            userRepository.save(new User("Alex", "Johns", 22));
+            System.out.println("Count1");
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        Assert.assertEquals("Invalid repository size", 2, userRepository.count());
+
+        throw new Exception("Flow breaker1");
     }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void performSecondComplexTransaction() throws Exception {
+        System.out.println("EM for performSecondComplexTransaction: " + entityManager.get().hashCode());
+        System.out.println("Save3");
+        userRepository.save(new User("1", "1", 1));
+        System.out.println("Count2");
+        Assert.assertEquals("Invalid repository size", 1, userRepository.count());
+        throw new Exception("Flow breaker2");
+    }
+
 }

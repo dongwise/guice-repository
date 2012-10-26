@@ -20,7 +20,6 @@ package com.google.code.guice.repository;
 
 
 import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Key;
@@ -66,12 +65,10 @@ class CustomRepositoryImplementationResolver {
         Assert.notNull(repositoryClass);
 
         Class customRepository = null;
-        Collection<? extends Class<?>> superTypes = ReflectionUtils.getAllSuperTypes(repositoryClass);
-
         /**
          * Detect only custom repository/enhancements interfaces - skip all from Spring and guice-repository project
          */
-        Collection<? extends Class<?>> unbindedSupertypes = Collections2.filter(superTypes, new Predicate<Object>() {
+        Collection<? extends Class<?>> superTypes = ReflectionUtils.getAllSuperTypes(repositoryClass, new Predicate<Object>() {
             public boolean apply(Object input) {
                 if (input instanceof Class) {
                     Class aClass = ((Class) input);
@@ -87,8 +84,8 @@ class CustomRepositoryImplementationResolver {
         /**
          * Searching for custom repository/enhancement implementation
          */
-        if (!unbindedSupertypes.isEmpty()) {
-            Class customRepositoryClass = unbindedSupertypes.iterator().next();
+        if (!superTypes.isEmpty()) {
+            Class customRepositoryClass = superTypes.iterator().next();
             Reflections reflections = new Reflections(customRepositoryClass.getPackage().getName());
 
             Set<Class> subTypesOf = reflections.getSubTypesOf(customRepositoryClass);

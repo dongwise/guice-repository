@@ -44,7 +44,13 @@ public class ComplexTransactionServiceTest {
     @Test
     public void testRepo() throws Exception {
         try {
-            complexTransactionService.performComplexTransaction();
+            complexTransactionService.performFirstComplexTransaction();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        try {
+            complexTransactionService.performSecondComplexTransaction();
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

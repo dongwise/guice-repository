@@ -31,6 +31,10 @@ import javax.persistence.PersistenceException;
  */
 class GuiceLocalEntityManagerFactoryBean extends LocalEntityManagerFactoryBean {
 
+    /*===========================================[ STATIC VARIABLES ]=============*/
+
+    private static final long serialVersionUID = -6793244803096198210L;
+
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
     private Provider<EntityManagerFactory> entityManagerFactoryProvider;

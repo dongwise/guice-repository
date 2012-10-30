@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 
+@SuppressWarnings({"MagicNumber"})
 public class ComplexTransactionService {
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
@@ -41,33 +42,30 @@ public class ComplexTransactionService {
 
     @Transactional(rollbackFor = Exception.class)
     public void performFirstComplexTransaction() throws Exception {
-        try {
-            System.out.println("EM for performComplexTransaction: " + entityManager.get().hashCode());
-            System.out.println("Delete");
+        System.out.println("EM for performComplexTransaction: " + entityManager.get());
+        System.out.println("DeleteAll");
+        userRepository.deleteAll();
+        System.out.println("Save1");
+        userRepository.save(new User("John", "Smith", 42));
+        System.out.println("Save2");
+        userRepository.save(new User("Alex", "Johns", 22));
+        System.out.println("Count1");
 
-            //TODO теряем транзакцию
-            userRepository.deleteAll();
-            System.out.println("Save1");
-            userRepository.save(new User("John", "Smith", 42));
-            System.out.println("Save2");
-            userRepository.save(new User("Alex", "Johns", 22));
-            System.out.println("Count1");
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
+        // partially committed
         Assert.assertEquals("Invalid repository size", 2, userRepository.count());
-
-        throw new Exception("Flow breaker1");
+        throw new Exception("First rollback");
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void performSecondComplexTransaction() throws Exception {
-        System.out.println("EM for performSecondComplexTransaction: " + entityManager.get().hashCode());
+        System.out.println("Checking size");
+        Assert.assertEquals("Invalid repository size", 0, userRepository.count());
+        System.out.println("EM for performSecondComplexTransaction: " + entityManager.get());
         System.out.println("Save3");
         userRepository.save(new User("1", "1", 1));
         System.out.println("Count2");
         Assert.assertEquals("Invalid repository size", 1, userRepository.count());
-        throw new Exception("Flow breaker2");
+        throw new Exception("Second rollback");
     }
 
 }

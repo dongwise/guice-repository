@@ -33,6 +33,7 @@ import org.springframework.data.repository.core.support.RepositoryFactorySupport
 import org.springframework.orm.jpa.EntityManagerFactoryUtils;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
 import javax.persistence.EntityManager;
@@ -131,6 +132,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
         domainClass = domainClassResolver.resolve(repositoryClass);
         this.transactionInterceptor = transactionInterceptor;
 
+        //TODO static?
         if (context == null) {
             context = createSpringContext();
         }
@@ -190,26 +192,42 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
         context.registerBeanDefinition("jpaRepositoryFactory",
                 BeanDefinitionBuilder.genericBeanDefinition(JpaRepositoryFactoryBean.class).getBeanDefinition());
 
+        JpaTransactionManager transactionManager = context.getBean(JpaTransactionManager.class);
+        transactionInterceptor.setTransactionManager(transactionManager);
         return context;
     }
 
     public R get() {
+///*
+//new
         EntityManagerFactory emf = entityManagerFactoryProvider.get();
-        EntityManager entityManager = emf.createEntityManager();
-        //TODO:
-//        GuiceLocalEntityManagerFactoryBean entityManagerFactoryBean = context.getBean(GuiceLocalEntityManagerFactoryBean.class);
 
         // Transaction support specifics
 //        EntityManagerFactory proxiedEmf = entityManagerFactoryBean.getObject();
-//        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
-//            TransactionSynchronizationManager.initSynchronization();
-//        }
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.initSynchronization();
+        }
 
-        EntityManagerFactoryUtils.doGetTransactionalEntityManager(emf, null);
+        EntityManager entityManager = EntityManagerFactoryUtils.doGetTransactionalEntityManager(emf, null);
+        System.out.println("Created EM: " + entityManager);
 
-        JpaTransactionManager transactionManager = context.getBean(JpaTransactionManager.class);
-        transactionInterceptor.setTransactionManager(transactionManager);
+//TODO в этом случае EM закрывается и повторная транзакция выполниться не может, т.к. ссылка на EM сохранена в репо
+//*/
 
+/*
+// initial
+        EntityManager entityManager = entityManagerProvider.get();
+        GuiceLocalEntityManagerFactoryBean entityManagerFactoryBean = context.getBean(GuiceLocalEntityManagerFactoryBean.class);
+
+        // Transaction support specifics
+        EntityManagerFactory proxiedEmf = entityManagerFactoryBean.getObject();
+        if (TransactionSynchronizationManager.hasResource(proxiedEmf)) {
+            TransactionSynchronizationManager.unbindResource(proxiedEmf);
+        }
+
+        TransactionSynchronizationManager.bindResource(proxiedEmf, new EntityManagerHolder(entityManagerProvider.get()));
+
+*/
         JpaRepositoryFactoryBean jpaRepositoryFactoryBean = createJpaRepositoryFactoryBean();
 
         jpaRepositoryFactoryBean.setBeanFactory(context);
@@ -235,7 +253,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
     protected JpaRepositoryFactoryBean createJpaRepositoryFactoryBean() {
         return new JpaRepositoryFactoryBean() {
             protected RepositoryFactorySupport createRepositoryFactory(EntityManager entityManager) {
-                return new CustomJpaRepositoryFactory(entityManager);
+                return new CustomJpaRepositoryFactory(new EntityManagerDelegate(entityManagerProvider));
             }
         };
     }
@@ -248,7 +266,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
          */
         try {
             if (SimpleJpaRepository.class.isAssignableFrom(customImplementationClass)) {
-                customRepositoryImplementation = customImplementationClass.getConstructor(Class.class, EntityManager.class).newInstance(domainClass, entityManagerProvider.get());
+                customRepositoryImplementation = customImplementationClass.getConstructor(Class.class, EntityManager.class).newInstance(domainClass, new EntityManagerDelegate(entityManagerProvider));
             } else {
                 customRepositoryImplementation = customImplementationClass.newInstance();
             }

@@ -19,7 +19,6 @@
 package com.google.code.guice.repository.transaction;
 
 import com.google.code.guice.repository.repo.UserRepository;
-import com.google.code.guice.repository.runner.ManualBindRepoTestRunner;
 import com.google.inject.Inject;
 import junit.framework.Assert;
 import org.junit.Test;
@@ -28,7 +27,7 @@ import org.junit.runner.RunWith;
 /**
  * @author Alexey Krylov AKA lexx
  */
-@RunWith(ManualBindRepoTestRunner.class)
+@RunWith(ComplexTransactionTestRunner.class)
 public class ComplexTransactionServiceTest {
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
@@ -42,12 +41,15 @@ public class ComplexTransactionServiceTest {
     /*===========================================[ CLASS METHODS ]==============*/
 
     @Test
-    public void testRepo() throws Exception {
+    public void testCompositeTransactions() throws Exception {
         try {
             complexTransactionService.performFirstComplexTransaction();
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
+        System.out.println("Main: checking size");
+        long count = repository.count();
+        Assert.assertEquals("Invalid repository size", 0, count);
 
         try {
             complexTransactionService.performSecondComplexTransaction();
@@ -55,7 +57,7 @@ public class ComplexTransactionServiceTest {
             System.out.println(e.getMessage());
         }
 
-        long count = repository.count();
+        count = repository.count();
         // no users should be added because we throw a flow-breaker exception and rollback the transaction
         Assert.assertEquals("Invalid repository size", 0, count);
     }

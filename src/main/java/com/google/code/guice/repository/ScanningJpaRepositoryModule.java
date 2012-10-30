@@ -25,7 +25,6 @@ import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
-import org.reflections.util.FilterBuilder;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -37,8 +36,8 @@ import java.util.*;
 import static com.google.common.collect.Collections2.filter;
 
 /**
- * Guice module with Repository support and auto Repository-scanning abilities.
- * With this module there is no need to manual binding of any Repositories - just specify target repository package :
+ * Guice module with Repository support and auto Repository-scanning abilities. With this module there is no need to
+ * manual binding of any Repositories - just specify target repository package :
  * <pre>
  *     install(new ScanningJpaRepositoryModule("com.mycorp.repo"){
  *        protected String getPersistenceUnitName(){
@@ -77,23 +76,16 @@ public class ScanningJpaRepositoryModule extends JpaRepositoryModule {
 
     @Override
     protected void configureRepositories() {
-        ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
 
-        FilterBuilder filterBuilder = new FilterBuilder();
         Set<URL> urls = new HashSet<URL>();
 
         for (String targetScanPackage : targetScanPackages) {
-            filterBuilder.include(FilterBuilder.prefix(targetScanPackage));
             urls.addAll(ClasspathHelper.forPackage(targetScanPackage));
         }
 
+        ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
         configurationBuilder.setUrls(urls);
-        configurationBuilder.filterInputsBy(filterBuilder);
-
-        configurationBuilder.setScanners(
-                new TypeAnnotationsScanner().filterResultsBy(filterBuilder),
-                new SubTypesScanner().filterResultsBy(filterBuilder));
-
+        configurationBuilder.setScanners(new TypeAnnotationsScanner(), new SubTypesScanner());
 
         Reflections reflections = new Reflections(configurationBuilder);
         Set<Class<?>> repositoryClasses = new HashSet<Class<?>>();

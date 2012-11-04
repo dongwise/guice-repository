@@ -16,17 +16,16 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository;
+package com.google.code.guice.repository.tests.general;
 
 import com.google.code.guice.repository.model.Account;
 import com.google.code.guice.repository.repo.AccountRepository;
-import com.google.code.guice.repository.runner.ManualBindRepoTestRunner;
+import com.google.code.guice.repository.tests.RepoTestBase;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -34,8 +33,7 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(ManualBindRepoTestRunner.class)
-public class BatchStoreRepositoryTest {
+public class BatchStoreRepositoryTest extends RepoTestBase {
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 

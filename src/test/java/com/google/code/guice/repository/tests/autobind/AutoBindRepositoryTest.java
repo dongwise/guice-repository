@@ -16,18 +16,19 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository;
+package com.google.code.guice.repository.tests.autobind;
 
-import com.google.code.guice.repository.repo.UserRepository;
-import com.google.code.guice.repository.runner.AutoBindRepoTestRunner;
 import com.google.code.guice.repository.model.Account;
 import com.google.code.guice.repository.model.Customer;
 import com.google.code.guice.repository.model.User;
 import com.google.code.guice.repository.repo.AccountRepository;
 import com.google.code.guice.repository.repo.CustomerRepository;
+import com.google.code.guice.repository.repo.UserRepository;
+import com.google.code.guice.repository.runner.AutoBindRepoTestRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.UUID;
@@ -53,9 +54,11 @@ public class AutoBindRepositoryTest {
 
     @Before
     public void cleanup(){
+        System.out.println("cleanup");
         userRepository.deleteAll();
         accountRepository.deleteAll();
         customerRepository.deleteAll();
+        System.out.println("cleanup done");
     }
 
     @Test

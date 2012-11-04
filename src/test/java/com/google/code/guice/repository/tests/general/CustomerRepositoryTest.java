@@ -16,41 +16,35 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository;
+package com.google.code.guice.repository.tests.general;
 
 import com.google.code.guice.repository.model.Account;
-import com.google.code.guice.repository.repo.AccountRepository;
-import com.google.code.guice.repository.runner.ManualBindRepoTestRunner;
+import com.google.code.guice.repository.model.Customer;
+import com.google.code.guice.repository.repo.CustomerRepository;
+import com.google.code.guice.repository.tests.RepoTestBase;
 import com.google.inject.Inject;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
-/**
- * Simple Repo-interface test
- *
- * @author Alexey Krylov AKA lexx
- */
-@RunWith(ManualBindRepoTestRunner.class)
-public class AccountRepositoryTest {
+public class CustomerRepositoryTest extends RepoTestBase {
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
     @Inject
-    private AccountRepository accountRepository;
+    private CustomerRepository customerRepository;
 
     /*===========================================[ CLASS METHODS ]==============*/
 
     @Before
     public void cleanup() {
-        accountRepository.deleteAll();
+        customerRepository.deleteAll();
     }
 
     @Test
@@ -61,9 +55,9 @@ public class AccountRepositoryTest {
             accounts.add(new Account(UUID.randomUUID().toString(), String.valueOf(i)));
         }
 
-        accountRepository.save(accounts);
-        assertEquals(count, accountRepository.count());
-        assertNotNull(accountRepository.findAccountByName(String.valueOf(1)));
-        assertNotNull(accountRepository.findAccountByUuid(accounts.get(0).getUuid()));
+        customerRepository.save(new Customer("name", "surname"));
+        customerRepository.sharedCustomMethod(new Long(42));
+        assertEquals(1, customerRepository.count());
+        assertEquals(1, customerRepository.findAll(new PageRequest(0, 10)).getContent().size());
     }
 }

@@ -16,16 +16,15 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository;
+package com.google.code.guice.repository.tests.general;
 
+import com.google.code.guice.repository.model.User;
 import com.google.code.guice.repository.repo.UserRepository;
+import com.google.code.guice.repository.tests.RepoTestBase;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.google.code.guice.repository.model.User;
-import com.google.code.guice.repository.runner.ManualBindRepoTestRunner;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -36,8 +35,7 @@ import java.util.concurrent.Executors;
 
 import static org.junit.Assert.assertEquals;
 
-@RunWith(ManualBindRepoTestRunner.class)
-public class UserRepositoryTest {
+public class UserRepositoryTest extends RepoTestBase {
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 

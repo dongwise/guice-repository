@@ -16,16 +16,13 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository;
+package com.google.code.guice.repository.tests.general.threading;
 
 import com.google.code.guice.repository.repo.UserRepository;
-import com.google.inject.Injector;
-import com.google.code.guice.repository.runner.ManualBindRepoTestRunner;
+import com.google.code.guice.repository.tests.RepoTestBase;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
-import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.Callable;
@@ -34,17 +31,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-@RunWith(ManualBindRepoTestRunner.class)
-public class MultiThreadedRepositoryInstantiationTest {
-
-    /*===========================================[ STATIC VARIABLES ]=============*/
-
-    private static final int MAX_CONCURRENT_THREADS = 1000;
+public class MultiThreadedRepositoryInstantiationTest extends RepoTestBase {
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
-    @Inject
-    private Injector injector;
     private AtomicLong instanceCounter;
 
     /*===========================================[ CLASS METHODS ]==============*/

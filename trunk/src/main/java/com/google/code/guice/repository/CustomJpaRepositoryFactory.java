@@ -34,7 +34,7 @@ import static org.springframework.data.querydsl.QueryDslUtils.QUERY_DSL_PRESENT;
  * Spring-data specifics - we need this because our "base" Repository implementation is not a SimpleJpaRepository, but
  * Repository with batch-store support.
  *
- * @author Alexey Krylov AKA lexx
+ * @author Alexey Krylov
  * @see SimpleBatchStoreJpaRepository
  */
 public class CustomJpaRepositoryFactory extends JpaRepositoryFactory {

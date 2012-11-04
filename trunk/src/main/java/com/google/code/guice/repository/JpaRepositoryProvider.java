@@ -64,7 +64,7 @@ import javax.persistence.EntityManagerFactory;
  *     }
  * </pre>
  *
- * @author Alexey Krylov AKA lexx
+ * @author Alexey Krylov
  */
 public class JpaRepositoryProvider<R extends Repository> implements Provider<R> {
 
@@ -76,11 +76,12 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
 
     private Class<R> repositoryClass;
     private Provider<EntityManagerFactory> entityManagerFactoryProvider;
-    private volatile ApplicationContext context;
+    private ApplicationContext context;
     private Provider<EntityManager> entityManagerProvider;
     private Class domainClass;
     private Class customImplementationClass;
     private TransactionInterceptor transactionInterceptor;
+    private R repository;
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
@@ -198,8 +199,6 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
     }
 
     public R get() {
-///*
-//new
         EntityManagerFactory emf = entityManagerFactoryProvider.get();
 
         // Transaction support specifics
@@ -209,7 +208,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
         }
 
         EntityManager entityManager = EntityManagerFactoryUtils.doGetTransactionalEntityManager(emf, null);
-        System.out.println("Created EM: " + entityManager);
+//        System.out.println("Created EM: " + entityManager);
 
 //TODO в этом случае EM закрывается и повторная транзакция выполниться не может, т.к. ссылка на EM сохранена в репо
 //*/

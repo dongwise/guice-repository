@@ -39,7 +39,7 @@ import java.util.Set;
  * See full specifics <a href="http://static.springsource.org/spring-data/data-jpa/docs/current/reference/html/#repositories.single-repository-behaviour">here</a>
  * </pre>
  *
- * @author Alexey Krylov AKA lexx
+ * @author Alexey Krylov
  */
 class CustomRepositoryImplementationResolver {
 

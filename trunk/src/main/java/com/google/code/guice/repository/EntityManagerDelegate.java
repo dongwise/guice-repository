@@ -158,7 +158,17 @@ public class EntityManagerDelegate implements EntityManager {
 
     @Override
     public Query createQuery(String qlString) {
-        return entityManagerProvider.get().createQuery(qlString);
+        EntityManager entityManager = entityManagerProvider.get();
+//        System.out.println("entityManager = " + entityManager+", open: "+entityManager.isOpen()+", thread: "+ Thread.currentThread().getName());
+        if (!entityManager.isOpen()){
+            try{
+            entityManagerProvider.get();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+//        System.out.println("delegate: "+entityManagerProvider.getClass().getName());
+        return entityManager.createQuery(qlString);
     }
 
     @Override

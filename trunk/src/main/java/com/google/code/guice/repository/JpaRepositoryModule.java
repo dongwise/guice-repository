@@ -29,10 +29,11 @@ import org.springframework.transaction.annotation.SpringTransactionAnnotationPar
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
+import javax.persistence.*;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.metamodel.Metamodel;
 import java.io.InputStream;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -56,7 +57,7 @@ import java.util.Properties;
  * ${persistence-unit-name}.properties file placed in the classpath. Also you can define all ORM specifics in
  * persistence.xml, there is no problem with it.
  *
- * @author Alexey Krylov AKA lexx
+ * @author Alexey Krylov
  */
 public abstract class JpaRepositoryModule extends AbstractModule {
 
@@ -115,13 +116,11 @@ public abstract class JpaRepositoryModule extends AbstractModule {
             emFactory = Persistence.createEntityManagerFactory(persistenceUnitName);
         }
 
-        bind(EntityManager.class).toProvider(new Provider<EntityManager>() {
-            @Override
-            public EntityManager get() {
-                return emFactory.createEntityManager();
-            }
-        });
-        bind(EntityManagerFactory.class).toInstance(emFactory);
+        ThreadLocalEntityManagerProvider entityManagerProvider = new ThreadLocalEntityManagerProvider(emFactory);
+        bind(ThreadLocalEntityManagerProvider.class).toInstance(entityManagerProvider);
+
+        bind(EntityManager.class).toProvider(ThreadLocalEntityManagerProvider.class);
+        bind(EntityManagerFactory.class).toInstance(new EntityManagerFactoryDelegate(emFactory, entityManagerProvider));
 
         bind(DomainClassResolver.class).in(Scopes.SINGLETON);
         bind(CustomRepositoryImplementationResolver.class).in(Scopes.SINGLETON);
@@ -207,4 +206,60 @@ public abstract class JpaRepositoryModule extends AbstractModule {
 
 
     }*/
+
+    private static class EntityManagerFactoryDelegate implements EntityManagerFactory {
+        private EntityManagerFactory delegate;
+        private Provider<EntityManager> entityManagerProvider;
+
+        private EntityManagerFactoryDelegate(EntityManagerFactory delegate, Provider<EntityManager> entityManagerProvider) {
+            this.delegate = delegate;
+            this.entityManagerProvider = entityManagerProvider;
+        }
+
+        @Override
+        public EntityManager createEntityManager() {
+            return entityManagerProvider.get();
+        }
+
+        @Override
+        public EntityManager createEntityManager(Map map) {
+            return entityManagerProvider.get();
+        }
+
+        @Override
+        public CriteriaBuilder getCriteriaBuilder() {
+            return delegate.getCriteriaBuilder();
+        }
+
+        @Override
+        public Metamodel getMetamodel() {
+            return delegate.getMetamodel();
+        }
+
+        @Override
+        public boolean isOpen() {
+            return delegate.isOpen();
+        }
+
+        @Override
+        public void close() {
+            delegate.close();
+        }
+
+        @Override
+        public Map<String, Object> getProperties() {
+            return delegate.getProperties();
+        }
+
+        @Override
+        public Cache getCache() {
+            return delegate.getCache();
+        }
+
+        @Override
+        public PersistenceUnitUtil getPersistenceUnitUtil() {
+            return delegate.getPersistenceUnitUtil();
+        }
+    }
+
 }

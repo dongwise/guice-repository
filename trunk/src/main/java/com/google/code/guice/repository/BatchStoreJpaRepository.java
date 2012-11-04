@@ -27,7 +27,7 @@ import java.io.Serializable;
  *
  * @param <T> entity type.
  *
- * @author Alexey Krylov AKA lexx
+ * @author Alexey Krylov
  */
 public interface BatchStoreJpaRepository<T, ID extends Serializable> extends JpaRepository<T, ID> {
 

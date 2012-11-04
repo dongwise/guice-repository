@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository.transaction;
+package com.google.code.guice.repository.tests.transaction;
 
 import com.google.code.guice.repository.model.User;
 import com.google.code.guice.repository.repo.UserRepository;

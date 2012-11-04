@@ -28,7 +28,7 @@ import java.lang.reflect.Type;
  *  </pre>
  * domain class will be resolved to <code>com.mycorp.model.User</code>
  *
- * @author Alexey Krylov AKA lexx
+ * @author Alexey Krylov
  */
 class DomainClassResolver {
 

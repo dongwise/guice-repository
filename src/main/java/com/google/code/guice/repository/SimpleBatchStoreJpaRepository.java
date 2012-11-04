@@ -36,7 +36,7 @@ import java.util.List;
  * JpaRepository with batch save support. It's a default implementation for all JPA repositories based on
  * guice-repository.
  *
- * @author Alexey Krylov AKA lexx
+ * @author Alexey Krylov
  * @see SimpleJpaRepository
  */
 

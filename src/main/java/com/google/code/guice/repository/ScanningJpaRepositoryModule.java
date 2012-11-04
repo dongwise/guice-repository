@@ -46,7 +46,7 @@ import static com.google.common.collect.Collections2.filter;
  *     });
  * </pre>
  *
- * @author Alexey Krylov AKA lexx
+ * @author Alexey Krylov
  */
 public class ScanningJpaRepositoryModule extends JpaRepositoryModule {
 

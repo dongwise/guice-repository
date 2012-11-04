@@ -24,7 +24,7 @@ import javax.persistence.EntityManager;
  * Provides EntityManager for Repository. Extend your Repository from this interface if EntityManager instance is
  * required for custom methods.
  *
- * @author Alexey Krylov AKA lexx
+ * @author Alexey Krylov
  */
 public interface EntityManagerProvider {
 

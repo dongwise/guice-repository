@@ -16,9 +16,11 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository.transaction;
+package com.google.code.guice.repository.tests.transaction;
 
 import com.google.code.guice.repository.repo.UserRepository;
+import com.google.code.guice.repository.tests.transaction.ComplexTransactionService;
+import com.google.code.guice.repository.transaction.ComplexTransactionTestRunner;
 import com.google.inject.Inject;
 import junit.framework.Assert;
 import org.junit.Test;

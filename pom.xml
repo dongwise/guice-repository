@@ -203,7 +203,7 @@
             <artifactId>hibernate-core</artifactId>
             <version>${version.hibernate}</version>
             <type>jar</type>
-            <!--<scope>test</scope>-->
+            <scope>test</scope>
         </dependency>
 
         <dependency>

@@ -19,7 +19,7 @@
 package com.google.code.guice.repository.testing.runner;
 
 import com.google.code.guice.repository.ScanningJpaRepositoryModule;
-import com.google.code.guice.repository.common.GuiceTestRunner;
+import com.google.code.guice.repository.testing.common.GuiceTestRunner;
 import org.junit.runners.model.InitializationError;
 
 public class AutoBindRepoTestRunner extends GuiceTestRunner {

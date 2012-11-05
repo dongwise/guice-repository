@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository.runner;
+package com.google.code.guice.repository.testing.runner;
 
 import com.google.code.guice.repository.ScanningJpaRepositoryModule;
 import com.google.code.guice.repository.common.GuiceTestRunner;

@@ -24,9 +24,6 @@ import com.google.inject.Inject;
 import junit.framework.Assert;
 import org.junit.Test;
 
-/**
- * @author Alexey Krylov AKA lexx
- */
 public class ComplexTransactionServiceTest extends RepoTestBase{
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/

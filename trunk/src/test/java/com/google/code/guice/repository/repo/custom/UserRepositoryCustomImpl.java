@@ -16,12 +16,13 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository.repo;
+package com.google.code.guice.repository.repo.custom;
 
 import com.google.code.guice.repository.model.User;
+import com.google.code.guice.repository.repo.UserRepositoryCustom;
 import org.junit.Assert;
 
-public class UserRepositoryCustomImpl implements  UserRepositoryCustom {
+public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 
     /*===========================================[ CLASS METHODS ]==============*/
 

@@ -33,6 +33,7 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+@SuppressWarnings({"MagicNumber"})
 public class BatchStoreRepositoryTest extends RepoTestBase {
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
@@ -60,7 +61,7 @@ public class BatchStoreRepositoryTest extends RepoTestBase {
     public void after() {
         AccountRepository accountRepository = accountRepositoryProvider.get();
         accountRepository.deleteAll();
-        assertEquals(0, accountRepository.count());
+        assertEquals("Invalid repository size", 0, accountRepository.count());
         timer.cancel();
     }
 

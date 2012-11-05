@@ -18,12 +18,10 @@
 
 package com.google.code.guice.repository.runner;
 
-import com.google.code.guice.repository.*;
+import com.google.code.guice.repository.JpaRepositoryModule;
+import com.google.code.guice.repository.JpaRepositoryProvider;
 import com.google.code.guice.repository.common.GuiceTestRunner;
-import com.google.code.guice.repository.repo.CustomerRepositoryImpl;
 import com.google.code.guice.repository.repo.UserRepository;
-import com.google.code.guice.repository.repo.AccountRepository;
-import com.google.code.guice.repository.repo.CustomerRepository;
 import org.junit.runners.model.InitializationError;
 
 public class ManualBindRepoTestRunner extends GuiceTestRunner {
@@ -35,8 +33,9 @@ public class ManualBindRepoTestRunner extends GuiceTestRunner {
             @Override
             protected void configureRepositories() {
                 bind(UserRepository.class).toProvider(new JpaRepositoryProvider<UserRepository>());
-                bind(AccountRepository.class).toProvider(new JpaRepositoryProvider<AccountRepository>());
-                bind(CustomerRepository.class).toProvider(new JpaRepositoryProvider<CustomerRepository>(CustomerRepositoryImpl.class));
+                //TODO: uncomment!!!
+//                bind(AccountRepository.class).toProvider(new JpaRepositoryProvider<AccountRepository>());
+//                bind(CustomerRepository.class).toProvider(new JpaRepositoryProvider<CustomerRepository>(CustomerRepositoryImpl.class));
             }
         });
     }

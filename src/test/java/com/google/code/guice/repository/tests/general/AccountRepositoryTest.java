@@ -64,8 +64,8 @@ public class AccountRepositoryTest extends RepoTestBase {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        assertEquals(count, accountRepository.count());
-        assertNotNull(accountRepository.findAccountByName(String.valueOf(1)));
-        assertNotNull(accountRepository.findAccountByUuid(accounts.get(0).getUuid()));
+        assertEquals("Invalid repository size", count, accountRepository.count());
+        assertNotNull("Account not found by name", accountRepository.findAccountByName(String.valueOf(1)));
+        assertNotNull("Account not found by UUID", accountRepository.findAccountByUuid(accounts.get(0).getUuid()));
     }
 }

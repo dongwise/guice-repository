@@ -19,18 +19,15 @@
 package com.google.code.guice.repository.tests.transaction;
 
 import com.google.code.guice.repository.repo.UserRepository;
-import com.google.code.guice.repository.tests.transaction.ComplexTransactionService;
-import com.google.code.guice.repository.transaction.ComplexTransactionTestRunner;
+import com.google.code.guice.repository.tests.RepoTestBase;
 import com.google.inject.Inject;
 import junit.framework.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 /**
  * @author Alexey Krylov AKA lexx
  */
-@RunWith(ComplexTransactionTestRunner.class)
-public class ComplexTransactionServiceTest {
+public class ComplexTransactionServiceTest extends RepoTestBase{
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 

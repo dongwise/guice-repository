@@ -35,6 +35,7 @@ import java.util.concurrent.Executors;
 
 import static org.junit.Assert.assertEquals;
 
+@SuppressWarnings({"MagicNumber"})
 public class UserRepositoryTest extends RepoTestBase {
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
@@ -59,15 +60,15 @@ public class UserRepositoryTest extends RepoTestBase {
         userRepository.deleteOtherUsers();
 
         userRepository.deleteAll();
-        assertEquals(0, userRepository.count());
+        assertEquals("Invalid repository size", 0, userRepository.count());
 
         userRepository.save(new User("john", "smith", 42));
         userRepository.save(new User("alex", "johns", 33));
         userRepository.save(new User("sam", "brown", 22));
-        assertEquals(3, userRepositoryProvider.get().count());
+        assertEquals("Invalid repository size", 3, userRepositoryProvider.get().count());
 
         Page<User> users = userRepository.findAll(new PageRequest(0, 100));
-        assertEquals(3, users.getNumberOfElements());
+        assertEquals("Invalid requested page size", 3, users.getNumberOfElements());
 
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.invokeAll(Arrays.asList(Executors.callable(new Runnable() {
@@ -76,10 +77,10 @@ public class UserRepositoryTest extends RepoTestBase {
                     System.out.println("Start concurrent thread");
                     UserRepository anotherRepo = userRepositoryProvider.get();
                     System.out.println("count");
-                    assertEquals(3, anotherRepo.count());
+                    assertEquals("Invalid repository size", 3, anotherRepo.count());
                     System.out.println("save");
                     anotherRepo.save(new User(UUID.randomUUID().toString(), UUID.randomUUID().toString(), 10));
-                    assertEquals(4, anotherRepo.count());
+                    assertEquals("Invalid repository size", 4, anotherRepo.count());
                     System.out.println("Stored 4");
                 } catch (Exception e) {
                     e.printStackTrace();

@@ -57,7 +57,7 @@ public class CustomerRepositoryTest extends RepoTestBase {
 
         customerRepository.save(new Customer("name", "surname"));
         customerRepository.sharedCustomMethod(new Long(42));
-        assertEquals(1, customerRepository.count());
-        assertEquals(1, customerRepository.findAll(new PageRequest(0, 10)).getContent().size());
+        assertEquals("Invalid repository size", 1, customerRepository.count());
+        assertEquals("Invalid repository size", 1, customerRepository.findAll(new PageRequest(0, 10)).getContent().size());
     }
 }

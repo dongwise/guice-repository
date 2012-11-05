@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository.common;
+package com.google.code.guice.repository.testing.common;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;

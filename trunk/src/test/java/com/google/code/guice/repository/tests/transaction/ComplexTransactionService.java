@@ -18,7 +18,7 @@
 
 package com.google.code.guice.repository.tests.transaction;
 
-import com.google.code.guice.repository.model.User;
+import com.google.code.guice.repository.testing.model.User;
 import com.google.code.guice.repository.testing.repo.UserRepository;
 import com.google.inject.Provider;
 import junit.framework.Assert;

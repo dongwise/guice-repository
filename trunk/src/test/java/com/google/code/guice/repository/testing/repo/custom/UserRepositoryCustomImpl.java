@@ -18,7 +18,7 @@
 
 package com.google.code.guice.repository.testing.repo.custom;
 
-import com.google.code.guice.repository.model.User;
+import com.google.code.guice.repository.testing.model.User;
 import com.google.code.guice.repository.testing.repo.UserRepositoryCustom;
 import org.junit.Assert;
 

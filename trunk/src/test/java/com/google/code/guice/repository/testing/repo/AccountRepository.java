@@ -20,7 +20,7 @@ package com.google.code.guice.repository.testing.repo;
 
 import com.google.code.guice.repository.BatchStoreJpaRepository;
 import com.google.code.guice.repository.EntityManagerProvider;
-import com.google.code.guice.repository.model.Account;
+import com.google.code.guice.repository.testing.model.Account;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 

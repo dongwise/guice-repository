@@ -19,7 +19,7 @@
 package com.google.code.guice.repository.testing.repo;
 
 import com.google.code.guice.repository.SimpleBatchStoreJpaRepository;
-import com.google.code.guice.repository.model.Customer;
+import com.google.code.guice.repository.testing.model.Customer;
 import org.junit.Assert;
 
 import javax.persistence.EntityManager;

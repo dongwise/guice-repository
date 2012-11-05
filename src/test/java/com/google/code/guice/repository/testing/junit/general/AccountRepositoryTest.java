@@ -18,11 +18,10 @@
 
 package com.google.code.guice.repository.testing.junit.general;
 
+import com.google.code.guice.repository.testing.junit.RepoTestBase;
 import com.google.code.guice.repository.testing.model.Account;
 import com.google.code.guice.repository.testing.repo.AccountRepository;
-import com.google.code.guice.repository.testing.junit.RepoTestBase;
 import com.google.inject.Inject;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.LinkedList;
@@ -45,11 +44,6 @@ public class AccountRepositoryTest extends RepoTestBase {
     private AccountRepository accountRepository;
 
     /*===========================================[ CLASS METHODS ]==============*/
-
-    @Before
-    public void cleanup() {
-        accountRepository.deleteAll();
-    }
 
     @Test
     public void testRepo() throws Exception {

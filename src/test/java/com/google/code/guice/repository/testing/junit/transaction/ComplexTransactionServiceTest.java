@@ -16,20 +16,18 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository.tests.transaction;
+package com.google.code.guice.repository.testing.junit.transaction;
 
+import com.google.code.guice.repository.testing.junit.RepoTestBase;
 import com.google.code.guice.repository.testing.repo.UserRepository;
-import com.google.code.guice.repository.transaction.ComplexTransactionTestRunner;
 import com.google.inject.Inject;
 import junit.framework.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 /**
  * @author Alexey Krylov AKA lexx
  */
-@RunWith(ComplexTransactionTestRunner.class)
-public class ComplexTransactionServiceTest {
+public class ComplexTransactionServiceTest extends RepoTestBase{
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
@@ -46,16 +44,16 @@ public class ComplexTransactionServiceTest {
         try {
             complexTransactionService.performFirstComplexTransaction();
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error("Error", e);
         }
-        System.out.println("Main: checking size");
+        logger.info("Main: checking size");
         long count = repository.count();
         Assert.assertEquals("Invalid repository size", 0, count);
 
         try {
             complexTransactionService.performSecondComplexTransaction();
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error("Error", e);
         }
 
         count = repository.count();

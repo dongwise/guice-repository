@@ -18,21 +18,16 @@
 
 package com.google.code.guice.repository.testing.junit.general;
 
-import com.google.code.guice.repository.testing.model.Account;
+import com.google.code.guice.repository.testing.junit.RepoTestBase;
 import com.google.code.guice.repository.testing.model.Customer;
 import com.google.code.guice.repository.testing.repo.CustomerRepository;
-import com.google.code.guice.repository.testing.junit.RepoTestBase;
 import com.google.inject.Inject;
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.data.domain.PageRequest;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
-
 import static org.junit.Assert.assertEquals;
 
+@SuppressWarnings({"MagicNumber"})
 public class CustomerRepositoryTest extends RepoTestBase {
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
@@ -42,21 +37,10 @@ public class CustomerRepositoryTest extends RepoTestBase {
 
     /*===========================================[ CLASS METHODS ]==============*/
 
-    @Before
-    public void cleanup() {
-        customerRepository.deleteAll();
-    }
-
     @Test
     public void testRepo() throws Exception {
-        List<Account> accounts = new LinkedList<Account>();
-        int count = 10;
-        for (int i = 0; i < count; i++) {
-            accounts.add(new Account(UUID.randomUUID().toString(), String.valueOf(i)));
-        }
-
         customerRepository.save(new Customer("name", "surname"));
-        customerRepository.sharedCustomMethod(new Long(42));
+        customerRepository.sharedCustomMethod((long) 42);
         assertEquals("Invalid repository size", 1, customerRepository.count());
         assertEquals("Invalid repository size", 1, customerRepository.findAll(new PageRequest(0, 10)).getContent().size());
     }

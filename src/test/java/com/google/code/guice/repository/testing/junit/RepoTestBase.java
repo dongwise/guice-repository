@@ -18,6 +18,9 @@
 
 package com.google.code.guice.repository.testing.junit;
 
+import com.google.code.guice.repository.testing.repo.AccountRepository;
+import com.google.code.guice.repository.testing.repo.CustomerRepository;
+import com.google.code.guice.repository.testing.repo.UserRepository;
 import com.google.code.guice.repository.testing.runner.ManualBindRepoTestRunner;
 import com.google.inject.Injector;
 import org.junit.Before;
@@ -46,6 +49,8 @@ public abstract class RepoTestBase {
     @Before
     public void beforeClass() {
         logger = LoggerFactory.getLogger(getClass());
-
+        injector.getInstance(UserRepository.class).deleteAll();
+        injector.getInstance(AccountRepository.class).deleteAll();
+        injector.getInstance(CustomerRepository.class).deleteAll();
     }
 }

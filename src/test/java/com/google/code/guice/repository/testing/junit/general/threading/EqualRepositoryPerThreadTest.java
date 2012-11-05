@@ -18,8 +18,8 @@
 
 package com.google.code.guice.repository.testing.junit.general.threading;
 
-import com.google.code.guice.repository.testing.repo.UserRepository;
 import com.google.code.guice.repository.testing.junit.RepoTestBase;
+import com.google.code.guice.repository.testing.repo.UserRepository;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.*;
 
-public class DifferentRepositoryPerThreadTest extends RepoTestBase {
+public class EqualRepositoryPerThreadTest extends RepoTestBase {
 
     /*===========================================[ CLASS METHODS ]==============*/
 
@@ -46,11 +46,11 @@ public class DifferentRepositoryPerThreadTest extends RepoTestBase {
                     UserRepository repo2 = injector.getInstance(UserRepository.class);
                     int hashCode1 = repo1.hashCode();
                     int hashCode2 = repo2.hashCode();
-                    Assert.assertNotSame("Equal Repo's per one thread!", hashCode1, hashCode2);
+                    Assert.assertEquals("Not equal Repo's per one thread!", hashCode1, hashCode2);
 
                     if (repositoryHashes.isEmpty()) {
                         repositoryHashes.add(hashCode1);
-                    } else if (!repositoryHashes.add(hashCode1)) {
+                    } else if (repositoryHashes.add(hashCode1)) {
                         Assert.fail("Produced Repo is new: " + hashCode1);
                     }
                     return null;

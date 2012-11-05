@@ -19,6 +19,7 @@
 package com.google.code.guice.repository;
 
 import com.google.common.collect.Lists;
+import net.jcip.annotations.ThreadSafe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
@@ -37,11 +38,14 @@ import java.util.List;
  * guice-repository.
  *
  * @author Alexey Krylov
+ * @version 1.0.0
  * @see SimpleJpaRepository
+ * @since 10.04.2012
  */
 
 @Repository
 @Transactional(readOnly = true)
+@ThreadSafe
 public class SimpleBatchStoreJpaRepository<T, ID extends Serializable> extends SimpleJpaRepository<T, ID> implements
         BatchStoreJpaRepository<T, ID>, EntityManagerProvider {
 
@@ -83,7 +87,7 @@ public class SimpleBatchStoreJpaRepository<T, ID extends Serializable> extends S
         Assert.isTrue(batchSize > 0);
 
         String entityClassName = list.iterator().next().getClass().getSimpleName();
-        logger.info(String.format("batch for [%d] of [%s]", list.size(), entityClassName ));
+        logger.info(String.format("batch for [%d] of [%s]", list.size(), entityClassName));
 
         int startIndex = 0;
         int count = list.size();

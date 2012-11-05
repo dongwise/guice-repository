@@ -16,9 +16,10 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository;
+package com.google.code.guice.repository.mapping;
 
 import com.google.inject.Provider;
+import net.jcip.annotations.ThreadSafe;
 
 import javax.persistence.*;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -26,7 +27,16 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.metamodel.Metamodel;
 import java.util.Map;
 
+/**
+ * Special thread-safe implementation of {@link EntityManager} - it delegates all method call's to {@link
+ * ThreadLocalEntityManagerProvider}.
+ *
+ * @author Alexey Krylov
+ * @version 1.0.1
+ * @since 31.10.2012
+ */
 @SuppressWarnings({"ClassWithTooManyMethods", "EqualsWhichDoesntCheckParameterClass"})
+@ThreadSafe
 public class EntityManagerDelegate implements EntityManager {
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
@@ -160,10 +170,10 @@ public class EntityManagerDelegate implements EntityManager {
     public Query createQuery(String qlString) {
         EntityManager entityManager = entityManagerProvider.get();
 //        System.out.println("entityManager = " + entityManager+", open: "+entityManager.isOpen()+", thread: "+ Thread.currentThread().getName());
-        if (!entityManager.isOpen()){
-            try{
-            entityManagerProvider.get();
-            }catch (Exception e){
+        if (!entityManager.isOpen()) {
+            try {
+                entityManagerProvider.get();
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

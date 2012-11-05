@@ -16,9 +16,11 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository;
+package com.google.code.guice.repository.support;
 
 
+import com.google.code.guice.repository.BatchStoreJpaRepository;
+import com.google.code.guice.repository.EntityManagerProvider;
 import com.google.common.base.Predicate;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -30,7 +32,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.repository.Repository;
 import org.springframework.util.Assert;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -40,8 +44,11 @@ import java.util.Set;
  * </pre>
  *
  * @author Alexey Krylov
+ * @version 1.0.0
+ * @since 10.04.2012
  */
-class CustomRepositoryImplementationResolver {
+@SuppressWarnings({"MethodOnlyUsedFromInnerClass"})
+public class CustomRepositoryImplementationResolver {
 
     /*===========================================[ STATIC VARIABLES ]=============*/
 
@@ -51,33 +58,33 @@ class CustomRepositoryImplementationResolver {
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
     private Injector injector;
+    private Set<Class> exclusions;
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
     @Inject
     public void init(Injector injector) {
         this.injector = injector;
+        exclusions = new HashSet<Class>();
+        addExclusions(exclusions);
     }
 
     /*===========================================[ CLASS METHODS ]==============*/
 
-    Class resolve(Class<? extends Repository> repositoryClass) {
+    protected void addExclusions(Set<Class> exclusions) {
+        exclusions.addAll(Arrays.asList(BatchStoreJpaRepository.class, EntityManagerProvider.class));
+    }
+
+    public Class resolve(Class<? extends Repository> repositoryClass) {
         Assert.notNull(repositoryClass);
 
         Class customRepository = null;
         /**
          * Detect only custom repository/enhancements interfaces - skip all from Spring and guice-repository project
          */
-        Collection<? extends Class<?>> superTypes = ReflectionUtils.getAllSuperTypes(repositoryClass, new Predicate<Object>() {
-            public boolean apply(Object input) {
-                if (input instanceof Class) {
-                    Class aClass = ((Class) input);
-                    return !aClass.getName().startsWith(SPRING_DATA_PACKAGE) &&
-                            !aClass.getPackage().equals(getClass().getPackage()) &&
-                            injector.getExistingBinding(Key.get((Class<Object>) aClass)) == null;
-                }
-
-                return false;
+        Collection<? extends Class<?>> superTypes = ReflectionUtils.getAllSuperTypes(repositoryClass, new Predicate<Class>() {
+            public boolean apply(Class input) {
+                return isValidCustomInterface(input);
             }
         });
 
@@ -99,5 +106,11 @@ class CustomRepositoryImplementationResolver {
         }
 
         return customRepository;
+    }
+
+    protected boolean isValidCustomInterface(Class aClass) {
+        return !exclusions.contains(aClass) &&
+                !aClass.getName().startsWith(SPRING_DATA_PACKAGE) &&
+                injector.getExistingBinding(Key.get((Class<Object>) aClass)) == null;
     }
 }

@@ -18,14 +18,20 @@
 
 package com.google.code.guice.repository;
 
+import net.jcip.annotations.ThreadSafe;
+
 import javax.persistence.EntityManager;
 
 /**
- * Provides EntityManager for Repository. Extend your Repository from this interface if EntityManager instance is
+ * Provides {@link EntityManager} instance for your specific cases.
+ * Extend your Repository from this interface if EntityManager instance is
  * required for custom methods.
  *
  * @author Alexey Krylov
+ * @version 1.0.0
+ * @since 10.04.2012
  */
+@ThreadSafe
 public interface EntityManagerProvider {
 
     /*===========================================[ INTERFACE METHODS ]==============*/

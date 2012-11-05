@@ -18,11 +18,10 @@
 
 package com.google.code.guice.repository.testing.junit.general.threading;
 
+import com.google.code.guice.repository.testing.junit.RepoTestBase;
 import com.google.code.guice.repository.testing.model.User;
 import com.google.code.guice.repository.testing.repo.UserRepository;
-import com.google.code.guice.repository.testing.junit.RepoTestBase;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import javax.inject.Inject;
@@ -42,11 +41,6 @@ public class MultiThreadedRepositoryTest extends RepoTestBase {
     private UserRepository userRepository;
 
     /*===========================================[ CLASS METHODS ]==============*/
-
-    @Before
-    public void cleanup() {
-        injector.getInstance(UserRepository.class).deleteAll();
-    }
 
     @SuppressWarnings({"MagicNumber"})
     @Test
@@ -105,7 +99,7 @@ public class MultiThreadedRepositoryTest extends RepoTestBase {
             try {
                 future.get();
             } catch (ExecutionException e) {
-                e.printStackTrace();
+                logger.error("Error", e);
                 Assert.fail(e.getMessage());
             }
         }

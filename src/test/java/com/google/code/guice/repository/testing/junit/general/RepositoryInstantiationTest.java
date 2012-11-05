@@ -28,30 +28,28 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class RepositoryInstantiationTest extends RepoTestBase {
-    private static final int WARMUP_SIZE = 1000;
-    private static final int TEST_DURATION_SECONDS = 5;
 
     /*===========================================[ STATIC VARIABLES ]=============*/
-/*===========================================[ INSTANCE VARIABLES ]=========*/
-/*===========================================[ CONSTRUCTORS ]===============*/
-/*===========================================[ CLASS METHODS ]==============*/
+
+    private static final int TEST_DURATION_SECONDS = 5;
+
+    /*===========================================[ CLASS METHODS ]==============*/
+
+    @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "JUnitTestMethodWithNoAssertions"})
     @Test
     public void testInstantiationSpeed() throws Exception {
-        final AtomicLong instanceCounter = new AtomicLong();
-        Collection<Callable<Object>> callables = new ArrayList<Callable<Object>>();
         logger.info("Warming up...");
+        doTest(5);
+        logger.info("Testing...");
+        Long instanceCount = doTest(TEST_DURATION_SECONDS);
+        logger.info(String.format("Speed: [%d] instances/sec", instanceCount / TEST_DURATION_SECONDS));
+    }
+
+    private Long doTest(int testTime) throws InterruptedException {
+        final CountDownLatch testTimeLatch = new CountDownLatch(testTime);
         final Set<Integer> hashCodes = new HashSet<Integer>();
-        // warmup period
-        for (int i = 0; i < WARMUP_SIZE; i++) {
-            UserRepository instance = injector.getInstance(UserRepository.class);
-            // avoid code block removing by HotSpot optimizations
-            int hashCode = instance.hashCode();
-            hashCodes.add(hashCode);
-        }
+        final AtomicLong instanceCounter = new AtomicLong();
 
-        hashCodes.clear();
-
-        final CountDownLatch testTimeLatch = new CountDownLatch(TEST_DURATION_SECONDS);
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
@@ -60,25 +58,25 @@ public class RepositoryInstantiationTest extends RepoTestBase {
             }
         }, TimeUnit.SECONDS.toMillis(1), TimeUnit.SECONDS.toMillis(1));
 
-        logger.info("Testing...");
 
         final AtomicBoolean working = new AtomicBoolean(true);
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.execute(new Runnable() {
             @Override
             public void run() {
-                while (working.get()){
+                while (working.get()) {
                     UserRepository instance = injector.getInstance(UserRepository.class);
                     // avoid code block removing by HotSpot optimizations
                     int hashCode = instance.hashCode();
                     hashCodes.add(hashCode);
+                    instanceCounter.incrementAndGet();
                 }
             }
         });
-        // real test period
 
-        testTimeLatch.await(TEST_DURATION_SECONDS, TimeUnit.SECONDS);
-        working.set(false);
-        System.out.println(String.format("Speed: [%d] instances/sec", hashCodes.size() / TEST_DURATION_SECONDS));
+        // real test period
+        testTimeLatch.await(testTime, TimeUnit.SECONDS);
+        logger.info("Hashcodes size: " + hashCodes.size());
+        return instanceCounter.get();
     }
 }

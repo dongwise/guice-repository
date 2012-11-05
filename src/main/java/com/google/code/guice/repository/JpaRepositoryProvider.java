@@ -18,9 +18,16 @@
 
 package com.google.code.guice.repository;
 
+import com.google.code.guice.repository.configuration.ScanningJpaRepositoryModule;
+import com.google.code.guice.repository.mapping.EntityManagerDelegate;
+import com.google.code.guice.repository.mapping.EntityManagerFactoryHolderBean;
+import com.google.code.guice.repository.support.CustomJpaRepositoryFactory;
+import com.google.code.guice.repository.support.CustomRepositoryImplementationResolver;
+import com.google.code.guice.repository.support.DomainClassResolver;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.inject.*;
+import net.jcip.annotations.ThreadSafe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -65,7 +72,11 @@ import javax.persistence.EntityManagerFactory;
  * </pre>
  *
  * @author Alexey Krylov
+ * @version 1.0.0
+ * @since 10.04.2012
  */
+@SuppressWarnings({"SynchronizeOnThis", "FieldAccessedSynchronizedAndUnsynchronized"})
+@ThreadSafe
 public class JpaRepositoryProvider<R extends Repository> implements Provider<R> {
 
     /*===========================================[ STATIC VARIABLES ]=============*/
@@ -81,7 +92,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
     private Class domainClass;
     private Class customImplementationClass;
     private TransactionInterceptor transactionInterceptor;
-    private R repository;
+    private volatile R repository;
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
@@ -93,7 +104,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
      *
      * @see ScanningJpaRepositoryModule
      */
-    JpaRepositoryProvider(Class<R> repositoryClass, Class customImplementationClass) {
+    public JpaRepositoryProvider(Class<R> repositoryClass, Class customImplementationClass) {
         Assert.notNull(repositoryClass);
         this.repositoryClass = repositoryClass;
         this.customImplementationClass = customImplementationClass;
@@ -132,11 +143,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
 
         domainClass = domainClassResolver.resolve(repositoryClass);
         this.transactionInterceptor = transactionInterceptor;
-
-        //TODO static?
-        if (context == null) {
-            context = createSpringContext();
-        }
+        context = createSpringContext();
 
         if (customImplementationClass == null) {
             customImplementationClass = customRepositoryImplementationResolver.resolve(repositoryClass);
@@ -183,7 +190,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
         GenericApplicationContext context = new GenericApplicationContext();
 
         context.registerBeanDefinition("entityManagerFactory",
-                BeanDefinitionBuilder.genericBeanDefinition(GuiceLocalEntityManagerFactoryBean.class).
+                BeanDefinitionBuilder.genericBeanDefinition(EntityManagerFactoryHolderBean.class).
                         addConstructorArgValue(entityManagerFactoryProvider).getBeanDefinition());
 
         context.registerBeanDefinition("transactionManager",
@@ -199,51 +206,41 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
     }
 
     public R get() {
-        EntityManagerFactory emf = entityManagerFactoryProvider.get();
+        // double-checked locking with volatile
+        R repo = repository;
+        if (repository == null) {
+            synchronized (this) {
+                repo = repository;
+                if (repo == null) {
+                    EntityManagerFactory emf = entityManagerFactoryProvider.get();
 
-        // Transaction support specifics
-//        EntityManagerFactory proxiedEmf = entityManagerFactoryBean.getObject();
-        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
-            TransactionSynchronizationManager.initSynchronization();
-        }
+                    if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+                        TransactionSynchronizationManager.initSynchronization();
+                    }
 
-        EntityManager entityManager = EntityManagerFactoryUtils.doGetTransactionalEntityManager(emf, null);
-//        System.out.println("Created EM: " + entityManager);
+                    EntityManager entityManager = EntityManagerFactoryUtils.doGetTransactionalEntityManager(emf, null);
 
-//TODO в этом случае EM закрывается и повторная транзакция выполниться не может, т.к. ссылка на EM сохранена в репо
-//*/
+                    JpaRepositoryFactoryBean jpaRepositoryFactoryBean = createJpaRepositoryFactoryBean();
 
-/*
-// initial
-        EntityManager entityManager = entityManagerProvider.get();
-        GuiceLocalEntityManagerFactoryBean entityManagerFactoryBean = context.getBean(GuiceLocalEntityManagerFactoryBean.class);
+                    jpaRepositoryFactoryBean.setBeanFactory(context);
+                    jpaRepositoryFactoryBean.setEntityManager(entityManager);
+                    jpaRepositoryFactoryBean.setRepositoryInterface(repositoryClass);
 
-        // Transaction support specifics
-        EntityManagerFactory proxiedEmf = entityManagerFactoryBean.getObject();
-        if (TransactionSynchronizationManager.hasResource(proxiedEmf)) {
-            TransactionSynchronizationManager.unbindResource(proxiedEmf);
-        }
+                    if (customImplementationClass != null) {
+                        Object customRepositoryImplementation = instantiateCustomRepository();
 
-        TransactionSynchronizationManager.bindResource(proxiedEmf, new EntityManagerHolder(entityManagerProvider.get()));
+                        if (customRepositoryImplementation != null) {
+                            jpaRepositoryFactoryBean.setCustomImplementation(customRepositoryImplementation);
+                        }
+                    }
 
-*/
-        JpaRepositoryFactoryBean jpaRepositoryFactoryBean = createJpaRepositoryFactoryBean();
-
-        jpaRepositoryFactoryBean.setBeanFactory(context);
-        jpaRepositoryFactoryBean.setEntityManager(entityManager);
-        jpaRepositoryFactoryBean.setRepositoryInterface(repositoryClass);
-
-        if (customImplementationClass != null) {
-            Object customRepositoryImplementation = instantiateCustomRepository();
-
-            if (customRepositoryImplementation != null) {
-                jpaRepositoryFactoryBean.setCustomImplementation(customRepositoryImplementation);
+                    jpaRepositoryFactoryBean.afterPropertiesSet();
+                    repository = (R) jpaRepositoryFactoryBean.getObject();
+                    repo = repository;
+                }
             }
         }
-
-        jpaRepositoryFactoryBean.afterPropertiesSet();
-
-        return (R) jpaRepositoryFactoryBean.getObject();
+        return repo;
     }
 
     /**

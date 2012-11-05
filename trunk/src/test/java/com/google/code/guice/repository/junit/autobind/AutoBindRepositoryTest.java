@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository.tests.autobind;
+package com.google.code.guice.repository.junit.autobind;
 
 import com.google.code.guice.repository.model.Account;
 import com.google.code.guice.repository.model.Customer;
@@ -28,7 +28,6 @@ import com.google.code.guice.repository.runner.AutoBindRepoTestRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.UUID;

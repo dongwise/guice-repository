@@ -16,11 +16,11 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository.tests.general.threading;
+package com.google.code.guice.repository.junit.general.threading;
 
 import com.google.code.guice.repository.model.User;
 import com.google.code.guice.repository.repo.UserRepository;
-import com.google.code.guice.repository.tests.RepoTestBase;
+import com.google.code.guice.repository.junit.RepoTestBase;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

@@ -16,10 +16,19 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository.repo;
+package com.google.code.guice.repository.testing.repo;
 
-import com.google.code.guice.repository.model.User;
+import com.google.code.guice.repository.BatchStoreJpaRepository;
+import com.google.code.guice.repository.EntityManagerProvider;
+import com.google.code.guice.repository.model.Account;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-public interface UserRepositoryCustom {
-    void someCustomMethod(User user);
+public interface AccountRepository extends BatchStoreJpaRepository<Account, Long>,
+        EntityManagerProvider {
+
+    Account findAccountByUuid(String uuid);
+
+    @Query("select a from Account a where a.name = :name")
+    Account findAccountByName(@Param("name") String name);
 }

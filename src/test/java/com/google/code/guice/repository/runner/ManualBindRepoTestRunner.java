@@ -21,7 +21,7 @@ package com.google.code.guice.repository.runner;
 import com.google.code.guice.repository.JpaRepositoryModule;
 import com.google.code.guice.repository.JpaRepositoryProvider;
 import com.google.code.guice.repository.common.GuiceTestRunner;
-import com.google.code.guice.repository.repo.UserRepository;
+import com.google.code.guice.repository.testing.repo.UserRepository;
 import org.junit.runners.model.InitializationError;
 
 public class ManualBindRepoTestRunner extends GuiceTestRunner {

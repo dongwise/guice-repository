@@ -18,7 +18,7 @@
 
 package com.google.code.guice.repository.junit.general.threading;
 
-import com.google.code.guice.repository.repo.UserRepository;
+import com.google.code.guice.repository.testing.repo.UserRepository;
 import com.google.code.guice.repository.junit.RepoTestBase;
 import org.junit.Before;
 import org.junit.Test;

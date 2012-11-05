@@ -16,36 +16,37 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository.tests;
+package com.google.code.guice.repository.junit.general;
 
-import com.google.code.guice.repository.runner.ManualBindRepoTestRunner;
-import com.google.inject.Injector;
-import org.junit.Before;
-import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.google.code.guice.repository.repo.AccountRepository;
+import com.google.code.guice.repository.junit.RepoTestBase;
+import com.google.inject.Inject;
+import org.junit.Test;
 
-import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.persistence.EntityManager;
 
-@RunWith(ManualBindRepoTestRunner.class)
-public abstract class RepoTestBase {
+import static org.junit.Assert.assertTrue;
 
-    /*===========================================[ STATIC VARIABLES ]=============*/
-
-    protected static final int MAX_CONCURRENT_THREADS = 10;
+/**
+ * Compares EntityManager equality between injected one and repository's internal.
+ *
+ * @author Alexey Krylov
+ */
+public class EntityManagerRepoEqualityTest extends RepoTestBase {
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
-    protected Logger logger;
+    @Inject
+    private AccountRepository accountRepository;
 
     @Inject
-    protected Injector injector;
+    private Provider<EntityManager> entityManager;
 
     /*===========================================[ CLASS METHODS ]==============*/
 
-    @Before
-    public void beforeClass() {
-        logger = LoggerFactory.getLogger(getClass());
-
+    @Test
+    public void testRepo() throws Exception {
+        assertTrue("EntityManager's is not equal", accountRepository.getEntityManager().equals(entityManager.get()));
     }
 }

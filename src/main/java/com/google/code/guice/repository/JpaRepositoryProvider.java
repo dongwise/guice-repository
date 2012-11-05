@@ -208,7 +208,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
     public R get() {
         // double-checked locking with volatile
         R repo = repository;
-        if (repository == null) {
+        if (repo == null) {
             synchronized (this) {
                 repo = repository;
                 if (repo == null) {

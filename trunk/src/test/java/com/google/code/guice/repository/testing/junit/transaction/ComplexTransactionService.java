@@ -16,12 +16,14 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository.tests.transaction;
+package com.google.code.guice.repository.testing.junit.transaction;
 
 import com.google.code.guice.repository.testing.model.User;
 import com.google.code.guice.repository.testing.repo.UserRepository;
 import com.google.inject.Provider;
 import junit.framework.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
@@ -29,6 +31,10 @@ import javax.persistence.EntityManager;
 
 @SuppressWarnings({"MagicNumber"})
 public class ComplexTransactionService {
+
+    /*===========================================[ STATIC VARIABLES ]=============*/
+
+    private static final Logger logger = LoggerFactory.getLogger(ComplexTransactionService.class);
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
@@ -42,14 +48,14 @@ public class ComplexTransactionService {
 
     @Transactional(rollbackFor = Exception.class)
     public void performFirstComplexTransaction() throws Exception {
-        System.out.println("EM for performComplexTransaction: " + entityManager.get());
-        System.out.println("DeleteAll");
+        logger.info("EM for performComplexTransaction: " + entityManager.get());
+        logger.info("DeleteAll");
         userRepository.deleteAll();
-        System.out.println("Save1");
+        logger.info("Save1");
         userRepository.save(new User("John", "Smith", 42));
-        System.out.println("Save2");
+        logger.info("Save2");
         userRepository.save(new User("Alex", "Johns", 22));
-        System.out.println("Count1");
+        logger.info("Count1");
 
         // partially committed
         Assert.assertEquals("Invalid repository size", 2, userRepository.count());
@@ -58,14 +64,13 @@ public class ComplexTransactionService {
 
     @Transactional(rollbackFor = Exception.class)
     public void performSecondComplexTransaction() throws Exception {
-        System.out.println("Checking size");
+        logger.info("Checking size");
         Assert.assertEquals("Invalid repository size", 0, userRepository.count());
-        System.out.println("EM for performSecondComplexTransaction: " + entityManager.get());
-        System.out.println("Save3");
+        logger.info("EM for performSecondComplexTransaction: " + entityManager.get());
+        logger.info("Save3");
         userRepository.save(new User("1", "1", 1));
-        System.out.println("Count2");
+        logger.info("Count2");
         Assert.assertEquals("Invalid repository size", 1, userRepository.count());
         throw new Exception("Second rollback");
     }
-
 }

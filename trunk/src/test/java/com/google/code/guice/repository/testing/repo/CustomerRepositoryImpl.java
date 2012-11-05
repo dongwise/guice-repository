@@ -34,7 +34,7 @@ public class CustomerRepositoryImpl extends SimpleBatchStoreJpaRepository<Custom
     /*===========================================[ CLASS METHODS ]==============*/
 
     public void sharedCustomMethod(Long customerID) {
-        Assert.assertNotNull(customerID);
+        Assert.assertNotNull("CustomerID is null", customerID);
         System.out.println("customerID = " + customerID);
     }
 }

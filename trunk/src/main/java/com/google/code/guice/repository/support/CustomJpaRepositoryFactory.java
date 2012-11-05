@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository;
+package com.google.code.guice.repository.support;
 
+import com.google.code.guice.repository.SimpleBatchStoreJpaRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactory;
@@ -35,12 +36,19 @@ import static org.springframework.data.querydsl.QueryDslUtils.QUERY_DSL_PRESENT;
  * Repository with batch-store support.
  *
  * @author Alexey Krylov
+ * @version 1.0.0
  * @see SimpleBatchStoreJpaRepository
+ * @since 10.04.2012
  */
 public class CustomJpaRepositoryFactory extends JpaRepositoryFactory {
-    CustomJpaRepositoryFactory(EntityManager entityManager) {
+
+    /*===========================================[ CONSTRUCTORS ]===============*/
+
+    public CustomJpaRepositoryFactory(EntityManager entityManager) {
         super(entityManager);
     }
+
+    /*===========================================[ CLASS METHODS ]==============*/
 
     @Override
     protected JpaRepository<?, ?> getTargetRepository(RepositoryMetadata metadata, EntityManager entityManager) {

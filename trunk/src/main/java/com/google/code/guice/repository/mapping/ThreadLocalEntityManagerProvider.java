@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2010 the original author or authors.
+ * Copyright (C) 2012 the original author or authors.
  * See the notice.md file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -7,7 +7,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,39 +16,47 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository;
+package com.google.code.guice.repository.mapping;
 
 import com.google.inject.Provider;
-import org.springframework.orm.jpa.LocalEntityManagerFactoryBean;
+import net.jcip.annotations.ThreadSafe;
 
+import javax.inject.Singleton;
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.PersistenceException;
 
 /**
- * Holder for EntityManagerFactory, it is needed for Spring-data integration.
- *
  * @author Alexey Krylov
+ * @version 1.0.1
+ * @since 05.11.2012
  */
-class GuiceLocalEntityManagerFactoryBean extends LocalEntityManagerFactoryBean {
-
-    /*===========================================[ STATIC VARIABLES ]=============*/
-
-    private static final long serialVersionUID = -6793244803096198210L;
+@Singleton
+@ThreadSafe
+public class ThreadLocalEntityManagerProvider implements Provider<EntityManager> {
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
-    private Provider<EntityManagerFactory> entityManagerFactoryProvider;
+    private final ThreadLocal<EntityManager> entityManager;
+    private final EntityManagerFactory emFactory;
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
-    GuiceLocalEntityManagerFactoryBean(Provider<EntityManagerFactory> entityManagerFactoryProvider) {
-        this.entityManagerFactoryProvider = entityManagerFactoryProvider;
+    public ThreadLocalEntityManagerProvider(EntityManagerFactory emFactory) {
+        this.emFactory = emFactory;
+        entityManager = new ThreadLocal<EntityManager>();
     }
 
     /*===========================================[ CLASS METHODS ]==============*/
 
     @Override
-    protected EntityManagerFactory createNativeEntityManagerFactory() throws PersistenceException {
-        return entityManagerFactoryProvider.get();
+    public EntityManager get() {
+        if (entityManager.get() == null || !entityManager.get().isOpen()) {
+            synchronized (entityManager) {
+                entityManager.remove();
+                entityManager.set(emFactory.createEntityManager());
+            }
+        }
+
+        return entityManager.get();
     }
 }

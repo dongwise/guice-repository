@@ -50,7 +50,7 @@ public class BatchStoreRepositoryTest extends RepoTestBase {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                System.out.println(String.format("Current count: [%d], free memory: [%d] mb", accountRepositoryProvider.get().count(),
+                logger.info(String.format("Current count: [%d], free memory: [%d] mb", accountRepositoryProvider.get().count(),
                         Runtime.getRuntime().freeMemory() / (1024 * 1024)));
             }
         }, TimeUnit.SECONDS.toMillis(1), TimeUnit.SECONDS.toMillis(1));

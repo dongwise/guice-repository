@@ -27,7 +27,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
     /*===========================================[ CLASS METHODS ]==============*/
 
     public void someCustomMethod(User user) {
-        Assert.assertNotNull(user);
+        Assert.assertNotNull("User is null", user);
         System.out.println("user = " + user);
     }
 }

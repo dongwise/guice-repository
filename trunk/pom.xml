@@ -50,6 +50,10 @@
 
         <version.guice>3.0</version.guice>
         <version.google-guava>13.0.1</version.google-guava>
+
+        <!-- Common tools -->
+
+        <version.jcip-annotations>1.0</version.jcip-annotations>
         <version.reflections>0.9.8</version.reflections>
 
         <!-- Logging -->
@@ -102,6 +106,14 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${version.google-guava}</version>
+        </dependency>
+
+        <!-- Common tools -->
+
+        <dependency>
+            <groupId>net.jcip</groupId>
+            <artifactId>jcip-annotations</artifactId>
+            <version>${version.jcip-annotations}</version>
         </dependency>
 
         <dependency>

@@ -18,12 +18,11 @@
 
 package com.google.code.guice.repository.testing.junit.general;
 
+import com.google.code.guice.repository.testing.junit.RepoTestBase;
 import com.google.code.guice.repository.testing.model.User;
 import com.google.code.guice.repository.testing.repo.UserRepository;
-import com.google.code.guice.repository.testing.junit.RepoTestBase;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -44,12 +43,6 @@ public class UserRepositoryTest extends RepoTestBase {
     private Provider<UserRepository> userRepositoryProvider;
 
     /*===========================================[ CLASS METHODS ]==============*/
-
-    @Before
-    public void cleanup() {
-        userRepositoryProvider.get().deleteAll();
-    }
-
 
     @Test
     public void testRepo() throws Exception {
@@ -74,24 +67,24 @@ public class UserRepositoryTest extends RepoTestBase {
         executorService.invokeAll(Arrays.asList(Executors.callable(new Runnable() {
             public void run() {
                 try {
-                    System.out.println("Start concurrent thread");
+                    logger.info("Start concurrent thread");
                     UserRepository anotherRepo = userRepositoryProvider.get();
-                    System.out.println("count");
+                    logger.info("count");
                     assertEquals("Invalid repository size", 3, anotherRepo.count());
-                    System.out.println("save");
+                    logger.info("save");
                     anotherRepo.save(new User(UUID.randomUUID().toString(), UUID.randomUUID().toString(), 10));
                     assertEquals("Invalid repository size", 4, anotherRepo.count());
-                    System.out.println("Stored 4");
+                    logger.info("Stored 4");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         })));
 
-        System.out.println("After");
-        assertEquals(4, userRepository.count());
+        logger.info("After");
+        assertEquals("Invalid repository size", 4, userRepository.count());
         userRepository.deleteAll();
-        assertEquals(0, userRepository.count());
+        assertEquals("Invalid repository size", 0, userRepository.count());
 
         userRepository.someCustomMethod(new User("john", "smith", 42));
     }

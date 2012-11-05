@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository;
+package com.google.code.guice.repository.support;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -29,8 +29,10 @@ import java.lang.reflect.Type;
  * domain class will be resolved to <code>com.mycorp.model.User</code>
  *
  * @author Alexey Krylov
+ * @version 1.0.0
+ * @since 10.04.2012
  */
-class DomainClassResolver {
+public class DomainClassResolver {
 
     /*===========================================[ CLASS METHODS ]==============*/
 

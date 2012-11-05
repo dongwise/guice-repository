@@ -16,8 +16,10 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository;
+package com.google.code.guice.repository.configuration;
 
+import com.google.code.guice.repository.BatchStoreJpaRepository;
+import com.google.code.guice.repository.JpaRepositoryProvider;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import org.reflections.Reflections;
@@ -47,6 +49,8 @@ import static com.google.common.collect.Collections2.filter;
  * </pre>
  *
  * @author Alexey Krylov
+ * @version 1.0.0
+ * @since 10.04.2012
  */
 public class ScanningJpaRepositoryModule extends JpaRepositoryModule {
 

@@ -18,7 +18,7 @@
 
 package com.google.code.guice.repository.testing.repo;
 
-import com.google.code.guice.repository.model.Customer;
+import com.google.code.guice.repository.testing.model.Customer;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CustomerRepository extends JpaRepository<Customer, Long> {

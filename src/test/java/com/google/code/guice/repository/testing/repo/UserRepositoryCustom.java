@@ -18,7 +18,7 @@
 
 package com.google.code.guice.repository.testing.repo;
 
-import com.google.code.guice.repository.model.User;
+import com.google.code.guice.repository.testing.model.User;
 
 public interface UserRepositoryCustom {
     void someCustomMethod(User user);

@@ -18,7 +18,7 @@
 
 package com.google.code.guice.repository.junit.general;
 
-import com.google.code.guice.repository.model.Account;
+import com.google.code.guice.repository.testing.model.Account;
 import com.google.code.guice.repository.testing.repo.AccountRepository;
 import com.google.code.guice.repository.junit.RepoTestBase;
 import com.google.inject.Inject;

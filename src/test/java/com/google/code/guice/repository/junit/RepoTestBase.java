@@ -18,7 +18,7 @@
 
 package com.google.code.guice.repository.junit;
 
-import com.google.code.guice.repository.runner.ManualBindRepoTestRunner;
+import com.google.code.guice.repository.testing.runner.ManualBindRepoTestRunner;
 import com.google.inject.Injector;
 import org.junit.Before;
 import org.junit.runner.RunWith;

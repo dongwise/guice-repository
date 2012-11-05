@@ -18,13 +18,13 @@
 
 package com.google.code.guice.repository.junit.autobind;
 
-import com.google.code.guice.repository.model.Account;
-import com.google.code.guice.repository.model.Customer;
-import com.google.code.guice.repository.model.User;
+import com.google.code.guice.repository.testing.model.Account;
+import com.google.code.guice.repository.testing.model.Customer;
+import com.google.code.guice.repository.testing.model.User;
 import com.google.code.guice.repository.testing.repo.AccountRepository;
 import com.google.code.guice.repository.testing.repo.CustomerRepository;
 import com.google.code.guice.repository.testing.repo.UserRepository;
-import com.google.code.guice.repository.runner.AutoBindRepoTestRunner;
+import com.google.code.guice.repository.testing.runner.AutoBindRepoTestRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

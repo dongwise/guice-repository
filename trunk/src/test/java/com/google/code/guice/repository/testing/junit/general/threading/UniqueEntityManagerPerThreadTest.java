@@ -16,46 +16,46 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository.junit.general.threading;
+package com.google.code.guice.repository.testing.junit.general.threading;
 
-import com.google.code.guice.repository.testing.repo.UserRepository;
-import com.google.code.guice.repository.junit.RepoTestBase;
+import com.google.code.guice.repository.testing.junit.RepoTestBase;
 import org.junit.Assert;
 import org.junit.Test;
 
+import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.*;
 
-public class DifferentRepositoryPerThreadTest extends RepoTestBase {
+public class UniqueEntityManagerPerThreadTest extends RepoTestBase {
 
     /*===========================================[ CLASS METHODS ]==============*/
 
     @Test
-    public void testRepositoryPerThreadEquality() throws InterruptedException {
+    public void testUniqueEntityManagers() throws InterruptedException {
         Collection<Callable<Object>> callables = new ArrayList<Callable<Object>>();
-        final Set<Integer> repositoryHashes = new ConcurrentSkipListSet<Integer>();
+        final Set<Integer> entityManagerHashes = new ConcurrentSkipListSet<Integer>();
 
         for (int i = 0; i < MAX_CONCURRENT_THREADS; i++) {
-            callables.add(new Callable<Object>() {
+            callables.add(Executors.callable(new Runnable() {
                 @Override
-                public Object call() throws Exception {
-                    UserRepository repo1 = injector.getInstance(UserRepository.class);
-                    UserRepository repo2 = injector.getInstance(UserRepository.class);
-                    int hashCode1 = repo1.hashCode();
-                    int hashCode2 = repo2.hashCode();
-                    Assert.assertNotSame("Equal Repo's per one thread!", hashCode1, hashCode2);
-
-                    if (repositoryHashes.isEmpty()) {
-                        repositoryHashes.add(hashCode1);
-                    } else if (!repositoryHashes.add(hashCode1)) {
-                        Assert.fail("Produced Repo is new: " + hashCode1);
+                public void run() {
+                    EntityManager em1 = injector.getInstance(EntityManager.class);
+                    EntityManager em2 = injector.getInstance(EntityManager.class);
+                    int hashCode1 = em1.hashCode();
+                    int hashCode2 = em2.hashCode();
+                    logger.info("Thread: " + Thread.currentThread().getName() + ": hc: " + hashCode1);
+                    Assert.assertEquals("Different EM's per one thread!", hashCode1, hashCode2);
+                    if (entityManagerHashes.isEmpty()) {
+                        entityManagerHashes.add(hashCode1);
+                    } else if (!entityManagerHashes.add(hashCode1)) {
+                        logger.info("Error thread: " + Thread.currentThread().getName());
+                        Assert.fail("Produced EntityManager is not unique: " + hashCode1);
                     }
-                    return null;
                 }
-            });
+            }));
         }
 
         ExecutorService executorService = Executors.newFixedThreadPool(MAX_CONCURRENT_THREADS);
@@ -64,7 +64,7 @@ public class DifferentRepositoryPerThreadTest extends RepoTestBase {
             try {
                 future.get();
             } catch (ExecutionException e) {
-                logger.error("Error", e);
+                e.printStackTrace();
                 Assert.fail(e.getMessage());
             }
         }

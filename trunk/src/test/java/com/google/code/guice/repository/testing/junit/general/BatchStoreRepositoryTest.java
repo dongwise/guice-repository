@@ -16,11 +16,11 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository.junit.general;
+package com.google.code.guice.repository.testing.junit.general;
 
 import com.google.code.guice.repository.testing.model.Account;
 import com.google.code.guice.repository.testing.repo.AccountRepository;
-import com.google.code.guice.repository.junit.RepoTestBase;
+import com.google.code.guice.repository.testing.junit.RepoTestBase;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import org.junit.After;

@@ -63,7 +63,7 @@
 
         <!-- Spring stuff -->
 
-        <version.spring>3.1.1.RELEASE</version.spring>
+        <version.spring>3.1.2.RELEASE</version.spring>
         <version.spring-data-jpa>1.0.3.RELEASE</version.spring-data-jpa>
 
         <!-- Persistence implementation API -->

@@ -18,8 +18,7 @@
 
 package com.google.code.guice.repository.tests.transaction;
 
-import com.google.code.guice.repository.repo.UserRepository;
-import com.google.code.guice.repository.tests.transaction.ComplexTransactionService;
+import com.google.code.guice.repository.testing.repo.UserRepository;
 import com.google.code.guice.repository.transaction.ComplexTransactionTestRunner;
 import com.google.inject.Inject;
 import junit.framework.Assert;

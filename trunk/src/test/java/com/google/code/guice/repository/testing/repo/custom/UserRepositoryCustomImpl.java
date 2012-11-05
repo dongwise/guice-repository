@@ -16,19 +16,18 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository.repo;
+package com.google.code.guice.repository.testing.repo.custom;
 
-import com.google.code.guice.repository.BatchStoreJpaRepository;
-import com.google.code.guice.repository.EntityManagerProvider;
-import com.google.code.guice.repository.model.Account;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import com.google.code.guice.repository.model.User;
+import com.google.code.guice.repository.testing.repo.UserRepositoryCustom;
+import org.junit.Assert;
 
-public interface AccountRepository extends BatchStoreJpaRepository<Account, Long>,
-        EntityManagerProvider {
+public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 
-    Account findAccountByUuid(String uuid);
+    /*===========================================[ CLASS METHODS ]==============*/
 
-    @Query("select a from Account a where a.name = :name")
-    Account findAccountByName(@Param("name") String name);
+    public void someCustomMethod(User user) {
+        Assert.assertNotNull(user);
+        System.out.println("user = " + user);
+    }
 }

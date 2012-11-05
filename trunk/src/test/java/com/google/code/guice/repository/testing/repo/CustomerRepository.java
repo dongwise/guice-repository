@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository.repo;
+package com.google.code.guice.repository.testing.repo;
 
 import com.google.code.guice.repository.model.Customer;
 import org.springframework.data.jpa.repository.JpaRepository;

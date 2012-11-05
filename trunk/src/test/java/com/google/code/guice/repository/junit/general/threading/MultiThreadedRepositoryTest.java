@@ -19,7 +19,7 @@
 package com.google.code.guice.repository.junit.general.threading;
 
 import com.google.code.guice.repository.model.User;
-import com.google.code.guice.repository.repo.UserRepository;
+import com.google.code.guice.repository.testing.repo.UserRepository;
 import com.google.code.guice.repository.junit.RepoTestBase;
 import org.junit.Assert;
 import org.junit.Before;

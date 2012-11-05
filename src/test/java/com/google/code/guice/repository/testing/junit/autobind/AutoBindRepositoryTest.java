@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository.junit.autobind;
+package com.google.code.guice.repository.testing.junit.autobind;
 
 import com.google.code.guice.repository.testing.model.Account;
 import com.google.code.guice.repository.testing.model.Customer;

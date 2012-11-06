@@ -49,7 +49,7 @@ public abstract class RepoTestBase {
 
     @Before
     @Transactional
-    public void before() {
+    public void baseBefore() {
         logger = LoggerFactory.getLogger(getClass());
         injector.getInstance(UserRepository.class).deleteAll();
         injector.getInstance(AccountRepository.class).deleteAll();

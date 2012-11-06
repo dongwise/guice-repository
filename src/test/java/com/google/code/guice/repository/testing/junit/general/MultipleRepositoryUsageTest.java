@@ -16,43 +16,36 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository.testing.junit;
+package com.google.code.guice.repository.testing.junit.general;
 
+import com.google.code.guice.repository.testing.junit.RepoTestBase;
+import com.google.code.guice.repository.testing.model.Account;
+import com.google.code.guice.repository.testing.model.User;
 import com.google.code.guice.repository.testing.repo.AccountRepository;
-import com.google.code.guice.repository.testing.repo.CustomerRepository;
 import com.google.code.guice.repository.testing.repo.UserRepository;
-import com.google.code.guice.repository.testing.runner.ManualBindRepoTestRunner;
-import com.google.inject.Injector;
-import org.junit.Before;
-import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.transaction.annotation.Transactional;
+import org.junit.Assert;
+import org.junit.Test;
 
 import javax.inject.Inject;
+import java.util.UUID;
 
-@RunWith(ManualBindRepoTestRunner.class)
-public abstract class RepoTestBase {
-
-    /*===========================================[ STATIC VARIABLES ]=============*/
-
-    protected static final int MAX_CONCURRENT_THREADS = 10;
+public class MultipleRepositoryUsageTest extends RepoTestBase {
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
-    protected Logger logger;
+    @Inject
+    private UserRepository userRepository;
 
     @Inject
-    protected Injector injector;
+    private AccountRepository accountRepository;
 
     /*===========================================[ CLASS METHODS ]==============*/
 
-    @Before
-    @Transactional
-    public void beforeClass() {
-        logger = LoggerFactory.getLogger(getClass());
-        injector.getInstance(UserRepository.class).deleteAll();
-        injector.getInstance(AccountRepository.class).deleteAll();
-        injector.getInstance(CustomerRepository.class).deleteAll();
+    @Test
+    public void testRepositories() throws Exception {
+        userRepository.save(new User("Alex", "Johns", 10));
+        accountRepository.save(new Account(UUID.randomUUID().toString(), "1"));
+        Assert.assertEquals("Invalid repository size", 1, userRepository.count());
+        Assert.assertEquals("Invalid repository size", 1, accountRepository.count());
     }
 }

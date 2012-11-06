@@ -18,7 +18,9 @@
 
 package com.google.code.guice.repository.testing.junit.transaction;
 
+import com.google.code.guice.repository.testing.model.Account;
 import com.google.code.guice.repository.testing.model.User;
+import com.google.code.guice.repository.testing.repo.AccountRepository;
 import com.google.code.guice.repository.testing.repo.UserRepository;
 import com.google.inject.Provider;
 import junit.framework.Assert;
@@ -28,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import java.util.UUID;
 
 @SuppressWarnings({"MagicNumber"})
 public class ComplexTransactionService {
@@ -40,6 +43,9 @@ public class ComplexTransactionService {
 
     @Inject
     private UserRepository userRepository;
+
+    @Inject
+    private AccountRepository accountRepository;
 
     @Inject
     private Provider<EntityManager> entityManager;
@@ -56,9 +62,10 @@ public class ComplexTransactionService {
         logger.info("Save2");
         userRepository.save(new User("Alex", "Johns", 22));
         logger.info("Count1");
-
+        accountRepository.save(new Account(UUID.randomUUID().toString(), "name"));
         // partially committed
         Assert.assertEquals("Invalid repository size", 2, userRepository.count());
+        Assert.assertEquals("Invalid repository size", 1, accountRepository.count());
         throw new Exception("First rollback");
     }
 
@@ -72,5 +79,12 @@ public class ComplexTransactionService {
         logger.info("Count2");
         Assert.assertEquals("Invalid repository size", 1, userRepository.count());
         throw new Exception("Second rollback");
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void performThirdComplexTransaction() throws Exception{
+        userRepository.deleteAll();
+        accountRepository.deleteAll();
+        throw new Exception("Third rollback");
     }
 }

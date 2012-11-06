@@ -20,7 +20,6 @@ package com.google.code.guice.repository;
 
 import com.google.code.guice.repository.configuration.ScanningJpaRepositoryModule;
 import com.google.code.guice.repository.mapping.EntityManagerDelegate;
-import com.google.code.guice.repository.mapping.EntityManagerFactoryHolderBean;
 import com.google.code.guice.repository.support.CustomJpaRepositoryFactory;
 import com.google.code.guice.repository.support.CustomRepositoryImplementationResolver;
 import com.google.code.guice.repository.support.DomainClassResolver;
@@ -30,16 +29,12 @@ import com.google.inject.*;
 import net.jcip.annotations.ThreadSafe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
 import org.springframework.orm.jpa.EntityManagerFactoryUtils;
-import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.transaction.interceptor.TransactionInterceptor;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
@@ -82,10 +77,10 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
     /*===========================================[ STATIC VARIABLES ]=============*/
 
     private static final Logger logger = LoggerFactory.getLogger(JpaRepositoryProvider.class);
-    private static volatile ApplicationContext context;
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
+    private ApplicationContext context;
     private Class<R> repositoryClass;
     private Provider<EntityManagerFactory> entityManagerFactoryProvider;
     private Provider<EntityManager> entityManagerProvider;
@@ -132,7 +127,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
                      Provider<EntityManager> entityManagerProvider,
                      CustomRepositoryImplementationResolver customRepositoryImplementationResolver,
                      DomainClassResolver domainClassResolver,
-                     TransactionInterceptor transactionInterceptor) {
+                     ApplicationContext context) {
         this.entityManagerFactoryProvider = entityManagerFactoryProvider;
         this.entityManagerProvider = entityManagerProvider;
 
@@ -141,16 +136,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
         }
 
         domainClass = domainClassResolver.resolve(repositoryClass);
-
-        ApplicationContext localApplicationContext = context;
-        if (localApplicationContext == null) {
-            synchronized (JpaRepositoryProvider.class) {
-                localApplicationContext = context;
-                if (localApplicationContext == null) {
-                    context = createSpringContext(entityManagerFactoryProvider, transactionInterceptor);
-                }
-            }
-        }
+        this.context = context;
 
         if (customImplementationClass == null) {
             customImplementationClass = customRepositoryImplementationResolver.resolve(repositoryClass);
@@ -186,30 +172,6 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
 
         repositoryClass = key.getTypeLiteral().getRawType();
         return repositoryClass;
-    }
-
-    /**
-     * Creates a Spring-context for spring-data-jpa.
-     *
-     * @return initialized Spring-context.
-     */
-    protected ApplicationContext createSpringContext(Provider<EntityManagerFactory> entityManagerFactoryProvider, TransactionInterceptor transactionInterceptor) {
-        GenericApplicationContext context = new GenericApplicationContext();
-
-        context.registerBeanDefinition("entityManagerFactory",
-                BeanDefinitionBuilder.genericBeanDefinition(EntityManagerFactoryHolderBean.class).
-                        addConstructorArgValue(entityManagerFactoryProvider).getBeanDefinition());
-
-        context.registerBeanDefinition("transactionManager",
-                BeanDefinitionBuilder.genericBeanDefinition(JpaTransactionManager.class).getBeanDefinition());
-
-
-        context.registerBeanDefinition("jpaRepositoryFactory",
-                BeanDefinitionBuilder.genericBeanDefinition(JpaRepositoryFactoryBean.class).getBeanDefinition());
-
-        JpaTransactionManager transactionManager = context.getBean(JpaTransactionManager.class);
-        transactionInterceptor.setTransactionManager(transactionManager);
-        return context;
     }
 
     public R get() {

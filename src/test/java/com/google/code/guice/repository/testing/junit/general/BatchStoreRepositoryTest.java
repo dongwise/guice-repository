@@ -18,9 +18,9 @@
 
 package com.google.code.guice.repository.testing.junit.general;
 
+import com.google.code.guice.repository.testing.junit.RepoTestBase;
 import com.google.code.guice.repository.testing.model.Account;
 import com.google.code.guice.repository.testing.repo.AccountRepository;
-import com.google.code.guice.repository.testing.junit.RepoTestBase;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import org.junit.After;
@@ -50,11 +50,15 @@ public class BatchStoreRepositoryTest extends RepoTestBase {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                logger.info(String.format("Current count: [%d], free memory: [%d] mb", accountRepositoryProvider.get().count(),
-                        Runtime.getRuntime().freeMemory() / (1024 * 1024)));
+                try {
+                    long free = Runtime.getRuntime().freeMemory() / (1024 * 1024);
+                    logger.info(String.format("Current count: [%d], free memory: [%d] mb", accountRepositoryProvider.get().count(),
+                            free));
+                } catch (Throwable e) {
+                    logger.error("Error", e);
+                }
             }
         }, TimeUnit.SECONDS.toMillis(1), TimeUnit.SECONDS.toMillis(1));
-        accountRepositoryProvider.get().deleteAll();
     }
 
     @After

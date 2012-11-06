@@ -18,6 +18,7 @@
 
 package com.google.code.guice.repository.configuration;
 
+import com.google.code.guice.repository.mapping.ApplicationContextProvider;
 import com.google.code.guice.repository.mapping.EntityManagerFactoryDelegate;
 import com.google.code.guice.repository.mapping.ThreadLocalEntityManagerProvider;
 import com.google.code.guice.repository.support.CustomRepositoryImplementationResolver;
@@ -27,6 +28,7 @@ import com.google.inject.Scopes;
 import com.google.inject.matcher.Matchers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.annotation.AnnotationTransactionAttributeSource;
 import org.springframework.transaction.annotation.SpringTransactionAnnotationParser;
 import org.springframework.transaction.annotation.Transactional;
@@ -133,6 +135,12 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         // Transaction Manager will be configured later
         TransactionInterceptor transactionInterceptor = new TransactionInterceptor(null, tas);
         bind(TransactionInterceptor.class).toInstance(transactionInterceptor);
+
+        // Spring application context singleton
+        ApplicationContextProvider applicationContextProvider = new ApplicationContextProvider();
+        bind(ApplicationContextProvider.class).toInstance(applicationContextProvider);
+        bind(ApplicationContext.class).toProvider(ApplicationContextProvider.class);
+
         bindInterceptor(Matchers.any(), Matchers.annotatedWith(Transactional.class), transactionInterceptor);
         bindInterceptor(Matchers.annotatedWith(Transactional.class), Matchers.any(), transactionInterceptor);
 

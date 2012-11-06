@@ -16,43 +16,41 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository.testing.junit;
+package com.google.code.guice.repository.testing.junit.transaction;
 
-import com.google.code.guice.repository.testing.repo.AccountRepository;
-import com.google.code.guice.repository.testing.repo.CustomerRepository;
+import com.google.code.guice.repository.testing.model.User;
 import com.google.code.guice.repository.testing.repo.UserRepository;
-import com.google.code.guice.repository.testing.runner.ManualBindRepoTestRunner;
-import com.google.inject.Injector;
-import org.junit.Before;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 
-@RunWith(ManualBindRepoTestRunner.class)
-public abstract class RepoTestBase {
+@SuppressWarnings({"MagicNumber"})
+public class BasicTransactionService {
 
     /*===========================================[ STATIC VARIABLES ]=============*/
 
-    protected static final int MAX_CONCURRENT_THREADS = 10;
+    private static final Logger logger = LoggerFactory.getLogger(BasicTransactionService.class);
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
-    protected Logger logger;
-
     @Inject
-    protected Injector injector;
+    private UserRepository userRepository;
 
     /*===========================================[ CLASS METHODS ]==============*/
 
-    @Before
-    @Transactional
-    public void beforeClass() {
-        logger = LoggerFactory.getLogger(getClass());
-        injector.getInstance(UserRepository.class).deleteAll();
-        injector.getInstance(AccountRepository.class).deleteAll();
-        injector.getInstance(CustomerRepository.class).deleteAll();
+    //TODO unstable
+    @Transactional(rollbackFor = Exception.class)
+    public void generateUsers(int usersCount) throws Exception {
+        for (int i = 0; i < usersCount; i++) {
+            userRepository.save(new User("Name" + i, "Surname" + i, i));
+            logger.info("Generated: " + i);
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteUsersOlderThan(int age) throws Exception {
+        userRepository.getEntityManager().createQuery("delete from User where age > " + age).executeUpdate();
     }
 }

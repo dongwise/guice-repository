@@ -134,6 +134,8 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         TransactionInterceptor transactionInterceptor = new TransactionInterceptor(null, tas);
         bind(TransactionInterceptor.class).toInstance(transactionInterceptor);
         bindInterceptor(Matchers.any(), Matchers.annotatedWith(Transactional.class), transactionInterceptor);
+        bindInterceptor(Matchers.annotatedWith(Transactional.class), Matchers.any(), transactionInterceptor);
+
         configureRepositories();
         logger.info(String.format("%s configured", moduleName));
     }

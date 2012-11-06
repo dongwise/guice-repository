@@ -75,23 +75,22 @@ import javax.persistence.EntityManagerFactory;
  * @version 1.0.0
  * @since 10.04.2012
  */
-@SuppressWarnings({"SynchronizeOnThis", "FieldAccessedSynchronizedAndUnsynchronized"})
+@SuppressWarnings({"FieldAccessedSynchronizedAndUnsynchronized"})
 @ThreadSafe
 public class JpaRepositoryProvider<R extends Repository> implements Provider<R> {
 
     /*===========================================[ STATIC VARIABLES ]=============*/
 
     private static final Logger logger = LoggerFactory.getLogger(JpaRepositoryProvider.class);
+    private static volatile ApplicationContext context;
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
     private Class<R> repositoryClass;
     private Provider<EntityManagerFactory> entityManagerFactoryProvider;
-    private ApplicationContext context;
     private Provider<EntityManager> entityManagerProvider;
     private Class domainClass;
     private Class customImplementationClass;
-    private TransactionInterceptor transactionInterceptor;
     private volatile R repository;
 
     /*===========================================[ CONSTRUCTORS ]===============*/
@@ -142,8 +141,16 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
         }
 
         domainClass = domainClassResolver.resolve(repositoryClass);
-        this.transactionInterceptor = transactionInterceptor;
-        context = createSpringContext();
+
+        ApplicationContext localApplicationContext = context;
+        if (localApplicationContext == null) {
+            synchronized (JpaRepositoryProvider.class) {
+                localApplicationContext = context;
+                if (localApplicationContext == null) {
+                    context = createSpringContext(entityManagerFactoryProvider, transactionInterceptor);
+                }
+            }
+        }
 
         if (customImplementationClass == null) {
             customImplementationClass = customRepositoryImplementationResolver.resolve(repositoryClass);
@@ -186,7 +193,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
      *
      * @return initialized Spring-context.
      */
-    protected ApplicationContext createSpringContext() {
+    protected ApplicationContext createSpringContext(Provider<EntityManagerFactory> entityManagerFactoryProvider, TransactionInterceptor transactionInterceptor) {
         GenericApplicationContext context = new GenericApplicationContext();
 
         context.registerBeanDefinition("entityManagerFactory",

@@ -20,14 +20,14 @@
         </rollingPolicy>
     </appender>
 
-    <logger name="org.hibernate.ejb" level="ERROR" additivity="false">
+    <!--<logger name="org.hibernate.ejb" level="ERROR" additivity="false">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="RUNTIME"/>
     </logger>
     <logger name="org.springframework.orm.jpa" level="ERROR" additivity="false">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="RUNTIME"/>
-    </logger>
+    </logger>-->
 
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>

@@ -19,12 +19,17 @@
 package com.google.code.guice.repository.testing.junit.transaction;
 
 import com.google.code.guice.repository.testing.junit.RepoTestBase;
+import com.google.code.guice.repository.testing.model.Account;
+import com.google.code.guice.repository.testing.model.User;
+import com.google.code.guice.repository.testing.repo.AccountRepository;
 import com.google.code.guice.repository.testing.repo.UserRepository;
 import com.google.inject.Inject;
 import junit.framework.Assert;
 import org.junit.Test;
 
-public class ComplexTransactionServiceTest extends RepoTestBase{
+import java.util.UUID;
+
+public class ComplexTransactionServiceTest extends RepoTestBase {
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
@@ -32,7 +37,10 @@ public class ComplexTransactionServiceTest extends RepoTestBase{
     private ComplexTransactionService complexTransactionService;
 
     @Inject
-    private UserRepository repository;
+    private UserRepository userRepository;
+
+    @Inject
+    private AccountRepository accountRepository;
 
     /*===========================================[ CLASS METHODS ]==============*/
 
@@ -44,7 +52,7 @@ public class ComplexTransactionServiceTest extends RepoTestBase{
             logger.error("Error", e);
         }
         logger.info("Main: checking size");
-        long count = repository.count();
+        long count = userRepository.count();
         Assert.assertEquals("Invalid repository size", 0, count);
 
         try {
@@ -53,8 +61,22 @@ public class ComplexTransactionServiceTest extends RepoTestBase{
             logger.error("Error", e);
         }
 
-        count = repository.count();
         // no users should be added because we throw a flow-breaker exception and rollback the transaction
-        Assert.assertEquals("Invalid repository size", 0, count);
+        Assert.assertEquals("Invalid repository size", 0, userRepository.count());
+
+        userRepository.save(new User("1", "1", 1));
+        userRepository.save(new User("2", "2", 2));
+        accountRepository.save(new Account(UUID.randomUUID().toString(), "1"));
+        accountRepository.save(new Account(UUID.randomUUID().toString(), "2"));
+        Assert.assertEquals("Invalid repository size", 2, userRepository.count());
+        Assert.assertEquals("Invalid repository size", 2, accountRepository.count());
+
+        try {
+            complexTransactionService.performThirdComplexTransaction();
+        } catch (Exception e) {
+            logger.error("Error", e);
+        }
+        Assert.assertEquals("Invalid repository size", 2, userRepository.count());
+        Assert.assertEquals("Invalid repository size", 2, accountRepository.count());
     }
 }

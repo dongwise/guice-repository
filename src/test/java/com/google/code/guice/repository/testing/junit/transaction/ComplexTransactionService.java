@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings({"MagicNumber"})
 public class ComplexTransactionService {
@@ -82,9 +83,15 @@ public class ComplexTransactionService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void performThirdComplexTransaction() throws Exception{
+    public void performThirdComplexTransaction() throws Exception {
         userRepository.deleteAll();
         accountRepository.deleteAll();
         throw new Exception("Third rollback");
+    }
+
+    @Transactional(timeout = 1, rollbackFor = Exception.class)
+    public void testTimeoutedTransaction() throws Exception {
+        userRepository.save(new User("user", "password", 1));
+        TimeUnit.SECONDS.sleep(3);
     }
 }

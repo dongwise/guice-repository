@@ -26,8 +26,11 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
+@Transactional(readOnly = true)
 public interface UserRepository extends JpaSpecificationExecutor<User>,
         BatchStoreJpaRepository<User, Long>, EntityManagerProvider, UserRepositoryCustom{
+
+    User findUserByName(String name);
 
     @Modifying
     @Transactional

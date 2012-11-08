@@ -79,4 +79,11 @@ public class ComplexTransactionServiceTest extends RepoTestBase {
         Assert.assertEquals("Invalid repository size", 2, userRepository.count());
         Assert.assertEquals("Invalid repository size", 2, accountRepository.count());
     }
+
+    @Test
+    public void testTimeoutedTransaction() throws Exception {
+        complexTransactionService.testTimeoutedTransaction();
+        Assert.assertEquals("Invalid repository size", 0, userRepository.count());
+    }
+
 }

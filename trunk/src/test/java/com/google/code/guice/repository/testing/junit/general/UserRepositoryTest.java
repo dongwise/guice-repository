@@ -33,6 +33,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 @SuppressWarnings({"MagicNumber"})
 public class UserRepositoryTest extends RepoTestBase {
@@ -59,6 +60,8 @@ public class UserRepositoryTest extends RepoTestBase {
         userRepository.save(new User("alex", "johns", 33));
         userRepository.save(new User("sam", "brown", 22));
         assertEquals("Invalid repository size", 3, userRepositoryProvider.get().count());
+
+        assertNotNull("User not found", userRepository.findUserByName("john"));
 
         Page<User> users = userRepository.findAll(new PageRequest(0, 100));
         assertEquals("Invalid requested page size", 3, users.getNumberOfElements());

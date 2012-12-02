@@ -19,7 +19,6 @@
 package com.google.code.guice.repository;
 
 import com.google.code.guice.repository.configuration.ScanningJpaRepositoryModule;
-import com.google.code.guice.repository.mapping.EntityManagerDelegate;
 import com.google.code.guice.repository.support.CustomJpaRepositoryFactory;
 import com.google.code.guice.repository.support.CustomRepositoryImplementationResolver;
 import com.google.code.guice.repository.support.DomainClassResolver;
@@ -29,17 +28,18 @@ import com.google.inject.*;
 import net.jcip.annotations.ThreadSafe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
-import org.springframework.orm.jpa.EntityManagerFactoryUtils;
+import org.springframework.data.repository.core.support.RepositoryProxyPostProcessor;
+import org.springframework.transaction.interceptor.TransactionInterceptor;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 
 /**
  * Creates an instance of JpaRepository. Bind all your repositories to this provider. Examples:
@@ -82,11 +82,13 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
 
     private ApplicationContext context;
     private Class<R> repositoryClass;
-    private Provider<EntityManagerFactory> entityManagerFactoryProvider;
-    private Provider<EntityManager> entityManagerProvider;
+    //private Provider<EntityManagerFactory> entityManagerFactoryProvider;
+    private EntityManager entityManager;
+    //private Provider<EntityManager> entityManagerProvider;
     private Class domainClass;
     private Class customImplementationClass;
     private volatile R repository;
+    private TransactionInterceptor transactionInterceptor;
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
@@ -123,14 +125,12 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
     @SuppressWarnings({"MethodParameterNamingConvention"})
     @Inject
     public void init(Injector injector,
-                     Provider<EntityManagerFactory> entityManagerFactoryProvider,
-                     Provider<EntityManager> entityManagerProvider,
+                     EntityManager entityManager,
                      CustomRepositoryImplementationResolver customRepositoryImplementationResolver,
                      DomainClassResolver domainClassResolver,
-                     ApplicationContext context) {
-        this.entityManagerFactoryProvider = entityManagerFactoryProvider;
-        this.entityManagerProvider = entityManagerProvider;
-
+                     ApplicationContext context, TransactionInterceptor transactionInterceptor) {
+        this.entityManager = entityManager;
+        this.transactionInterceptor = transactionInterceptor;
         if (repositoryClass == null) {
             repositoryClass = extractRepositoryClass(injector);
         }
@@ -181,13 +181,9 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
             synchronized (this) {
                 repo = repository;
                 if (repo == null) {
-                    EntityManagerFactory emf = entityManagerFactoryProvider.get();
-
                     if (!TransactionSynchronizationManager.isSynchronizationActive()) {
                         TransactionSynchronizationManager.initSynchronization();
                     }
-
-                    EntityManager entityManager = EntityManagerFactoryUtils.doGetTransactionalEntityManager(emf, null);
 
                     JpaRepositoryFactoryBean jpaRepositoryFactoryBean = createJpaRepositoryFactoryBean();
 
@@ -205,6 +201,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
 
                     jpaRepositoryFactoryBean.afterPropertiesSet();
                     repository = (R) jpaRepositoryFactoryBean.getObject();
+
                     repo = repository;
                 }
             }
@@ -218,7 +215,14 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
     protected JpaRepositoryFactoryBean createJpaRepositoryFactoryBean() {
         return new JpaRepositoryFactoryBean() {
             protected RepositoryFactorySupport createRepositoryFactory(EntityManager entityManager) {
-                return new CustomJpaRepositoryFactory(new EntityManagerDelegate(entityManagerProvider));
+                CustomJpaRepositoryFactory jpaRepositoryFactory = new CustomJpaRepositoryFactory(entityManager);
+                jpaRepositoryFactory.addRepositoryProxyPostProcessor(new RepositoryProxyPostProcessor() {
+                    @Override
+                    public void postProcess(ProxyFactory factory) {
+                        factory.addAdvice(transactionInterceptor);
+                    }
+                });
+                return jpaRepositoryFactory;
             }
         };
     }
@@ -231,7 +235,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
          */
         try {
             if (SimpleJpaRepository.class.isAssignableFrom(customImplementationClass)) {
-                customRepositoryImplementation = customImplementationClass.getConstructor(Class.class, EntityManager.class).newInstance(domainClass, new EntityManagerDelegate(entityManagerProvider));
+                customRepositoryImplementation = customImplementationClass.getConstructor(Class.class, EntityManager.class).newInstance(domainClass, entityManager);
             } else {
                 customRepositoryImplementation = customImplementationClass.newInstance();
             }

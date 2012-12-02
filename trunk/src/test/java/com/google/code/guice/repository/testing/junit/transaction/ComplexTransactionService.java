@@ -23,7 +23,7 @@ import com.google.code.guice.repository.testing.model.User;
 import com.google.code.guice.repository.testing.repo.AccountRepository;
 import com.google.code.guice.repository.testing.repo.UserRepository;
 import com.google.inject.Provider;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -91,7 +91,7 @@ public class ComplexTransactionService {
 
     @Transactional(timeout = 1, rollbackFor = Exception.class)
     public void testTimeoutedTransaction() throws Exception {
-        userRepository.save(new User("user", "password", 1));
         TimeUnit.SECONDS.sleep(3);
+        userRepository.findAll();
     }
 }

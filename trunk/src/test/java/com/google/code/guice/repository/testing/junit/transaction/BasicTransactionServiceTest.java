@@ -21,7 +21,7 @@ package com.google.code.guice.repository.testing.junit.transaction;
 import com.google.code.guice.repository.testing.junit.RepoTestBase;
 import com.google.code.guice.repository.testing.repo.UserRepository;
 import com.google.inject.Inject;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class BasicTransactionServiceTest extends RepoTestBase {

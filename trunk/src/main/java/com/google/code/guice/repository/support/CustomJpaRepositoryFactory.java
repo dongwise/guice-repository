@@ -53,7 +53,7 @@ public class CustomJpaRepositoryFactory extends JpaRepositoryFactory {
     @Override
     protected JpaRepository<?, ?> getTargetRepository(RepositoryMetadata metadata, EntityManager entityManager) {
         Class<?> repositoryInterface = metadata.getRepositoryInterface();
-        JpaEntityInformation<?, Serializable> entityInformation = getEntityInformation(metadata.getDomainClass());
+        JpaEntityInformation<?, Serializable> entityInformation = getEntityInformation(metadata.getDomainType());
 
         if (isQueryDslExecutor(repositoryInterface)) {
             return new QueryDslJpaRepository(entityInformation, entityManager);

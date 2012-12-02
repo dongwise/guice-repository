@@ -19,13 +19,14 @@
 package com.google.code.guice.repository.configuration;
 
 import com.google.code.guice.repository.mapping.ApplicationContextProvider;
-import com.google.code.guice.repository.mapping.EntityManagerFactoryDelegate;
-import com.google.code.guice.repository.mapping.ThreadLocalEntityManagerProvider;
+import com.google.code.guice.repository.mapping.EntityManagerFactoryProvider;
+import com.google.code.guice.repository.mapping.EntityManagerProvider;
 import com.google.code.guice.repository.support.CustomRepositoryImplementationResolver;
 import com.google.code.guice.repository.support.DomainClassResolver;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 import com.google.inject.matcher.Matchers;
+import com.google.inject.name.Names;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -36,7 +37,6 @@ import org.springframework.transaction.interceptor.TransactionInterceptor;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 import java.io.InputStream;
 import java.util.Properties;
 //TODO: think about WS usecase and PersistFilter
@@ -44,8 +44,10 @@ import java.util.Properties;
 /**
  * Guice module with Repository support. Repository bindings should be made in <code>configureRepositories</code>
  * method. Module uses JpaPersistModule from guice-persist, which is requires persistence-unit name as an input
- * parameter. There is three options to specify persistence-unit name: <ol> <li> constructor parameter. For example: new
- * JpaRepositoryModule("my-persistence-unit") </li> <li> system property 'persistence-unit-name'. For example: launch an
+ * parameter. There is three options to specify persistence-unit name: <ol> <li> constructor parameter. For example:
+ * new
+ * JpaRepositoryModule("my-persistence-unit") </li> <li> system property 'persistence-unit-name'. For example: launch
+ * an
  * application with -Dpersistence-unit-name=my-persistence-unit </li> <li>override <code>getPersistenceUnitName</code>
  * method. For example:
  * <pre>
@@ -57,7 +59,8 @@ import java.util.Properties;
  *       </pre>
  * </li> </ol>
  *
- * It is very useful to separate ORM specifics from persistence.xml. This technique gives you possibilities to pack your
+ * It is very useful to separate ORM specifics from persistence.xml. This technique gives you possibilities to pack
+ * your
  * persistence.xml with mappings/specification-driven aspects to artifact. Module will look for this specifics in
  * ${persistence-unit-name}.properties file placed in the classpath. Also you can define all ORM specifics in
  * persistence.xml, there is no problem with it.
@@ -71,6 +74,7 @@ public abstract class JpaRepositoryModule extends AbstractModule {
     /*===========================================[ STATIC VARIABLES ]=============*/
 
     public static final String P_PERSISTENCE_UNIT_NAME = "persistence-unit-name";
+    public static final String P_PERSISTENCE_UNIT_PROPERTIES = "persistence-unit-properties";
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
@@ -114,18 +118,11 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         logger.info(String.format("Configuring %s with persistence-unit name: [%s]", moduleName, persistenceUnitName));
 
         Properties props = getPersistenceUnitProperties();
-        final EntityManagerFactory emFactory;
-        if (props != null) {
-            emFactory = Persistence.createEntityManagerFactory(persistenceUnitName, props);
-        } else {
-            emFactory = Persistence.createEntityManagerFactory(persistenceUnitName);
-        }
+        bind(String.class).annotatedWith(Names.named(P_PERSISTENCE_UNIT_NAME)).toInstance(persistenceUnitName);
+        bind(Properties.class).annotatedWith(Names.named(P_PERSISTENCE_UNIT_PROPERTIES)).toInstance(props);
 
-        ThreadLocalEntityManagerProvider entityManagerProvider = new ThreadLocalEntityManagerProvider(emFactory);
-        bind(ThreadLocalEntityManagerProvider.class).toInstance(entityManagerProvider);
-
-        bind(EntityManager.class).toProvider(ThreadLocalEntityManagerProvider.class);
-        bind(EntityManagerFactory.class).toInstance(new EntityManagerFactoryDelegate(emFactory, entityManagerProvider));
+        bind(EntityManagerFactory.class).toProvider(EntityManagerFactoryProvider.class);
+        bind(EntityManager.class).toProvider(EntityManagerProvider.class);
 
         bind(DomainClassResolver.class).in(Scopes.SINGLETON);
         bind(CustomRepositoryImplementationResolver.class).in(Scopes.SINGLETON);
@@ -136,9 +133,7 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         TransactionInterceptor transactionInterceptor = new TransactionInterceptor(null, tas);
         bind(TransactionInterceptor.class).toInstance(transactionInterceptor);
 
-        // Spring application context singleton
-        ApplicationContextProvider applicationContextProvider = new ApplicationContextProvider();
-        bind(ApplicationContextProvider.class).toInstance(applicationContextProvider);
+        // Spring's ApplicationContext provider
         bind(ApplicationContext.class).toProvider(ApplicationContextProvider.class);
 
         bindInterceptor(Matchers.any(), Matchers.annotatedWith(Transactional.class), transactionInterceptor);

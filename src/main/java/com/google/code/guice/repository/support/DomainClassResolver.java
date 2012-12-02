@@ -35,7 +35,7 @@ import java.lang.reflect.Type;
 public class DomainClassResolver {
 
     /*===========================================[ CLASS METHODS ]==============*/
-
+    //TODO: replace with type util
     public Class resolve(Class aClass) {
         Type parent = aClass.getGenericSuperclass();
         if (parent == null) {

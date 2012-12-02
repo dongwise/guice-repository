@@ -18,17 +18,20 @@
 
 package com.google.code.guice.repository.mapping;
 
+import com.google.code.guice.repository.configuration.JpaRepositoryModule;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.inject.name.Named;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
 import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.orm.jpa.LocalEntityManagerFactoryBean;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
 
 import javax.inject.Singleton;
-import javax.persistence.EntityManagerFactory;
+import java.util.Properties;
 
 /**
  * Creates a Spring-context for spring-data-jpa.
@@ -47,22 +50,27 @@ public class ApplicationContextProvider implements Provider<ApplicationContext> 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
     @Inject
-    public void init(Provider<EntityManagerFactory> entityManagerFactoryProvider, TransactionInterceptor transactionInterceptor) {
+    public void init(final TransactionInterceptor transactionInterceptor,
+                     @Named(JpaRepositoryModule.P_PERSISTENCE_UNIT_NAME) String persistenceUnitName,
+                     @Named(JpaRepositoryModule.P_PERSISTENCE_UNIT_PROPERTIES) Properties props) {
         GenericApplicationContext context = new GenericApplicationContext();
 
-        context.registerBeanDefinition("entityManagerFactory",
-                BeanDefinitionBuilder.genericBeanDefinition(EntityManagerFactoryHolderBean.class).
-                        addConstructorArgValue(entityManagerFactoryProvider).getBeanDefinition());
+        //TODO customization for dialect & etc
+        context.registerBeanDefinition("entityManagerFactoryBean",
+                BeanDefinitionBuilder.genericBeanDefinition(LocalEntityManagerFactoryBean.class).
+                        addPropertyValue("persistenceUnitName", persistenceUnitName).
+                        addPropertyValue("jpaProperties", props).getBeanDefinition());
 
         context.registerBeanDefinition("transactionManager",
                 BeanDefinitionBuilder.genericBeanDefinition(JpaTransactionManager.class).getBeanDefinition());
 
-
-        context.registerBeanDefinition("jpaRepositoryFactory",
+        context.registerBeanDefinition("jpaRepositoryFactoryBean",
                 BeanDefinitionBuilder.genericBeanDefinition(JpaRepositoryFactoryBean.class).getBeanDefinition());
 
         JpaTransactionManager transactionManager = context.getBean(JpaTransactionManager.class);
         transactionInterceptor.setTransactionManager(transactionManager);
+        transactionInterceptor.setBeanFactory(context);
+        transactionInterceptor.afterPropertiesSet();
         this.context = context;
     }
 

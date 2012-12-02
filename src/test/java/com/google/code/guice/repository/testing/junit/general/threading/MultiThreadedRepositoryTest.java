@@ -48,10 +48,20 @@ public class MultiThreadedRepositoryTest extends RepoTestBase {
         Assert.assertEquals("Repo is not empty", 0, injector.getInstance(UserRepository.class).count());
         Collection<Callable<Object>> callables = new ArrayList<Callable<Object>>();
         final CountDownLatch generateLatch = new CountDownLatch(MAX_CONCURRENT_THREADS * COUNT_PER_THREAD);
+        final Set<Integer> repoHashes = new ConcurrentSkipListSet<Integer>();
 
         Runnable producer = new Runnable() {
             public void run() {
                 UserRepository instance = injector.getInstance(UserRepository.class);
+
+                int hashCode = instance.hashCode();
+                if (repoHashes.isEmpty()) {
+                    repoHashes.add(hashCode);
+                } else if (repoHashes.add(hashCode)) {
+                    logger.info("Error thread: " + Thread.currentThread().getName());
+                    Assert.fail("Returned Repo instance is unique: " + hashCode);
+                }
+
                 for (int i = 0; i < COUNT_PER_THREAD; i++) {
                     instance.save(new User(UUID.randomUUID().toString(), UUID.randomUUID().toString(), i));
                     generateLatch.countDown();
@@ -85,9 +95,9 @@ public class MultiThreadedRepositoryTest extends RepoTestBase {
 
                     if (entityManagerHashes.isEmpty()) {
                         entityManagerHashes.add(hashCode1);
-                    } else if (!entityManagerHashes.add(hashCode1)) {
+                    } else if (entityManagerHashes.add(hashCode1)) {
                         logger.info("Error thread: " + Thread.currentThread().getName());
-                        Assert.fail("Returned Repo EntityManager is not unique: " + hashCode1);
+                        Assert.fail("Returned SharedEntityManager is unique: " + hashCode1);
                     }
                 }
             }));

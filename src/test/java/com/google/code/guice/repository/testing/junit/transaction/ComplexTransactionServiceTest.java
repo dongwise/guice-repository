@@ -24,8 +24,9 @@ import com.google.code.guice.repository.testing.model.User;
 import com.google.code.guice.repository.testing.repo.AccountRepository;
 import com.google.code.guice.repository.testing.repo.UserRepository;
 import com.google.inject.Inject;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.transaction.TransactionTimedOutException;
 
 import java.util.UUID;
 
@@ -82,7 +83,15 @@ public class ComplexTransactionServiceTest extends RepoTestBase {
 
     @Test
     public void testTimeoutedTransaction() throws Exception {
-        complexTransactionService.testTimeoutedTransaction();
+        Exception lastException = null;
+
+        try {
+            complexTransactionService.testTimeoutedTransaction();
+        } catch (Exception e) {
+            lastException = e;
+        }
+        Assert.assertNotNull("No exception has been received", lastException);
+        Assert.assertTrue("Received exception is not TransactionTimeOutException: " + lastException.getClass(), lastException instanceof TransactionTimedOutException);
         Assert.assertEquals("Invalid repository size", 0, userRepository.count());
     }
 

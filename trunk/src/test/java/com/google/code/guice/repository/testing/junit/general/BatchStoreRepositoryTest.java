@@ -76,7 +76,7 @@ public class BatchStoreRepositoryTest extends RepoTestBase {
         long percent = initialMemory / 100;
 
         int batchSize = 1000;
-        int iterationsCount = 100;
+        int iterationsCount = 50;
 
         AccountRepository accountRepository = accountRepositoryProvider.get();
         for (int i = 0; i < iterationsCount; i++) {

@@ -10,4 +10,11 @@
         <class>com.google.code.guice.repository.testing.model.Account</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
     </persistence-unit>
+
+
+    <persistence-unit name="test-h2-secondary" transaction-type="RESOURCE_LOCAL">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <class>com.google.code.guice.repository.testing.model.UserData</class>
+        <exclude-unlisted-classes>true</exclude-unlisted-classes>
+    </persistence-unit>
 </persistence>

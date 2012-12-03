@@ -28,14 +28,11 @@ import com.google.inject.*;
 import net.jcip.annotations.ThreadSafe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
-import org.springframework.data.repository.core.support.RepositoryProxyPostProcessor;
-import org.springframework.transaction.interceptor.TransactionInterceptor;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
@@ -88,7 +85,6 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
     private Class domainClass;
     private Class customImplementationClass;
     private volatile R repository;
-    private TransactionInterceptor transactionInterceptor;
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
@@ -128,9 +124,8 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
                      EntityManager entityManager,
                      CustomRepositoryImplementationResolver customRepositoryImplementationResolver,
                      DomainClassResolver domainClassResolver,
-                     ApplicationContext context, TransactionInterceptor transactionInterceptor) {
+                     ApplicationContext context) {
         this.entityManager = entityManager;
-        this.transactionInterceptor = transactionInterceptor;
         if (repositoryClass == null) {
             repositoryClass = extractRepositoryClass(injector);
         }
@@ -215,14 +210,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
     protected JpaRepositoryFactoryBean createJpaRepositoryFactoryBean() {
         return new JpaRepositoryFactoryBean() {
             protected RepositoryFactorySupport createRepositoryFactory(EntityManager entityManager) {
-                CustomJpaRepositoryFactory jpaRepositoryFactory = new CustomJpaRepositoryFactory(entityManager);
-                jpaRepositoryFactory.addRepositoryProxyPostProcessor(new RepositoryProxyPostProcessor() {
-                    @Override
-                    public void postProcess(ProxyFactory factory) {
-                        factory.addAdvice(transactionInterceptor);
-                    }
-                });
-                return jpaRepositoryFactory;
+                return new CustomJpaRepositoryFactory(entityManager);
             }
         };
     }

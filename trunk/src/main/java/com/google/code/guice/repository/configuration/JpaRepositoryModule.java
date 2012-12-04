@@ -18,11 +18,11 @@
 
 package com.google.code.guice.repository.configuration;
 
+import com.google.code.guice.repository.inject.PersistenceContexts;
 import com.google.code.guice.repository.mapping.ApplicationContextProvider;
 import com.google.code.guice.repository.mapping.EntityManagerFactoryProvider;
 import com.google.code.guice.repository.mapping.EntityManagerProvider;
 import com.google.code.guice.repository.support.CustomRepositoryImplementationResolver;
-import com.google.code.guice.repository.support.DomainClassResolver;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 import com.google.inject.matcher.Matchers;
@@ -38,6 +38,8 @@ import org.springframework.transaction.interceptor.TransactionInterceptor;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 //TODO: think about WS usecase and PersistFilter
 
@@ -74,22 +76,25 @@ public abstract class JpaRepositoryModule extends AbstractModule {
     /*===========================================[ STATIC VARIABLES ]=============*/
 
     public static final String P_PERSISTENCE_UNIT_NAME = "persistence-unit-name";
+    //todo rename props
     public static final String P_PERSISTENCE_UNIT_PROPERTIES = "persistence-unit-properties";
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
     private Logger logger;
     private String persistenceUnitName;
+    private final List<String> persistenceUnits;
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
-    protected JpaRepositoryModule(String... persistenceUnitName) {
+    protected JpaRepositoryModule(String... persistenceUnitNames) {
         logger = LoggerFactory.getLogger(getClass());
         String pUnitName;
-        if (persistenceUnitName.length > 0) {
-            pUnitName = persistenceUnitName[0];
+        if (persistenceUnitNames.length > 0) {
+            pUnitName = persistenceUnitNames[0];
         } else {
             pUnitName = getPersistenceUnitName();
+            //todo multiple
             if (pUnitName == null) {
                 pUnitName = System.getProperty(P_PERSISTENCE_UNIT_NAME);
                 if (pUnitName == null) {
@@ -99,6 +104,7 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         }
 
         this.persistenceUnitName = pUnitName;
+        persistenceUnits = Arrays.asList(persistenceUnitNames);
     }
 
     /*===========================================[ CLASS METHODS ]==============*/
@@ -124,7 +130,6 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         bind(EntityManagerFactory.class).toProvider(EntityManagerFactoryProvider.class);
         bind(EntityManager.class).toProvider(EntityManagerProvider.class);
 
-        bind(DomainClassResolver.class).in(Scopes.SINGLETON);
         bind(CustomRepositoryImplementationResolver.class).in(Scopes.SINGLETON);
 
         // Only Spring's @Transactional annotation is supported
@@ -138,7 +143,8 @@ public abstract class JpaRepositoryModule extends AbstractModule {
 
         bindInterceptor(Matchers.any(), Matchers.annotatedWith(Transactional.class), transactionInterceptor);
         bindInterceptor(Matchers.annotatedWith(Transactional.class), Matchers.any(), transactionInterceptor);
-
+        //TODO: blabla -multiple
+        Matchers.annotatedWith(PersistenceContexts.persistenceContext(""));
         configureRepositories();
         logger.info(String.format("%s configured", moduleName));
     }

@@ -21,7 +21,7 @@ package com.google.code.guice.repository;
 import com.google.code.guice.repository.configuration.ScanningJpaRepositoryModule;
 import com.google.code.guice.repository.support.CustomJpaRepositoryFactory;
 import com.google.code.guice.repository.support.CustomRepositoryImplementationResolver;
-import com.google.code.guice.repository.support.DomainClassResolver;
+import com.google.code.guice.repository.support.TypeUtil;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.inject.*;
@@ -33,7 +33,6 @@ import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
 import javax.persistence.EntityManager;
@@ -123,14 +122,13 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
     public void init(Injector injector,
                      EntityManager entityManager,
                      CustomRepositoryImplementationResolver customRepositoryImplementationResolver,
-                     DomainClassResolver domainClassResolver,
                      ApplicationContext context) {
         this.entityManager = entityManager;
         if (repositoryClass == null) {
             repositoryClass = extractRepositoryClass(injector);
         }
 
-        domainClass = domainClassResolver.resolve(repositoryClass);
+        domainClass = TypeUtil.getFirstTypeParameterClass(repositoryClass);
         this.context = context;
 
         if (customImplementationClass == null) {
@@ -176,10 +174,6 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
             synchronized (this) {
                 repo = repository;
                 if (repo == null) {
-                    if (!TransactionSynchronizationManager.isSynchronizationActive()) {
-                        TransactionSynchronizationManager.initSynchronization();
-                    }
-
                     JpaRepositoryFactoryBean jpaRepositoryFactoryBean = createJpaRepositoryFactoryBean();
 
                     jpaRepositoryFactoryBean.setBeanFactory(context);

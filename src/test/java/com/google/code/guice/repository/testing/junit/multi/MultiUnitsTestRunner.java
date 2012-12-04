@@ -17,20 +17,21 @@ import org.junit.runners.model.InitializationError;
  * @since 03.12.12
  */
 public class MultiUnitsTestRunner extends GuiceTestRunner {
+
     /*===========================================[ STATIC VARIABLES ]=============*/
-/*===========================================[ INSTANCE VARIABLES ]=========*/
-/*===========================================[ CONSTRUCTORS ]===============*/
-/*===========================================[ CLASS METHODS ]==============*/
+
+    /*===========================================[ INSTANCE VARIABLES ]=========*/
+
+    /*===========================================[ CONSTRUCTORS ]===============*/
+
+    /*===========================================[ CLASS METHODS ]==============*/
+
     public MultiUnitsTestRunner(Class<?> classToRun) throws InitializationError {
-        super(classToRun, new JpaRepositoryModule("test-h2") {
+        super(classToRun, new JpaRepositoryModule("test-h2", "test-h2-secondary") {
                     @Override
                     protected void configureRepositories() {
                         bind(UserRepository.class).toProvider(new JpaRepositoryProvider<UserRepository>());
                         bind(AccountRepository.class).toProvider(new JpaRepositoryProvider<AccountRepository>());
-                    }
-                }, new JpaRepositoryModule("test-h2-secondary") {
-                    @Override
-                    protected void configureRepositories() {
                         bind(UserDataRepository.class).toProvider(new JpaRepositoryProvider<UserDataRepository>());
                     }
                 }

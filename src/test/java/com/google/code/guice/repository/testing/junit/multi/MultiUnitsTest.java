@@ -24,6 +24,7 @@ import java.util.UUID;
  */
 @RunWith(MultiUnitsTestRunner.class)
 public class MultiUnitsTest {
+
     /*===========================================[ STATIC VARIABLES ]=============*/
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
@@ -34,18 +35,18 @@ public class MultiUnitsTest {
     @Inject
     private AccountRepository accountRepository;
 
-
     @Inject
     private UserDataRepository userDataRepository;
 
-
-/*===========================================[ CONSTRUCTORS ]===============*/
-/*===========================================[ CLASS METHODS ]==============*/
-
+    /*===========================================[ CONSTRUCTORS ]===============*/
+    /*===========================================[ CLASS METHODS ]==============*/
 
     @Test
     public void complexTest() {
+        // TODO: http://blog.springsource.org/2011/04/26/advanced-spring-data-jpa-specifications-and-querydsl/#comment-198835
         //TODO
+
+        //TODO: 1. создать разные экземпляры TransactionManager
         userRepository.save(new User("user", "surname", 1));
         accountRepository.save(new Account(UUID.randomUUID().toString(), "surname"));
         userDataRepository.save(new UserData(UUID.randomUUID().toString()));

@@ -54,7 +54,7 @@ public class ApplicationContextProvider implements Provider<ApplicationContext> 
                      @Named(JpaRepositoryModule.P_PERSISTENCE_UNIT_NAME) String persistenceUnitName,
                      @Named(JpaRepositoryModule.P_PERSISTENCE_UNIT_PROPERTIES) Properties props) {
         GenericApplicationContext context = new GenericApplicationContext();
-
+        //http://blog.springsource.org/2011/04/26/advanced-spring-data-jpa-specifications-and-querydsl/#comment-198835
         //TODO customization for dialect & etc
         context.registerBeanDefinition("entityManagerFactoryBean",
                 BeanDefinitionBuilder.genericBeanDefinition(LocalEntityManagerFactoryBean.class).

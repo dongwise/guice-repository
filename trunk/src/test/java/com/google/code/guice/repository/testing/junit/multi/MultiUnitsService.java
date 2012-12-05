@@ -26,7 +26,6 @@ public class MultiUnitsService {
 
     }
 
-    @PersistenceContext(unitName = "test-h2-secondary")
     @Transactional("test-h2-secondary")
     public void secondaryTransaction(){
 

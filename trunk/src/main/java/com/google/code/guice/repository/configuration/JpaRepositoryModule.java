@@ -18,7 +18,7 @@
 
 package com.google.code.guice.repository.configuration;
 
-import com.google.code.guice.repository.inject.PersistenceContexts;
+import com.google.code.guice.repository.inject.Transactions;
 import com.google.code.guice.repository.mapping.ApplicationContextProvider;
 import com.google.code.guice.repository.mapping.EntityManagerFactoryProvider;
 import com.google.code.guice.repository.mapping.EntityManagerProvider;
@@ -37,6 +37,7 @@ import org.springframework.transaction.interceptor.TransactionInterceptor;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
@@ -141,10 +142,11 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         // Spring's ApplicationContext provider
         bind(ApplicationContext.class).toProvider(ApplicationContextProvider.class);
 
-        bindInterceptor(Matchers.any(), Matchers.annotatedWith(Transactional.class), transactionInterceptor);
-        bindInterceptor(Matchers.annotatedWith(Transactional.class), Matchers.any(), transactionInterceptor);
-        //TODO: blabla -multiple
-        Matchers.annotatedWith(PersistenceContexts.persistenceContext(""));
+        Transactional defaultTransactional = Transactions.defaultTransactional();
+        bindInterceptor(Matchers.any(), Matchers.annotatedWith(defaultTransactional), transactionInterceptor);
+        bindInterceptor(Matchers.annotatedWith(defaultTransactional), Matchers.any(), transactionInterceptor);
+        //TODO: blabla -multiple - isolate default transactional
+        //Matchers.annotatedWith(Transactions.transactional("test"));
         configureRepositories();
         logger.info(String.format("%s configured", moduleName));
     }
@@ -160,12 +162,20 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         String propFileName = persistenceUnitName + ".properties";
 
         InputStream pStream = getClass().getClassLoader().getResourceAsStream(propFileName);
-        if (pStream != null) {
+        try {
             props = new Properties();
-            try {
+            if (pStream != null) {
                 props.load(pStream);
-            } catch (Exception e) {
-                logger.error(String.format("Unable to load properties for persistence-unit: [%s]", persistenceUnitName), e);
+            }
+        } catch (Exception e) {
+            logger.error(String.format("Unable to load properties for persistence-unit: [%s]", persistenceUnitName), e);
+        } finally {
+            if (pStream != null) {
+                try {
+                    pStream.close();
+                } catch (IOException e) {
+                    logger.error("Error", e);
+                }
             }
         }
         return props;

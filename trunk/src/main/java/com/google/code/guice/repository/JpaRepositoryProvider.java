@@ -66,7 +66,6 @@ import javax.persistence.EntityManager;
  * @version 1.0.0
  * @since 10.04.2012
  */
-@SuppressWarnings({"FieldAccessedSynchronizedAndUnsynchronized"})
 @ThreadSafe
 public class JpaRepositoryProvider<R extends Repository> implements Provider<R> {
 
@@ -117,7 +116,6 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
 
     /*===========================================[ CLASS METHODS ]==============*/
 
-    @SuppressWarnings({"MethodParameterNamingConvention"})
     @Inject
     public void init(Injector injector,
                      EntityManager entityManager,
@@ -203,6 +201,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
      */
     protected JpaRepositoryFactoryBean createJpaRepositoryFactoryBean() {
         return new JpaRepositoryFactoryBean() {
+            @Override
             protected RepositoryFactorySupport createRepositoryFactory(EntityManager entityManager) {
                 return new CustomJpaRepositoryFactory(entityManager);
             }

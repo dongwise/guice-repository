@@ -5,24 +5,29 @@
 
 package com.google.code.guice.repository.inject;
 
-import javax.persistence.PersistenceContext;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
- * PersistenceContexts - TODO: description
+ * Transactions - TODO: description
  *
  * @author Alexey Krylov (AleX)
  * @since 04.12.12
  */
-public class PersistenceContexts {
+public class Transactions {
 
     /*===========================================[ CONSTRUCTORS ]=================*/
 
-    private PersistenceContexts() {
+    private Transactions() {
     }
 
     /*===========================================[ CLASS METHODS ]================*/
 
-    public static PersistenceContext persistenceContext(String unitName) {
-        return new PersistenceContextImpl(unitName);
+    public static Transactional transactional(String unitName) {
+        return new TransactionalImpl(unitName);
+    }
+
+
+    public static Transactional defaultTransactional() {
+        return new TransactionalImpl();
     }
 }

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2012 the original author or authors.
  * See the notice.md file distributed with this work for additional
  * information regarding copyright ownership.
@@ -18,6 +18,8 @@
 
 package com.google.code.guice.repository;
 
+import com.google.code.guice.repository.configuration.PersistenceUnitConfiguration;
+import com.google.code.guice.repository.configuration.PersistenceUnitsConfigurationManager;
 import com.google.code.guice.repository.configuration.ScanningJpaRepositoryModule;
 import com.google.code.guice.repository.support.CustomJpaRepositoryFactory;
 import com.google.code.guice.repository.support.CustomRepositoryImplementationResolver;
@@ -66,6 +68,7 @@ import javax.persistence.EntityManager;
  * @version 1.0.0
  * @since 10.04.2012
  */
+@SuppressWarnings({"SynchronizeOnThis", "FieldAccessedSynchronizedAndUnsynchronized"})
 @ThreadSafe
 public class JpaRepositoryProvider<R extends Repository> implements Provider<R> {
 
@@ -75,16 +78,27 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
-    private ApplicationContext context;
     private Class<R> repositoryClass;
-    //private Provider<EntityManagerFactory> entityManagerFactoryProvider;
-    private EntityManager entityManager;
-    //private Provider<EntityManager> entityManagerProvider;
+    private String persistenceUnitName;
     private Class domainClass;
     private Class customImplementationClass;
+
+    private ApplicationContext context;
     private volatile R repository;
+    private PersistenceUnitsConfigurationManager persistenceUnitsConfigurationManager;
 
     /*===========================================[ CONSTRUCTORS ]===============*/
+
+
+    /**
+     * Default constructor.
+     */
+    public JpaRepositoryProvider() {
+    }
+
+    public JpaRepositoryProvider(String persistenceUnitName) {
+        this.persistenceUnitName = persistenceUnitName;
+    }
 
     /**
      * Constructor for auto-binding.
@@ -94,10 +108,11 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
      *
      * @see ScanningJpaRepositoryModule
      */
-    public JpaRepositoryProvider(Class<R> repositoryClass, Class customImplementationClass) {
+    public JpaRepositoryProvider(Class<R> repositoryClass, Class customImplementationClass, String persistenceUnitName) {
         Assert.notNull(repositoryClass);
         this.repositoryClass = repositoryClass;
         this.customImplementationClass = customImplementationClass;
+        this.persistenceUnitName = persistenceUnitName;
     }
 
     /**
@@ -108,20 +123,19 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
         this.customImplementationClass = customImplementationClass;
     }
 
-    /**
-     * Default constructor.
-     */
-    public JpaRepositoryProvider() {
+    public JpaRepositoryProvider(Class customImplementationClass, String persistenceUnitName) {
+        this(customImplementationClass);
+        this.persistenceUnitName = persistenceUnitName;
     }
 
     /*===========================================[ CLASS METHODS ]==============*/
 
     @Inject
     public void init(Injector injector,
-                     EntityManager entityManager,
                      CustomRepositoryImplementationResolver customRepositoryImplementationResolver,
-                     ApplicationContext context) {
-        this.entityManager = entityManager;
+                     ApplicationContext context,
+                     PersistenceUnitsConfigurationManager persistenceUnitsConfigurationManager) {
+
         if (repositoryClass == null) {
             repositoryClass = extractRepositoryClass(injector);
         }
@@ -136,6 +150,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
         if (customImplementationClass != null) {
             logger.info(String.format("Custom repository implementation class for [%s] set to [%s]", repositoryClass.getName(), customImplementationClass.getName()));
         }
+        this.persistenceUnitsConfigurationManager = persistenceUnitsConfigurationManager;
     }
 
     /**
@@ -165,6 +180,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
         return repositoryClass;
     }
 
+    @Override
     public R get() {
         // double-checked locking with volatile
         R repo = repository;
@@ -174,12 +190,16 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
                 if (repo == null) {
                     JpaRepositoryFactoryBean jpaRepositoryFactoryBean = createJpaRepositoryFactoryBean();
 
+                    PersistenceUnitConfiguration configuration = persistenceUnitsConfigurationManager.getPersistenceUnitConfiguration(persistenceUnitName);
+                    EntityManager entityManager = configuration.getEntityManager();
+                    // Attaching to Spring's context
                     jpaRepositoryFactoryBean.setBeanFactory(context);
                     jpaRepositoryFactoryBean.setEntityManager(entityManager);
                     jpaRepositoryFactoryBean.setRepositoryInterface(repositoryClass);
+                    jpaRepositoryFactoryBean.setTransactionManager(configuration.getTransactionManagerName());
 
                     if (customImplementationClass != null) {
-                        Object customRepositoryImplementation = instantiateCustomRepository();
+                        Object customRepositoryImplementation = instantiateCustomRepository(entityManager);
 
                         if (customRepositoryImplementation != null) {
                             jpaRepositoryFactoryBean.setCustomImplementation(customRepositoryImplementation);
@@ -208,7 +228,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
         };
     }
 
-    protected Object instantiateCustomRepository() {
+    protected Object instantiateCustomRepository(EntityManager entityManager) {
         Object customRepositoryImplementation = null;
         /**
          * Watching a case when Repository implementation is a SimpleJpaRepository subclass -

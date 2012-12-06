@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2012 the original author or authors.
  * See the notice.md file distributed with this work for additional
  * information regarding copyright ownership.
@@ -51,7 +51,8 @@ public abstract class RepoTestBase {
     @Transactional
     public void baseBefore() {
         logger = LoggerFactory.getLogger(getClass());
-        injector.getInstance(UserRepository.class).deleteAll();
+        UserRepository userRepository = injector.getInstance(UserRepository.class);
+        userRepository.deleteAll();
         injector.getInstance(AccountRepository.class).deleteAll();
         injector.getInstance(CustomerRepository.class).deleteAll();
     }

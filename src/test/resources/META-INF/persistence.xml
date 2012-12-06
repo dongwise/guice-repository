@@ -3,6 +3,21 @@
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:schemaLocation="http://java.sun.com/xml/ns/persistence       http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
 
+    <persistence-unit name="test-h2">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <class>com.google.code.guice.repository.testing.model.Customer</class>
+        <class>com.google.code.guice.repository.testing.model.User</class>
+        <class>com.google.code.guice.repository.testing.model.Account</class>
+        <exclude-unlisted-classes>true</exclude-unlisted-classes>
+    </persistence-unit>
+
+
+    <persistence-unit name="test-h2-secondary">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <class>com.google.code.guice.repository.testing.model.UserData</class>
+        <exclude-unlisted-classes>true</exclude-unlisted-classes>
+    </persistence-unit>
+<!--
     <persistence-unit name="test-h2" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <class>com.google.code.guice.repository.testing.model.Customer</class>
@@ -17,4 +32,5 @@
         <class>com.google.code.guice.repository.testing.model.UserData</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
     </persistence-unit>
+-->
 </persistence>

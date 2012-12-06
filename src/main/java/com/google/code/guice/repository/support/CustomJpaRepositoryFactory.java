@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2012 the original author or authors.
  * See the notice.md file distributed with this work for additional
  * information regarding copyright ownership.
@@ -71,8 +71,8 @@ public class CustomJpaRepositoryFactory extends JpaRepositoryFactory {
         }
     }
 
-    @SuppressWarnings({"MethodOverridesPrivateMethodOfSuperclass"})
-    private boolean isQueryDslExecutor(Class<?> repositoryInterface) {
+    @SuppressWarnings("MethodOverridesPrivateMethodOfSuperclass")
+    private static boolean isQueryDslExecutor(Class<?> repositoryInterface) {
         return QUERY_DSL_PRESENT && QueryDslPredicateExecutor.class.isAssignableFrom(repositoryInterface);
     }
 }

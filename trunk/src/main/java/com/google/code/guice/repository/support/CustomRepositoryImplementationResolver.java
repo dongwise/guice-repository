@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2012 the original author or authors.
  * See the notice.md file distributed with this work for additional
  * information regarding copyright ownership.
@@ -47,7 +47,6 @@ import java.util.Set;
  * @version 1.0.0
  * @since 10.04.2012
  */
-@SuppressWarnings({"MethodOnlyUsedFromInnerClass"})
 public class CustomRepositoryImplementationResolver {
 
     /*===========================================[ STATIC VARIABLES ]=============*/
@@ -82,7 +81,8 @@ public class CustomRepositoryImplementationResolver {
         /**
          * Detect only custom repository/enhancements interfaces - skip all from Spring and guice-repository project
          */
-        Collection<? extends Class<?>> superTypes = ReflectionUtils.getAllSuperTypes(repositoryClass, new Predicate<Class>() {
+        Collection<Class<?>> superTypes = ReflectionUtils.getAllSuperTypes(repositoryClass, new Predicate<Class>() {
+            @Override
             public boolean apply(Class input) {
                 return isValidCustomInterface(input);
             }

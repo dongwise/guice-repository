@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2012 the original author or authors.
  * See the notice.md file distributed with this work for additional
  * information regarding copyright ownership.
@@ -120,7 +120,8 @@ public class ScanningJpaRepositoryModule extends JpaRepositoryModule {
                 Iterator<Class<?>> iterator = repoImplementations.iterator();
                 Class<?> implementation = iterator.hasNext() ? iterator.next() : null;
                 getLogger().info(String.format("Found repository: [%s]", repositoryClass.getName()));
-                bind(repositoryClass).toProvider(new JpaRepositoryProvider(repositoryClass, implementation));
+                //TODO: resolving with annotation/top @Transactional
+                bind(repositoryClass).toProvider(new JpaRepositoryProvider(repositoryClass, implementation, null));
             }
         }
     }

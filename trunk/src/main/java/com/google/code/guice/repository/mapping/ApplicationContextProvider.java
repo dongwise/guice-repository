@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2012 the original author or authors.
  * See the notice.md file distributed with this work for additional
  * information regarding copyright ownership.
@@ -18,20 +18,8 @@
 
 package com.google.code.guice.repository.mapping;
 
-import com.google.code.guice.repository.configuration.JpaRepositoryModule;
-import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.google.inject.name.Named;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
-import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.orm.jpa.LocalEntityManagerFactoryBean;
-import org.springframework.transaction.interceptor.TransactionInterceptor;
-
-import javax.inject.Singleton;
-import java.util.Properties;
 
 /**
  * Creates a Spring-context for spring-data-jpa.
@@ -40,7 +28,6 @@ import java.util.Properties;
  * @version 1.0.1
  * @since 07.11.2012
  */
-@Singleton
 public class ApplicationContextProvider implements Provider<ApplicationContext> {
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
@@ -49,9 +36,10 @@ public class ApplicationContextProvider implements Provider<ApplicationContext> 
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
+/*
     @Inject
-    public void init(final TransactionInterceptor transactionInterceptor,
-                     @Named(JpaRepositoryModule.P_PERSISTENCE_UNIT_NAME) String persistenceUnitName,
+    public void init(TransactionInterceptor transactionInterceptor,
+                     @Named(JpaRepositoryModule.P_PERSISTENCE_UNITS) String persistenceUnitName,
                      @Named(JpaRepositoryModule.P_PERSISTENCE_UNIT_PROPERTIES) Properties props) {
         GenericApplicationContext context = new GenericApplicationContext();
         //http://blog.springsource.org/2011/04/26/advanced-spring-data-jpa-specifications-and-querydsl/#comment-198835
@@ -67,13 +55,15 @@ public class ApplicationContextProvider implements Provider<ApplicationContext> 
         context.registerBeanDefinition("jpaRepositoryFactoryBean",
                 BeanDefinitionBuilder.genericBeanDefinition(JpaRepositoryFactoryBean.class).getBeanDefinition());
 
+        //TODO: use add advice
         JpaTransactionManager transactionManager = context.getBean(JpaTransactionManager.class);
-        transactionInterceptor.setTransactionManager(transactionManager);
+        //transactionInterceptor.setTransactionManager(transactionManager);
         transactionInterceptor.setBeanFactory(context);
-        transactionInterceptor.afterPropertiesSet();
+        //transactionInterceptor.afterPropertiesSet();
         this.context = context;
     }
 
+*/
     /*===========================================[ CLASS METHODS ]==============*/
 
     @Override

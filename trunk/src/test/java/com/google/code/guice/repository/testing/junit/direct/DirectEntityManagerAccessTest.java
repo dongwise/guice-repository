@@ -16,17 +16,17 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository.testing.runner;
+package com.google.code.guice.repository.testing.junit.direct;
 
-import com.google.code.guice.repository.configuration.ScanningJpaRepositoryModule;
-import com.google.code.guice.repository.testing.common.GuiceTestRunner;
-import org.junit.runners.model.InitializationError;
-
-public class AutoBindRepoTestRunner extends GuiceTestRunner {
-
-    /*===========================================[ CLASS METHODS ]==============*/
-
-    public AutoBindRepoTestRunner(Class<?> classToRun) throws InitializationError {
-        super(classToRun, new ScanningJpaRepositoryModule("com.google.code.guice.repository.testing.repo", "test-h2"));
-    }
+/**
+ * DirectEntityManagerAccessTest - TODO: description
+ *
+ * @author Alexey Krylov (lexx)
+ * @since 06.12.12
+ */
+public class DirectEntityManagerAccessTest {
+/*===========================================[ STATIC VARIABLES ]=============*/
+/*===========================================[ INSTANCE VARIABLES ]===========*/
+/*===========================================[ CONSTRUCTORS ]=================*/
+/*===========================================[ CLASS METHODS ]================*/
 }

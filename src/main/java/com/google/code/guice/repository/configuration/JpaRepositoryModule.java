@@ -32,6 +32,7 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.SharedEntityManagerCreator;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.AnnotationTransactionAttributeSource;
 import org.springframework.transaction.annotation.SpringTransactionAnnotationParser;
 import org.springframework.transaction.annotation.Transactional;
@@ -126,7 +127,8 @@ public abstract class JpaRepositoryModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        String moduleName = getClass().getSimpleName();
+        String simpleName = getClass().getSimpleName();
+        String moduleName = simpleName.isEmpty() ? getClass().getName() : simpleName;
         logger.info(String.format("Configuring [%s] for persistence units: [%s]", moduleName, Arrays.asList(persistenceUnits)));
 
         bind(EntityManagerFactory.class).toProvider(EntityManagerFactoryProvider.class).in(Scopes.SINGLETON);
@@ -144,8 +146,9 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         // Only Spring's @Transactional annotation is supported
         AnnotationTransactionAttributeSource tas = new AnnotationTransactionAttributeSource(new SpringTransactionAnnotationParser());
         //TODO: transactionInterceptor provider relative to persistence unit??
-        // Transaction Manager will be configured later
-        TransactionInterceptor transactionInterceptor = new TransactionInterceptor(null, tas);
+        // Setting default Transaction Manager
+        PlatformTransactionManager defaultTransactionManager = configurationManager.getDefaultConfiguration().getTransactionManager();
+        TransactionInterceptor transactionInterceptor = new TransactionInterceptor(defaultTransactionManager, tas);
         transactionInterceptor.setBeanFactory(applicationContext);
         bind(TransactionInterceptor.class).toInstance(transactionInterceptor);
 
@@ -169,33 +172,34 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         return manager;
     }
 
+    @SuppressWarnings("UnnecessaryLocalVariable")
     protected ApplicationContext createApplicationContext(Collection<PersistenceUnitConfiguration> persistenceUnits) {
         GenericApplicationContext context = new GenericApplicationContext();
         // TODO http://blog.springsource.org/2011/04/26/advanced-spring-data-jpa-specifications-and-querydsl/#comment-198835
         //TODO customization for dialect & etc
         // TODO: https://github.com/SpringSource/spring-data-jpa/blob/master/src/test/resources/multiple-entity-manager-integration-context.xml
+        String abstractEMFBeanName = "abstractEntityManagerFactory";
+        context.registerBeanDefinition(abstractEMFBeanName, BeanDefinitionBuilder.
+                genericBeanDefinition(LocalContainerEntityManagerFactoryBean.class).
+                //addPropertyReference("jpaVendorAdapter", "jpaVendorAdapter").
+                        //addPropertyReference("jpaDialect", "jpaDialect").
+                        //addPropertyReference("dataSource", "dataSource").
+                        //addPropertyReference("jpaProperties", "jpaProperties").
+                        //addPropertyValue("persistenceXmlLocation", "classpath:META-INF/persistence.xml").
+                        setAbstract(true).getBeanDefinition());
+
+
         for (PersistenceUnitConfiguration configuration : persistenceUnits) {
             String persistenceUnitName = configuration.getName();
+            // Naming is important - it's needed for later TransactionManager resolution based on @Transactional value with persistenceUnitName
+            String transactionManagerName = persistenceUnitName;
             Properties props = configuration.getProperties();
 
-            //TODO register first/default with name transactionManager, second - with persistenceUnitName
-
-            String abstractEMFBeanName = "abstractEntityManagerFactory";
-            //TODO: abstract beandefinition
-            context.registerBeanDefinition(abstractEMFBeanName, BeanDefinitionBuilder.
-                    genericBeanDefinition(LocalContainerEntityManagerFactoryBean.class).
-                    //addPropertyReference("jpaVendorAdapter", "jpaVendorAdapter").
-                    //addPropertyReference("jpaDialect", "jpaDialect").
-                    //addPropertyReference("dataSource", "dataSource").
-                    addPropertyReference("jpaProperties", "jpaProperties").
-                    addPropertyValue("persistenceXmlLocation", "classpath:META-INF/persistence.xml").
-                    setAbstract(true).getBeanDefinition());
-
             String entityManagerFactoryName = "entityManagerFactory#" + persistenceUnitName;
-            String transactionManagerName = "transactionManager#" + persistenceUnitName;
 
             context.registerBeanDefinition(entityManagerFactoryName,
                     BeanDefinitionBuilder.genericBeanDefinition().setParentName(abstractEMFBeanName).
+
                             addPropertyValue("persistenceUnitName", persistenceUnitName).
                             addPropertyValue("jpaProperties", props).getBeanDefinition());
 
@@ -203,20 +207,22 @@ public abstract class JpaRepositoryModule extends AbstractModule {
                     BeanDefinitionBuilder.genericBeanDefinition(JpaTransactionManager.class).
                             addPropertyReference("entityManagerFactory", entityManagerFactoryName).getBeanDefinition());
 
-            // Default bindings for EMF & Transaction Manager - they needed for repositories with @Transactional without value
-            if (configuration.isDefault()) {
-                context.registerAlias(entityManagerFactoryName, "entityManagerFactory");
-                context.registerAlias(transactionManagerName, "transactionManager");
-            }
-            // Wiring components
-            //JpaTransactionManager transactionManager = context.getBean(transactionManagerName, JpaTransactionManager.class);
-            //transactionManager.setEntityManagerFactory(emf);
+            //TODO register first/default with name transactionManager, second - with persistenceUnitName
 
+            // Default bindings for EMF & Transaction Manager - they needed for repositories with @Transactional without value
+            // Wiring components
             EntityManagerFactory emf = context.getBean(entityManagerFactoryName, EntityManagerFactory.class);
             EntityManager entityManager = SharedEntityManagerCreator.createSharedEntityManager(emf, props);
             configuration.setEntityManager(entityManager);
             configuration.setEntityManagerFactory(emf);
+            configuration.setTransactionManager(context.getBean(transactionManagerName, PlatformTransactionManager.class));
             configuration.setTransactionManagerName(transactionManagerName);
+
+            if (configuration.isDefault()) {
+                //todo check if needed for transactional tests
+                context.registerAlias(entityManagerFactoryName, "entityManagerFactory");
+                context.registerAlias(persistenceUnitName, "transactionManager");
+            }
         }
 
         return context;

@@ -24,7 +24,7 @@ import com.google.code.guice.repository.testing.repo.UserDataRepository;
 import com.google.code.guice.repository.testing.repo.UserRepository;
 import com.google.inject.Inject;
 import org.junit.Assert;
-import org.junit.Ignore;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -51,18 +51,32 @@ public class MultiPersistenceUnitsTest {
     private MultiPersistenceUnitsService multiPersistenceUnitsService;
 
     /*===========================================[ CLASS METHODS ]==============*/
-    @Test
-    @Ignore
-    public void multiPersistenceUnitsServiceTests(){
-        int count = 100;
 
-        multiPersistenceUnitsService.generateUsers(count);
-        multiPersistenceUnitsService.generateUserData(count);
-
-        Assert.assertEquals("Invalid generated users count", 100, userRepository.count());
-        Assert.assertEquals("Invalid generated user data count", 100, userDataRepository.count());
+    @Before
+    public void before() {
         userRepository.deleteAll();
         userDataRepository.deleteAll();
+    }
+
+    @Test
+    public void multiPersistenceUnitsServiceTests() {
+        int count = 100;
+        multiPersistenceUnitsService.generateUsers(count);
+        multiPersistenceUnitsService.generateUserData(count);
+        Assert.assertEquals("Invalid generated users count", count, userRepository.count());
+        Assert.assertEquals("Invalid generated user data count", count, userDataRepository.count());
+        userRepository.deleteAll();
+        userDataRepository.deleteAll();
+    }
+
+    @Test
+    public void testSave() {
+        int count = 100;
+        for (int i = 0; i < count; i++) {
+            userDataRepository.save(new UserData(String.valueOf(UUID.randomUUID())));
+        }
+
+        Assert.assertEquals("Invalid generated user data count", count, userDataRepository.count());
     }
 
     @Test

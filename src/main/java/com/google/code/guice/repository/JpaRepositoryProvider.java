@@ -21,7 +21,7 @@ package com.google.code.guice.repository;
 import com.google.code.guice.repository.configuration.PersistenceUnitConfiguration;
 import com.google.code.guice.repository.configuration.PersistenceUnitsConfigurationManager;
 import com.google.code.guice.repository.configuration.ScanningJpaRepositoryModule;
-import com.google.code.guice.repository.support.CustomJpaRepositoryFactory;
+import com.google.code.guice.repository.support.CustomJpaRepositoryFactoryBean;
 import com.google.code.guice.repository.support.CustomRepositoryImplementationResolver;
 import com.google.code.guice.repository.support.TypeUtil;
 import com.google.common.collect.BiMap;
@@ -34,7 +34,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.data.repository.Repository;
-import org.springframework.data.repository.core.support.RepositoryFactorySupport;
 import org.springframework.util.Assert;
 
 import javax.persistence.EntityManager;
@@ -85,7 +84,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
 
     private ApplicationContext context;
     private volatile R repository;
-    private PersistenceUnitsConfigurationManager persistenceUnitsConfigurationManager;
+    private PersistenceUnitsConfigurationManager configurationManager;
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
@@ -132,9 +131,9 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
 
     @Inject
     public void init(Injector injector,
-                     CustomRepositoryImplementationResolver customRepositoryImplementationResolver,
+                     CustomRepositoryImplementationResolver implementationResolver,
                      ApplicationContext context,
-                     PersistenceUnitsConfigurationManager persistenceUnitsConfigurationManager) {
+                     PersistenceUnitsConfigurationManager configurationManager) {
 
         if (repositoryClass == null) {
             repositoryClass = extractRepositoryClass(injector);
@@ -144,13 +143,13 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
         this.context = context;
 
         if (customImplementationClass == null) {
-            customImplementationClass = customRepositoryImplementationResolver.resolve(repositoryClass);
+            customImplementationClass = implementationResolver.resolve(repositoryClass);
         }
 
         if (customImplementationClass != null) {
             logger.info(String.format("Custom repository implementation class for [%s] set to [%s]", repositoryClass.getName(), customImplementationClass.getName()));
         }
-        this.persistenceUnitsConfigurationManager = persistenceUnitsConfigurationManager;
+        this.configurationManager = configurationManager;
     }
 
     /**
@@ -190,13 +189,16 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
                 if (repo == null) {
                     JpaRepositoryFactoryBean jpaRepositoryFactoryBean = createJpaRepositoryFactoryBean();
 
-                    PersistenceUnitConfiguration configuration = persistenceUnitsConfigurationManager.getPersistenceUnitConfiguration(persistenceUnitName);
+                    PersistenceUnitConfiguration configuration = configurationManager.getPersistenceUnitConfiguration(persistenceUnitName);
+
                     EntityManager entityManager = configuration.getEntityManager();
+                    // Needs to be set first
+                    jpaRepositoryFactoryBean.setTransactionManager(configuration.getTransactionManagerName());
                     // Attaching to Spring's context
                     jpaRepositoryFactoryBean.setBeanFactory(context);
                     jpaRepositoryFactoryBean.setEntityManager(entityManager);
                     jpaRepositoryFactoryBean.setRepositoryInterface(repositoryClass);
-                    jpaRepositoryFactoryBean.setTransactionManager(configuration.getTransactionManagerName());
+                    //jpaRepositoryFactoryBean.setNamedQueries();
 
                     if (customImplementationClass != null) {
                         Object customRepositoryImplementation = instantiateCustomRepository(entityManager);
@@ -220,12 +222,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
      * Some instantiation example is <a href="https://jira.springsource.org/browse/DATAJPA-69">here</a>.
      */
     protected JpaRepositoryFactoryBean createJpaRepositoryFactoryBean() {
-        return new JpaRepositoryFactoryBean() {
-            @Override
-            protected RepositoryFactorySupport createRepositoryFactory(EntityManager entityManager) {
-                return new CustomJpaRepositoryFactory(entityManager);
-            }
-        };
+        return new CustomJpaRepositoryFactoryBean();
     }
 
     protected Object instantiateCustomRepository(EntityManager entityManager) {

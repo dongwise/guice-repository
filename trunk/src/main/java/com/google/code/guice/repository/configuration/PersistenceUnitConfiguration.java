@@ -18,6 +18,8 @@
 
 package com.google.code.guice.repository.configuration;
 
+import org.springframework.transaction.PlatformTransactionManager;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import java.util.Properties;
@@ -38,6 +40,7 @@ public class PersistenceUnitConfiguration {
     private Properties properties;
     private EntityManagerFactory entityManagerFactory;
     private EntityManager entityManager;
+    private PlatformTransactionManager transactionManager;
     private String transactionManagerName;
     private boolean isDefault;
 
@@ -81,24 +84,33 @@ public class PersistenceUnitConfiguration {
         this.transactionManagerName = transactionManagerName;
     }
 
+    public PlatformTransactionManager getTransactionManager() {
+        return transactionManager;
+    }
+
+    protected void setTransactionManager(PlatformTransactionManager transactionManager) {
+        this.transactionManager = transactionManager;
+    }
+
     public boolean isDefault() {
         return isDefault;
     }
 
-    protected void setDefault(boolean aDefault) {
-        isDefault = aDefault;
+    protected void setDefault(boolean isDefault) {
+        this.isDefault = isDefault;
     }
 
+
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (!(o instanceof PersistenceUnitConfiguration)) {
+        if (!(obj instanceof PersistenceUnitConfiguration)) {
             return false;
         }
 
-        PersistenceUnitConfiguration persistenceUnitConfiguration = (PersistenceUnitConfiguration) o;
+        PersistenceUnitConfiguration persistenceUnitConfiguration = (PersistenceUnitConfiguration) obj;
 
         if (name != null ? !name.equals(persistenceUnitConfiguration.name) : persistenceUnitConfiguration.name != null) {
             return false;

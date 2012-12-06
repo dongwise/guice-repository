@@ -23,6 +23,7 @@ import com.google.code.guice.repository.testing.model.UserData;
 import com.google.code.guice.repository.testing.repo.UserDataRepository;
 import com.google.code.guice.repository.testing.repo.UserRepository;
 import com.google.inject.Inject;
+import org.junit.Assert;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -48,12 +49,14 @@ public class MultiPersistenceUnitsService {
         for (int i = 0; i < count; i++) {
             userRepository.save(new User("name" + i, "surname" + i, i));
         }
+        Assert.assertEquals("Invalid users count", count, userRepository.count());
     }
-
+    //TODO needed Smart Proxy to change transaction manager at runtime for single Guice TransactionInterceptor
     @Transactional("test-h2-secondary")
     public void generateUserData(int count) {
         for (int i = 0; i < count; i++) {
             userDataRepository.save(new UserData());
         }
+        Assert.assertEquals("Invalid users data count", count, userDataRepository.count());
     }
 }

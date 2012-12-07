@@ -19,6 +19,7 @@
 package com.google.code.guice.repository.configuration;
 
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.interceptor.TransactionInterceptor;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -43,6 +44,7 @@ public class PersistenceUnitConfiguration {
     private PlatformTransactionManager transactionManager;
     private String transactionManagerName;
     private boolean isDefault;
+    private TransactionInterceptor transactionInterceptor;
 
     /*===========================================[ CONSTRUCTORS ]=================*/
 
@@ -112,11 +114,7 @@ public class PersistenceUnitConfiguration {
 
         PersistenceUnitConfiguration persistenceUnitConfiguration = (PersistenceUnitConfiguration) obj;
 
-        if (name != null ? !name.equals(persistenceUnitConfiguration.name) : persistenceUnitConfiguration.name != null) {
-            return false;
-        }
-
-        return true;
+        return !(name != null ? !name.equals(persistenceUnitConfiguration.name) : persistenceUnitConfiguration.name != null);
     }
 
     @Override
@@ -133,5 +131,13 @@ public class PersistenceUnitConfiguration {
         sb.append(", transactionManagerName='").append(transactionManagerName).append('\'');
         sb.append('}');
         return sb.toString();
+    }
+
+    public TransactionInterceptor getTransactionInterceptor() {
+        return transactionInterceptor;
+    }
+
+    protected void setTransactionInterceptor(TransactionInterceptor transactionInterceptor) {
+        this.transactionInterceptor = transactionInterceptor;
     }
 }

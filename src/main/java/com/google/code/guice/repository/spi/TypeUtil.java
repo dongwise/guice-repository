@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository.support;
+package com.google.code.guice.repository.spi;
 
 import net.jcip.annotations.ThreadSafe;
 

@@ -18,10 +18,9 @@
 
 package com.google.code.guice.repository.configuration;
 
-import com.google.code.guice.repository.mapping.EntityManagerFactoryProvider;
-import com.google.code.guice.repository.mapping.EntityManagerProvider;
-import com.google.code.guice.repository.support.CompositeTransactionInterceptor;
-import com.google.code.guice.repository.support.CustomRepositoryImplementationResolver;
+import com.google.code.guice.repository.spi.CompositeTransactionInterceptor;
+import com.google.code.guice.repository.spi.CustomRepositoryImplementationResolver;
+import com.google.code.guice.repository.spi.PersistenceContextTypeListener;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 import com.google.inject.matcher.Matchers;
@@ -37,6 +36,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.AnnotationTransactionAttributeSource;
 import org.springframework.transaction.annotation.SpringTransactionAnnotationParser;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAttributeSource;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
 
 import javax.persistence.EntityManager;
@@ -81,7 +81,7 @@ public abstract class JpaRepositoryModule extends AbstractModule {
     /*===========================================[ STATIC VARIABLES ]=============*/
 
     public static final String P_PERSISTENCE_UNITS = "persistence-units";
-    public static final String PERSISTENCE_UNIT_SPLIT_REGEX = ",|;";
+    public static final String PERSISTENCE_UNITS_SPLIT_REGEX = ",|;";
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
@@ -102,7 +102,7 @@ public abstract class JpaRepositoryModule extends AbstractModule {
                 if (pPersistenceUnits == null) {
                     throw new IllegalStateException("Unable to instantiate JpaRepositoryModule: no persistence-unit-name specified");
                 } else {
-                    String[] splittedPersistenceUnits = pPersistenceUnits.split(PERSISTENCE_UNIT_SPLIT_REGEX);
+                    String[] splittedPersistenceUnits = pPersistenceUnits.split(PERSISTENCE_UNITS_SPLIT_REGEX);
                     if (splittedPersistenceUnits.length > 0) {
                         foundPersistenceUnits = splittedPersistenceUnits;
                     }
@@ -132,27 +132,34 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         String moduleName = simpleName.isEmpty() ? getClass().getName() : simpleName;
         logger.info(String.format("Configuring [%s] for persistence units: [%s]", moduleName, Arrays.asList(persistenceUnits)));
 
-        bind(EntityManagerFactory.class).toProvider(EntityManagerFactoryProvider.class).in(Scopes.SINGLETON);
-        bind(EntityManager.class).toProvider(EntityManagerProvider.class).in(Scopes.SINGLETON);
+        //bind(EntityManagerFactory.class).toProvider(EntityManagerFactoryProvider.class).in(Scopes.SINGLETON);
+        //bind(EntityManager.class).toProvider(EntityManagerProvider.class).in(Scopes.SINGLETON);
 
         bind(CustomRepositoryImplementationResolver.class).in(Scopes.SINGLETON);
 
         PersistenceUnitsConfigurationManager configurationManager = createPersistenceUnitsConfigurationManager(persistenceUnits);
         bind(PersistenceUnitsConfigurationManager.class).toInstance(configurationManager);
 
+        AnnotationTransactionAttributeSource tas = new AnnotationTransactionAttributeSource(new SpringTransactionAnnotationParser());
+        bind(TransactionAttributeSource.class).toInstance(tas);
+
         // Initializing Spring's Context
-        ApplicationContext applicationContext = createApplicationContext(configurationManager.getPersistenceUnitsConfigurations());
+        ApplicationContext applicationContext = createApplicationContext(configurationManager.getPersistenceUnitsConfigurations(), tas);
         bind(ApplicationContext.class).toInstance(applicationContext);
 
         // Only Spring's @Transactional annotation is supported
         //TODO: transactionInterceptor provider relative to persistence unit??
         // Setting default Transaction Manager
-        CompositeTransactionInterceptor compositeTransactionInterceptor = new CompositeTransactionInterceptor();
-        requestInjection(compositeTransactionInterceptor);
-        bindInterceptor(Matchers.any(), Matchers.annotatedWith(Transactional.class), compositeTransactionInterceptor);
-        bindInterceptor(Matchers.annotatedWith(Transactional.class), Matchers.any(), compositeTransactionInterceptor);
+        CompositeTransactionInterceptor transactionInterceptor = new CompositeTransactionInterceptor();
+        requestInjection(transactionInterceptor);
+        bindInterceptor(Matchers.any(), Matchers.annotatedWith(Transactional.class), transactionInterceptor);
+        bindInterceptor(Matchers.annotatedWith(Transactional.class), Matchers.any(), transactionInterceptor);
 
-        configureRepositories();
+        PersistenceContextTypeListener persistenceContextTypeListener = new PersistenceContextTypeListener();
+        requestInjection(persistenceContextTypeListener);
+
+        bindListener(Matchers.any(), persistenceContextTypeListener);
+        //bindRepositories();
         logger.info(String.format("[%s] configured", moduleName));
     }
 
@@ -170,7 +177,7 @@ public abstract class JpaRepositoryModule extends AbstractModule {
     }
 
     @SuppressWarnings("UnnecessaryLocalVariable")
-    protected ApplicationContext createApplicationContext(Collection<PersistenceUnitConfiguration> persistenceUnits) {
+    protected ApplicationContext createApplicationContext(Collection<PersistenceUnitConfiguration> persistenceUnits, TransactionAttributeSource tas) {
         GenericApplicationContext context = new GenericApplicationContext();
         // TODO http://blog.springsource.org/2011/04/26/advanced-spring-data-jpa-specifications-and-querydsl/#comment-198835
         //TODO customization for dialect & etc
@@ -184,8 +191,6 @@ public abstract class JpaRepositoryModule extends AbstractModule {
                         //addPropertyReference("jpaProperties", "jpaProperties").
                         //addPropertyValue("persistenceXmlLocation", "classpath:META-INF/persistence.xml").
                         setAbstract(true).getBeanDefinition());
-
-        AnnotationTransactionAttributeSource tas = new AnnotationTransactionAttributeSource(new SpringTransactionAnnotationParser());
 
         for (PersistenceUnitConfiguration configuration : persistenceUnits) {
             String persistenceUnitName = configuration.getName();
@@ -265,7 +270,7 @@ public abstract class JpaRepositoryModule extends AbstractModule {
     /**
      * Bind your repositories here.
      */
-    protected abstract void configureRepositories();
+    protected abstract void bindRepositories(RepositoryBinder binder);
 
     protected Logger getLogger() {
         return logger;

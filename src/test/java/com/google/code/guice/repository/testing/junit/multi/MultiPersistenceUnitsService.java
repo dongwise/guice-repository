@@ -51,12 +51,20 @@ public class MultiPersistenceUnitsService {
         }
         Assert.assertEquals("Invalid users count", count, userRepository.count());
     }
-    //TODO needed Smart Proxy to change transaction manager at runtime for single Guice TransactionInterceptor
+
     @Transactional("test-h2-secondary")
     public void generateUserData(int count) {
         for (int i = 0; i < count; i++) {
             userDataRepository.save(new UserData());
         }
         Assert.assertEquals("Invalid users data count", count, userDataRepository.count());
+    }
+
+    @Transactional(value = "test-h2-secondary", rollbackFor = Exception.class)
+    public void generateUserDataWithRollback(int count) throws Exception {
+        for (int i = 0; i < count; i++) {
+            userDataRepository.save(new UserData());
+        }
+        throw new Exception("Rollback UserData");
     }
 }

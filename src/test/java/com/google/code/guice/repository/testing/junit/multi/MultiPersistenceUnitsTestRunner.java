@@ -18,10 +18,12 @@
 
 package com.google.code.guice.repository.testing.junit.multi;
 
-import com.google.code.guice.repository.JpaRepositoryProvider;
 import com.google.code.guice.repository.configuration.JpaRepositoryModule;
+import com.google.code.guice.repository.configuration.RepositoryBinder;
 import com.google.code.guice.repository.testing.common.GuiceTestRunner;
-import com.google.code.guice.repository.testing.repo.*;
+import com.google.code.guice.repository.testing.repo.AccountRepository;
+import com.google.code.guice.repository.testing.repo.UserDataRepository;
+import com.google.code.guice.repository.testing.repo.UserRepository;
 import org.junit.runners.model.InitializationError;
 
 /**
@@ -32,24 +34,16 @@ import org.junit.runners.model.InitializationError;
  */
 public class MultiPersistenceUnitsTestRunner extends GuiceTestRunner {
 
-    /*===========================================[ STATIC VARIABLES ]=============*/
-
-    /*===========================================[ INSTANCE VARIABLES ]=========*/
-
     /*===========================================[ CONSTRUCTORS ]===============*/
-
-    /*===========================================[ CLASS METHODS ]==============*/
 
     public MultiPersistenceUnitsTestRunner(Class<?> classToRun) throws InitializationError {
         super(classToRun, new JpaRepositoryModule("test-h2", "test-h2-secondary") {
-                    @Override
-                    protected void configureRepositories() {
-                        bind(UserRepository.class).toProvider(new JpaRepositoryProvider<UserRepository>());
-                        bind(AccountRepository.class).toProvider(new JpaRepositoryProvider<AccountRepository>());
-                        bind(UserDataRepository.class).toProvider(new JpaRepositoryProvider<UserDataRepository>("test-h2-secondary"));
-                    }
-                }
-        );
+            @Override
+            protected void bindRepositories(RepositoryBinder binder) {
+                binder.bind(UserRepository.class);
+                binder.bind(AccountRepository.class);
+                binder.bind(UserDataRepository.class).attachedTo("test-h2-secondary");
+            }
+        });
     }
-
 }

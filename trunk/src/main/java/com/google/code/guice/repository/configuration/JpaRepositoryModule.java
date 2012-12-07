@@ -20,6 +20,7 @@ package com.google.code.guice.repository.configuration;
 
 import com.google.code.guice.repository.mapping.EntityManagerFactoryProvider;
 import com.google.code.guice.repository.mapping.EntityManagerProvider;
+import com.google.code.guice.repository.support.CompositeTransactionInterceptor;
 import com.google.code.guice.repository.support.CustomRepositoryImplementationResolver;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
@@ -144,16 +145,12 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         bind(ApplicationContext.class).toInstance(applicationContext);
 
         // Only Spring's @Transactional annotation is supported
-        AnnotationTransactionAttributeSource tas = new AnnotationTransactionAttributeSource(new SpringTransactionAnnotationParser());
         //TODO: transactionInterceptor provider relative to persistence unit??
         // Setting default Transaction Manager
-        PlatformTransactionManager defaultTransactionManager = configurationManager.getDefaultConfiguration().getTransactionManager();
-        TransactionInterceptor transactionInterceptor = new TransactionInterceptor(defaultTransactionManager, tas);
-        transactionInterceptor.setBeanFactory(applicationContext);
-        bind(TransactionInterceptor.class).toInstance(transactionInterceptor);
-
-        bindInterceptor(Matchers.any(), Matchers.annotatedWith(Transactional.class), transactionInterceptor);
-        bindInterceptor(Matchers.annotatedWith(Transactional.class), Matchers.any(), transactionInterceptor);
+        CompositeTransactionInterceptor compositeTransactionInterceptor = new CompositeTransactionInterceptor();
+        requestInjection(compositeTransactionInterceptor);
+        bindInterceptor(Matchers.any(), Matchers.annotatedWith(Transactional.class), compositeTransactionInterceptor);
+        bindInterceptor(Matchers.annotatedWith(Transactional.class), Matchers.any(), compositeTransactionInterceptor);
 
         configureRepositories();
         logger.info(String.format("[%s] configured", moduleName));
@@ -188,6 +185,7 @@ public abstract class JpaRepositoryModule extends AbstractModule {
                         //addPropertyValue("persistenceXmlLocation", "classpath:META-INF/persistence.xml").
                         setAbstract(true).getBeanDefinition());
 
+        AnnotationTransactionAttributeSource tas = new AnnotationTransactionAttributeSource(new SpringTransactionAnnotationParser());
 
         for (PersistenceUnitConfiguration configuration : persistenceUnits) {
             String persistenceUnitName = configuration.getName();
@@ -209,14 +207,20 @@ public abstract class JpaRepositoryModule extends AbstractModule {
 
             //TODO register first/default with name transactionManager, second - with persistenceUnitName
 
+
+            PlatformTransactionManager transactionManager = context.getBean(transactionManagerName, PlatformTransactionManager.class);
+            TransactionInterceptor transactionInterceptor = new TransactionInterceptor(transactionManager, tas);
+            transactionInterceptor.setBeanFactory(context);
+
             // Default bindings for EMF & Transaction Manager - they needed for repositories with @Transactional without value
             // Wiring components
             EntityManagerFactory emf = context.getBean(entityManagerFactoryName, EntityManagerFactory.class);
             EntityManager entityManager = SharedEntityManagerCreator.createSharedEntityManager(emf, props);
             configuration.setEntityManager(entityManager);
             configuration.setEntityManagerFactory(emf);
-            configuration.setTransactionManager(context.getBean(transactionManagerName, PlatformTransactionManager.class));
+            configuration.setTransactionManager(transactionManager);
             configuration.setTransactionManagerName(transactionManagerName);
+            configuration.setTransactionInterceptor(transactionInterceptor);
 
             if (configuration.isDefault()) {
                 //todo check if needed for transactional tests

@@ -30,6 +30,6 @@ public interface RepositoryBinder {
 
     RepositoryBinding bind(Class repositoryClass);
 
-    void bindRepositoryGroup(RepositoryGroup repositoryGroup);
+    void bindRepositoryGroup(RepositoriesGroup repositoriesGroup);
     //TODO: bind package with exclusions
 }

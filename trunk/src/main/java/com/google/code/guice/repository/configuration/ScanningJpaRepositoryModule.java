@@ -31,7 +31,6 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.PersistenceContext;
 import java.net.URL;
 import java.util.*;
 
@@ -57,7 +56,7 @@ public class ScanningJpaRepositoryModule extends JpaRepositoryModule {
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
-    private Collection<RepositoryGroup> repositoryGroups;
+    private Collection<RepositoriesGroup> repositoriesGroups;
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
@@ -66,19 +65,19 @@ public class ScanningJpaRepositoryModule extends JpaRepositoryModule {
      */
     public ScanningJpaRepositoryModule(String targetScanPackage, String... persistenceUnitName) {
         super(persistenceUnitName);
-        repositoryGroups = new ArrayList<RepositoryGroup>();
-        repositoryGroups.add(new RepositoryGroup(targetScanPackage, persistenceUnitsNames[0]));
+        repositoriesGroups = new ArrayList<RepositoriesGroup>();
+        repositoriesGroups.add(new RepositoriesGroup(targetScanPackage, persistenceUnitsNames[0]));
     }
 
-    public ScanningJpaRepositoryModule(Collection<RepositoryGroup> repositoryGroups) {
-        super(extractPersistenceUnitsNames(repositoryGroups));
-        this.repositoryGroups = Lists.newArrayList(repositoryGroups);
+    public ScanningJpaRepositoryModule(Collection<RepositoriesGroup> repositoriesGroups) {
+        super(extractPersistenceUnitsNames(repositoriesGroups));
+        this.repositoriesGroups = Lists.newArrayList(repositoriesGroups);
     }
 
-    private static String[] extractPersistenceUnitsNames(Collection<RepositoryGroup> repositoryGroups) {
+    private static String[] extractPersistenceUnitsNames(Collection<RepositoriesGroup> repositoriesGroups) {
         Collection<String> persistenceUnitsNames = new ArrayList<String>();
-        for (RepositoryGroup repositoryGroup : repositoryGroups) {
-            persistenceUnitsNames.add(repositoryGroup.getPersistenceUnitName());
+        for (RepositoriesGroup repositoriesGroup : repositoriesGroups) {
+            persistenceUnitsNames.add(repositoriesGroup.getPersistenceUnitName());
         }
 
         return persistenceUnitsNames.toArray(new String[persistenceUnitsNames.size()]);
@@ -88,11 +87,10 @@ public class ScanningJpaRepositoryModule extends JpaRepositoryModule {
     //TODO exclusion filter for AutoBind Test
     @Override
     protected void bindRepositories(RepositoryBinder binder) {
-        //TODO: check that all registered groups linked to already bound PersistenceUnits
-        for (RepositoryGroup repositoryGroup : repositoryGroups) {
+        for (RepositoriesGroup repositoriesGroup : repositoriesGroups) {
             Set<URL> urls = new HashSet<URL>();
-            Collection<String> packageNames = repositoryGroup.getPackageNames();
-            for (String packageName : packageNames) {
+            Collection<String> packagesToScan = repositoriesGroup.getRepositoriesPackages();
+            for (String packageName : packagesToScan) {
                 urls.addAll(ClasspathHelper.forPackage(packageName));
             }
 
@@ -119,12 +117,7 @@ public class ScanningJpaRepositoryModule extends JpaRepositoryModule {
                     Iterator<Class<?>> iterator = repoImplementations.iterator();
                     Class<?> implementation = iterator.hasNext() ? iterator.next() : null;
                     getLogger().info(String.format("Found repository: [%s]", repositoryClass.getName()));
-                    //TODO: resolving with annotation/top @Transactional
-                    String persistenceUnitName = repositoryGroup.getPersistenceUnitName();
-                    PersistenceContext persistenceContext = repositoryClass.getAnnotation(PersistenceContext.class);
-                    if (persistenceContext != null) {
-                        persistenceUnitName = persistenceContext.unitName();
-                    }
+                    String persistenceUnitName = repositoriesGroup.getPersistenceUnitName();
                     binder.bind(repositoryClass).withCustomImplementation(implementation).attachedTo(persistenceUnitName);
                 }
             }

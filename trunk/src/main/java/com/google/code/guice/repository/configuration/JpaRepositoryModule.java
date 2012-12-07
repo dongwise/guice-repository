@@ -18,7 +18,7 @@
 
 package com.google.code.guice.repository.configuration;
 
-import com.google.code.guice.repository.JpaRepositoryProvider;
+import com.google.code.guice.repository.spi.JpaRepositoryProvider;
 import com.google.code.guice.repository.spi.*;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
@@ -41,12 +41,12 @@ import org.springframework.transaction.interceptor.TransactionInterceptor;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceContext;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Properties;
-//TODO: think about WS usecase and PersistFilter
 
 /**
  * Guice module with Repository support. Repository bindings should be made in <code>configureRepositories</code>
@@ -132,9 +132,6 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         String moduleName = simpleName.isEmpty() ? getClass().getName() : simpleName;
         logger.info(String.format("Configuring [%s] for persistence units: %s", moduleName, Arrays.asList(persistenceUnitsNames)));
 
-        //bind(EntityManagerFactory.class).toProvider(EntityManagerFactoryProvider.class).in(Scopes.SINGLETON);
-        //bind(EntityManager.class).toProvider(EntityManagerProvider.class).in(Scopes.SINGLETON);
-
         bind(CustomRepositoryImplementationResolver.class).in(Scopes.SINGLETON);
 
         PersistenceUnitsConfigurationManager configurationManager = createPersistenceUnitsConfigurationManager(persistenceUnitsNames);
@@ -159,7 +156,12 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         requestInjection(persistenceContextTypeListener);
         bindListener(Matchers.any(), persistenceContextTypeListener);
 
-        // TODO
+        // Support for EntityManagerFactory with @PersistenceUnit injections
+        PersistenceUnitTypeListener persistenceUnitTypeListener = new PersistenceUnitTypeListener();
+        requestInjection(persistenceUnitTypeListener);
+        bindListener(Matchers.any(), persistenceUnitTypeListener);
+
+        // TODO rename
         DefaultRepositoryBinder repositoryBinder = createRepositoryBinder();
         bindRepositories(repositoryBinder);
 
@@ -168,6 +170,17 @@ public abstract class JpaRepositoryModule extends AbstractModule {
             Class<? extends Repository> repositoryClass = binding.getRepositoryClass();
             Class customRepositoryClass = binding.getCustomRepositoryClass();
             String persistenceUnitName = binding.getPersistenceUnitName();
+            String specificPersistenceUnitName = extractAnnotationsPersistenceUnitName(repositoryClass);
+
+            if (specificPersistenceUnitName != null && !specificPersistenceUnitName.isEmpty()) {
+                persistenceUnitName = specificPersistenceUnitName;
+            }
+
+            if (configurationManager.getPersistenceUnitConfiguration(persistenceUnitName) == null) {
+                throw new IllegalStateException(String.format("Unable to register repository [%s] - persistence unit [%s] is not registered",
+                        repositoryClass.getName(), persistenceUnitName));
+            }
+
             bind(repositoryClass).toProvider(new JpaRepositoryProvider(repositoryClass, customRepositoryClass, persistenceUnitName));
 
             logger.info(String.format("[%s] %s attached to [%s] available for injection",
@@ -177,6 +190,38 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         }
 
         logger.info(String.format("[%s] configured", moduleName));
+    }
+
+    protected String extractAnnotationsPersistenceUnitName(Class<? extends Repository> repositoryClass) {
+        String persistenceUnitName = null;
+        PersistenceContext persistenceContext = repositoryClass.getAnnotation(PersistenceContext.class);
+        if (persistenceContext != null) {
+            persistenceUnitName = persistenceContext.unitName();
+        }
+
+        boolean persistenceUnitNameFound = false;
+        boolean persistenceContextBased = false;
+        if (persistenceUnitName == null || persistenceUnitName.isEmpty()) {
+            Transactional annotation = repositoryClass.getAnnotation(Transactional.class);
+            if (annotation != null) {
+                persistenceUnitName = annotation.value();
+                if (!persistenceUnitName.isEmpty()) {
+                    persistenceUnitNameFound = true;
+                }
+            }
+        } else {
+            persistenceUnitNameFound = true;
+            persistenceContextBased = true;
+        }
+
+        if (persistenceUnitNameFound) {
+            logger.info(String.format("[%s] contains specified persistenceUnitName [%s] in %s annotation",
+                    repositoryClass.getName(),
+                    persistenceUnitName,
+                    persistenceContextBased ? "@PersistenceContext" : "@Transactional"));
+        }
+
+        return persistenceUnitName;
     }
 
     protected DefaultRepositoryBinder createRepositoryBinder() {
@@ -206,7 +251,7 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         context.registerBeanDefinition(abstractEMFBeanName, BeanDefinitionBuilder.
                 genericBeanDefinition(LocalContainerEntityManagerFactoryBean.class).
                 //addPropertyReference("jpaVendorAdapter", "jpaVendorAdapter").
-                        //addPropertyReference("jpaDialect", "jpaDialect").
+                //        addPropertyReference("jpaDialect", "jpaDialect").
                         //addPropertyValue("persistenceXmlLocation", "classpath:META-INF/persistence.xml").
                         setAbstract(true).getBeanDefinition());
 

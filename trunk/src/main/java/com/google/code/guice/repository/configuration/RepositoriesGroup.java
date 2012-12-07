@@ -31,29 +31,29 @@ import java.util.Collections;
  * @author Alexey Krylov (lexx)
  * @since 07.12.12
  */
-public class RepositoryGroup {
+public class RepositoriesGroup {
 
     /*===========================================[ INSTANCE VARIABLES ]===========*/
 
     private String persistenceUnitName;
-    private Collection<String> packageNames;
+    private Collection<String> repositoriesPackages;
 
     /*===========================================[ CLASS METHODS ]================*/
 
-    public RepositoryGroup(String packageName, String persistenceUnitName) {
-        packageNames = Arrays.asList(packageName);
+    protected RepositoriesGroup(String repositoriesPackage, String persistenceUnitName) {
+        repositoriesPackages = Arrays.asList(repositoriesPackage);
         this.persistenceUnitName = persistenceUnitName;
     }
 
-    public RepositoryGroup(Collection<String> packageNames, String persistenceUnitName) {
-        this.packageNames = new ArrayList<String>(packageNames);
+    protected RepositoriesGroup(Collection<String> repositoriesPackages, String persistenceUnitName) {
+        this.repositoriesPackages = new ArrayList<String>(repositoriesPackages);
         this.persistenceUnitName = persistenceUnitName;
     }
 
     /*===========================================[ CONSTRUCTORS ]=================*/
 
-    public Collection<String> getPackageNames() {
-        return Collections.unmodifiableCollection(packageNames);
+    public Collection<String> getRepositoriesPackages() {
+        return Collections.unmodifiableCollection(repositoriesPackages);
     }
 
     public String getPersistenceUnitName() {

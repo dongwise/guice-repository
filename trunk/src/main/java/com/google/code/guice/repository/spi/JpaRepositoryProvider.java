@@ -16,14 +16,11 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository;
+package com.google.code.guice.repository.spi;
 
 import com.google.code.guice.repository.configuration.PersistenceUnitConfiguration;
 import com.google.code.guice.repository.configuration.PersistenceUnitsConfigurationManager;
 import com.google.code.guice.repository.configuration.ScanningJpaRepositoryModule;
-import com.google.code.guice.repository.spi.CustomJpaRepositoryFactoryBean;
-import com.google.code.guice.repository.spi.CustomRepositoryImplementationResolver;
-import com.google.code.guice.repository.spi.TypeUtil;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.inject.*;
@@ -87,7 +84,6 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
     private PersistenceUnitsConfigurationManager configurationManager;
 
     /*===========================================[ CONSTRUCTORS ]===============*/
-
 
     /**
      * Default constructor.
@@ -227,6 +223,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
 
     protected Object instantiateCustomRepository(EntityManager entityManager) {
         Object customRepositoryImplementation = null;
+        //TODO instantiate with guice to allow injections
         /**
          * Watching a case when Repository implementation is a SimpleJpaRepository subclass -
          * we need to call a constructor with some parameters.

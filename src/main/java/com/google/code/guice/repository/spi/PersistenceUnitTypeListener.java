@@ -25,8 +25,8 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceUnit;
 import java.lang.reflect.Field;
 
 /**
@@ -35,7 +35,7 @@ import java.lang.reflect.Field;
  * @author Alexey Krylov (lexx)
  * @since 07.12.12
  */
-public class PersistenceContextTypeListener implements TypeListener {
+public class PersistenceUnitTypeListener implements TypeListener {
 
     /*===========================================[ INSTANCE VARIABLES ]===========*/
 
@@ -48,12 +48,12 @@ public class PersistenceContextTypeListener implements TypeListener {
     public <T> void hear(TypeLiteral<T> type, TypeEncounter<T> encounter) {
         for (Class<?> c = type.getRawType(); !c.equals(Object.class); c = c.getSuperclass()) {
             for (Field field : c.getDeclaredFields()) {
-                if (field.getType().equals(EntityManager.class)
-                        && field.isAnnotationPresent(PersistenceContext.class)) {
-                    PersistenceContext persistenceContext = field.getAnnotation(PersistenceContext.class);
-                    String persistenceUnitName = persistenceContext.unitName();
+                if (field.getType().equals(EntityManagerFactory.class)
+                        && field.isAnnotationPresent(PersistenceUnit.class)) {
+                    PersistenceUnit persistenceUnit = field.getAnnotation(PersistenceUnit.class);
+                    String persistenceUnitName = persistenceUnit.unitName();
                     PersistenceUnitConfiguration configuration = configurationManager.getPersistenceUnitConfiguration(persistenceUnitName);
-                    encounter.register(new EntityManagerMembersInjector<T>(field, configuration.getEntityManager()));
+                    encounter.register(new EntityManagerFactoryMembersInjector<T>(field, configuration.getEntityManagerFactory()));
                 }
             }
         }

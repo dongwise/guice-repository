@@ -18,9 +18,10 @@
 
 package com.google.code.guice.repository.testing.runner;
 
-import com.google.code.guice.repository.configuration.RepositoryGroup;
+import com.google.code.guice.repository.configuration.RepositoriesGroupBuilder;
 import com.google.code.guice.repository.configuration.ScanningJpaRepositoryModule;
 import com.google.code.guice.repository.testing.common.GuiceTestRunner;
+import com.google.code.guice.repository.testing.repo.UserDataRepository;
 import org.junit.runners.model.InitializationError;
 
 import java.util.Arrays;
@@ -31,6 +32,11 @@ public class AutoBindRepoTestRunner extends GuiceTestRunner {
     /*===========================================[ CLASS METHODS ]==============*/
 
     public AutoBindRepoTestRunner(Class<?> classToRun) throws InitializationError {
-        super(classToRun, new ScanningJpaRepositoryModule(Arrays.asList(new RepositoryGroup("com.google.code.guice.repository.testing.repo", "test-h2"))));
+        super(classToRun, new ScanningJpaRepositoryModule(
+                Arrays.asList(
+                        RepositoriesGroupBuilder.forPackage("com.google.code.guice.repository.testing.repo").
+                                withExclusionsPattern(".*" + UserDataRepository.class.getSimpleName() + ".*").
+                                attachedTo("test-h2").
+                                build())));
     }
 }

@@ -18,9 +18,9 @@
 
 package com.google.code.guice.repository.spi;
 
+import com.google.code.guice.repository.configuration.RepositoriesGroup;
 import com.google.code.guice.repository.configuration.RepositoryBinder;
 import com.google.code.guice.repository.configuration.RepositoryBinding;
-import com.google.code.guice.repository.configuration.RepositoryGroup;
 import org.springframework.util.Assert;
 
 import java.util.ArrayList;
@@ -49,7 +49,7 @@ public class DefaultRepositoryBinder implements RepositoryBinder {
     /*===========================================[ CLASS METHODS ]================*/
 
     @Override
-    public void bindRepositoryGroup(RepositoryGroup repositoryGroup) {
+    public void bindRepositoryGroup(RepositoriesGroup repositoriesGroup) {
 
     }
 

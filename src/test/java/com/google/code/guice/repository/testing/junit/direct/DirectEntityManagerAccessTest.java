@@ -46,7 +46,6 @@ public class DirectEntityManagerAccessTest {
     @PersistenceContext(unitName = "test-h2-secondary")
     private EntityManager secondaryEntityManager;
 
-    //TODO
     /*===========================================[ CLASS METHODS ]================*/
 
     @Test
@@ -54,7 +53,7 @@ public class DirectEntityManagerAccessTest {
     public void testPrimaryEntityManager() {
         entityManager.persist(new User());
         List resultList = entityManager.createQuery("from User").getResultList();
-        Assert.assertEquals(1, resultList.size());
+        Assert.assertEquals("No users found", 1, resultList.size());
     }
 
     @Test
@@ -62,6 +61,6 @@ public class DirectEntityManagerAccessTest {
     public void testSecondaryEntityManager() {
         secondaryEntityManager.persist(new UserData());
         List resultList = secondaryEntityManager.createQuery("from UserData").getResultList();
-        Assert.assertEquals(1, resultList.size());
+        Assert.assertEquals("No users data found", 1, resultList.size());
     }
 }

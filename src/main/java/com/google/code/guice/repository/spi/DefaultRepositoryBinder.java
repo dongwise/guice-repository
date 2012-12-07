@@ -20,7 +20,7 @@ package com.google.code.guice.repository.spi;
 
 import com.google.code.guice.repository.configuration.RepositoryBinder;
 import com.google.code.guice.repository.configuration.RepositoryBinding;
-import org.springframework.data.repository.Repository;
+import com.google.code.guice.repository.configuration.RepositoryGroup;
 import org.springframework.util.Assert;
 
 import java.util.ArrayList;
@@ -38,25 +38,30 @@ public class DefaultRepositoryBinder implements RepositoryBinder {
 
     /*===========================================[ INSTANCE VARIABLES ]===========*/
 
-    private Collection<RepositoryBinding> bindings;
+    private Collection<AccessibleRepositoryBinding> bindings;
 
     /*===========================================[ CONSTRUCTORS ]=================*/
 
     public DefaultRepositoryBinder() {
-        bindings = new ArrayList<RepositoryBinding>();
+        bindings = new ArrayList<AccessibleRepositoryBinding>();
     }
 
     /*===========================================[ CLASS METHODS ]================*/
 
     @Override
-    public RepositoryBinding bind(Class<? extends Repository> repositoryClass) {
+    public void bindRepositoryGroup(RepositoryGroup repositoryGroup) {
+
+    }
+
+    @Override
+    public RepositoryBinding bind(Class repositoryClass) {
         Assert.notNull(repositoryClass);
-        RepositoryBinding binding = new DefaultRepositoryBinding(repositoryClass);
+        AccessibleRepositoryBinding binding = new AccessibleRepositoryBinding(repositoryClass);
         bindings.add(binding);
         return binding;
     }
 
-    public Collection<RepositoryBinding> getBindings() {
+    public Collection<AccessibleRepositoryBinding> getBindings() {
         return Collections.unmodifiableCollection(bindings);
     }
 }

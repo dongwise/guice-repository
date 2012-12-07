@@ -19,7 +19,6 @@
 package com.google.code.guice.repository.spi;
 
 import com.google.code.guice.repository.configuration.RepositoryBinding;
-import org.springframework.data.repository.Repository;
 import org.springframework.util.Assert;
 
 /**
@@ -28,38 +27,40 @@ import org.springframework.util.Assert;
  * @author Alexey Krylov (lexx)
  * @since 07.12.12
  */
-public class DefaultRepositoryBinding implements RepositoryBinding {
+public class AccessibleRepositoryBinding implements RepositoryBinding {
 /*===========================================[ STATIC VARIABLES ]=============*/
 /*===========================================[ INSTANCE VARIABLES ]===========*/
     private String persistenceUnitName;
-    private Class<? extends Repository> repositoryClass;
+    private Class repositoryClass;
     private Class customRepositoryClass;
 /*===========================================[ CONSTRUCTORS ]=================*/
 
-    protected DefaultRepositoryBinding(Class<? extends Repository> repositoryClass) {
+    protected AccessibleRepositoryBinding(Class repositoryClass) {
         this.repositoryClass = repositoryClass;
     }
     /*===========================================[ CLASS METHODS ]================*/
 
     @Override
     public RepositoryBinding withCustomImplementation(Class customRepositoryClass) {
-        Assert.notNull(customRepositoryClass);
         this.customRepositoryClass = customRepositoryClass;
         return this;
     }
 
     @Override
     public RepositoryBinding attachedTo(String persistenceUnitName) {
-        Assert.notNull(persistenceUnitName);
         this.persistenceUnitName = persistenceUnitName;
         return this;
     }
 
-    public String getPersistenceUnitName() {
-        return persistenceUnitName;
+    public Class getRepositoryClass() {
+        return repositoryClass;
     }
 
     public Class getCustomRepositoryClass() {
         return customRepositoryClass;
+    }
+
+    public String getPersistenceUnitName() {
+        return persistenceUnitName;
     }
 }

@@ -31,7 +31,7 @@ public interface AccountRepository extends JpaRepository<Account, Long>,
 2. Install a Guice-module
 install(new JpaRepositoryModule("my-persistence-unit") {
             @Override
-            protected void configureRepositories() {
+            protected void bindRepositories() {
                 bind(AccountRepository.class).toProvider(new JpaRepositoryProvider<AccountRepository>());
             }
         });

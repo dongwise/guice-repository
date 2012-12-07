@@ -18,9 +18,8 @@
 
 package com.google.code.guice.repository.configuration;
 
-import com.google.code.guice.repository.spi.CompositeTransactionInterceptor;
-import com.google.code.guice.repository.spi.CustomRepositoryImplementationResolver;
-import com.google.code.guice.repository.spi.PersistenceContextTypeListener;
+import com.google.code.guice.repository.JpaRepositoryProvider;
+import com.google.code.guice.repository.spi.*;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 import com.google.inject.matcher.Matchers;
@@ -29,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.data.repository.Repository;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.SharedEntityManagerCreator;
@@ -86,17 +86,17 @@ public abstract class JpaRepositoryModule extends AbstractModule {
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
     private Logger logger;
-    private String[] persistenceUnits;
+    protected String[] persistenceUnitsNames;
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
-    protected JpaRepositoryModule(String... persistenceUnits) {
+    protected JpaRepositoryModule(String... persistenceUnitsNames) {
         logger = LoggerFactory.getLogger(getClass());
-        String[] foundPersistenceUnits = null;
-        if (persistenceUnits.length > 0) {
-            foundPersistenceUnits = Arrays.copyOf(persistenceUnits, persistenceUnits.length);
+        String[] foundPersistenceUnitsNames = null;
+        if (persistenceUnitsNames.length > 0) {
+            foundPersistenceUnitsNames = Arrays.copyOf(persistenceUnitsNames, persistenceUnitsNames.length);
         } else {
-            Collection<String> cPersistenceUnits = getPersistenceUnits();
+            Collection<String> cPersistenceUnits = getPersistenceUnitsNames();
             if (cPersistenceUnits == null) {
                 String pPersistenceUnits = System.getProperty(P_PERSISTENCE_UNITS);
                 if (pPersistenceUnits == null) {
@@ -104,15 +104,15 @@ public abstract class JpaRepositoryModule extends AbstractModule {
                 } else {
                     String[] splittedPersistenceUnits = pPersistenceUnits.split(PERSISTENCE_UNITS_SPLIT_REGEX);
                     if (splittedPersistenceUnits.length > 0) {
-                        foundPersistenceUnits = splittedPersistenceUnits;
+                        foundPersistenceUnitsNames = splittedPersistenceUnits;
                     }
                 }
             } else {
-                foundPersistenceUnits = cPersistenceUnits.toArray(new String[cPersistenceUnits.size()]);
+                foundPersistenceUnitsNames = cPersistenceUnits.toArray(new String[cPersistenceUnits.size()]);
             }
         }
 
-        this.persistenceUnits = foundPersistenceUnits;
+        this.persistenceUnitsNames = foundPersistenceUnitsNames;
     }
 
     /*===========================================[ CLASS METHODS ]==============*/
@@ -122,7 +122,7 @@ public abstract class JpaRepositoryModule extends AbstractModule {
      *
      * @return persistence-unit name.
      */
-    protected Collection<String> getPersistenceUnits() {
+    protected Collection<String> getPersistenceUnitsNames() {
         return null;
     }
 
@@ -130,37 +130,57 @@ public abstract class JpaRepositoryModule extends AbstractModule {
     protected void configure() {
         String simpleName = getClass().getSimpleName();
         String moduleName = simpleName.isEmpty() ? getClass().getName() : simpleName;
-        logger.info(String.format("Configuring [%s] for persistence units: [%s]", moduleName, Arrays.asList(persistenceUnits)));
+        logger.info(String.format("Configuring [%s] for persistence units: %s", moduleName, Arrays.asList(persistenceUnitsNames)));
 
         //bind(EntityManagerFactory.class).toProvider(EntityManagerFactoryProvider.class).in(Scopes.SINGLETON);
         //bind(EntityManager.class).toProvider(EntityManagerProvider.class).in(Scopes.SINGLETON);
 
         bind(CustomRepositoryImplementationResolver.class).in(Scopes.SINGLETON);
 
-        PersistenceUnitsConfigurationManager configurationManager = createPersistenceUnitsConfigurationManager(persistenceUnits);
+        PersistenceUnitsConfigurationManager configurationManager = createPersistenceUnitsConfigurationManager(persistenceUnitsNames);
         bind(PersistenceUnitsConfigurationManager.class).toInstance(configurationManager);
 
+        // Only Spring @Transactional annotation is supported
         AnnotationTransactionAttributeSource tas = new AnnotationTransactionAttributeSource(new SpringTransactionAnnotationParser());
         bind(TransactionAttributeSource.class).toInstance(tas);
 
-        // Initializing Spring's Context
+        // Initializing Spring Context
         ApplicationContext applicationContext = createApplicationContext(configurationManager.getPersistenceUnitsConfigurations(), tas);
         bind(ApplicationContext.class).toInstance(applicationContext);
 
-        // Only Spring's @Transactional annotation is supported
-        //TODO: transactionInterceptor provider relative to persistence unit??
-        // Setting default Transaction Manager
+        // Initializing interceptor for components created by Guice and marked with @Transactional
         CompositeTransactionInterceptor transactionInterceptor = new CompositeTransactionInterceptor();
         requestInjection(transactionInterceptor);
         bindInterceptor(Matchers.any(), Matchers.annotatedWith(Transactional.class), transactionInterceptor);
         bindInterceptor(Matchers.annotatedWith(Transactional.class), Matchers.any(), transactionInterceptor);
 
+        // Support for EntityManager with @PersistenceContext injections
         PersistenceContextTypeListener persistenceContextTypeListener = new PersistenceContextTypeListener();
         requestInjection(persistenceContextTypeListener);
-
         bindListener(Matchers.any(), persistenceContextTypeListener);
-        //bindRepositories();
+
+        // TODO
+        DefaultRepositoryBinder repositoryBinder = createRepositoryBinder();
+        bindRepositories(repositoryBinder);
+
+        Collection<AccessibleRepositoryBinding> bindings = repositoryBinder.getBindings();
+        for (AccessibleRepositoryBinding binding : bindings) {
+            Class<? extends Repository> repositoryClass = binding.getRepositoryClass();
+            Class customRepositoryClass = binding.getCustomRepositoryClass();
+            String persistenceUnitName = binding.getPersistenceUnitName();
+            bind(repositoryClass).toProvider(new JpaRepositoryProvider(repositoryClass, customRepositoryClass, persistenceUnitName));
+
+            logger.info(String.format("[%s] %s attached to [%s] available for injection",
+                    repositoryClass.getName(),
+                    customRepositoryClass != null ? "(" + customRepositoryClass.getName() + ")" : "",
+                    persistenceUnitName));
+        }
+
         logger.info(String.format("[%s] configured", moduleName));
+    }
+
+    protected DefaultRepositoryBinder createRepositoryBinder() {
+        return new DefaultRepositoryBinder();
     }
 
     protected PersistenceUnitsConfigurationManager createPersistenceUnitsConfigurationManager(String... persistenceUnits) {
@@ -187,8 +207,6 @@ public abstract class JpaRepositoryModule extends AbstractModule {
                 genericBeanDefinition(LocalContainerEntityManagerFactoryBean.class).
                 //addPropertyReference("jpaVendorAdapter", "jpaVendorAdapter").
                         //addPropertyReference("jpaDialect", "jpaDialect").
-                        //addPropertyReference("dataSource", "dataSource").
-                        //addPropertyReference("jpaProperties", "jpaProperties").
                         //addPropertyValue("persistenceXmlLocation", "classpath:META-INF/persistence.xml").
                         setAbstract(true).getBeanDefinition());
 
@@ -202,7 +220,6 @@ public abstract class JpaRepositoryModule extends AbstractModule {
 
             context.registerBeanDefinition(entityManagerFactoryName,
                     BeanDefinitionBuilder.genericBeanDefinition().setParentName(abstractEMFBeanName).
-
                             addPropertyValue("persistenceUnitName", persistenceUnitName).
                             addPropertyValue("jpaProperties", props).getBeanDefinition());
 
@@ -210,14 +227,10 @@ public abstract class JpaRepositoryModule extends AbstractModule {
                     BeanDefinitionBuilder.genericBeanDefinition(JpaTransactionManager.class).
                             addPropertyReference("entityManagerFactory", entityManagerFactoryName).getBeanDefinition());
 
-            //TODO register first/default with name transactionManager, second - with persistenceUnitName
-
-
             PlatformTransactionManager transactionManager = context.getBean(transactionManagerName, PlatformTransactionManager.class);
             TransactionInterceptor transactionInterceptor = new TransactionInterceptor(transactionManager, tas);
             transactionInterceptor.setBeanFactory(context);
 
-            // Default bindings for EMF & Transaction Manager - they needed for repositories with @Transactional without value
             // Wiring components
             EntityManagerFactory emf = context.getBean(entityManagerFactoryName, EntityManagerFactory.class);
             EntityManager entityManager = SharedEntityManagerCreator.createSharedEntityManager(emf, props);
@@ -227,8 +240,8 @@ public abstract class JpaRepositoryModule extends AbstractModule {
             configuration.setTransactionManagerName(transactionManagerName);
             configuration.setTransactionInterceptor(transactionInterceptor);
 
+            // Default bindings for EMF & Transaction Manager - they needed for repositories with @Transactional without value
             if (configuration.isDefault()) {
-                //todo check if needed for transactional tests
                 context.registerAlias(entityManagerFactoryName, "entityManagerFactory");
                 context.registerAlias(persistenceUnitName, "transactionManager");
             }

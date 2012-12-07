@@ -18,8 +18,6 @@
 
 package com.google.code.guice.repository.configuration;
 
-import org.springframework.data.repository.Repository;
-
 /**
  * RepositoryBinder - TODO: description
  *
@@ -30,5 +28,8 @@ public interface RepositoryBinder {
 
     /*===========================================[ INTERFACE METHODS ]==============*/
 
-    RepositoryBinding bind(Class<? extends Repository> repositoryClass);
+    RepositoryBinding bind(Class repositoryClass);
+
+    void bindRepositoryGroup(RepositoryGroup repositoryGroup);
+    //TODO: bind package with exclusions
 }

@@ -59,7 +59,7 @@ public class PersistenceUnitConfiguration {
     }
 
     public Properties getProperties() {
-        return properties;
+        return (Properties) properties.clone();
     }
 
     public EntityManager getEntityManager() {

@@ -27,6 +27,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.UUID;
 
@@ -39,7 +41,11 @@ import java.util.UUID;
 @RunWith(MultiPersistenceUnitsTestRunner.class)
 public class MultiPersistenceUnitsTest {
 
-    /*===========================================[ INSTANCE VARIABLES ]=========*/
+    /*===========================================[ STATIC VARIABLES ]=============*/
+
+    private static final Logger logger = LoggerFactory.getLogger(MultiPersistenceUnitsTest.class);
+
+    /*===========================================[ INSTANCE VARIABLES ]==========*/
 
     @Inject
     private UserRepository userRepository;
@@ -50,7 +56,7 @@ public class MultiPersistenceUnitsTest {
     @Inject
     private MultiPersistenceUnitsService multiPersistenceUnitsService;
 
-    /*===========================================[ CLASS METHODS ]==============*/
+    /*===========================================[ CLASS METHODS ]===============*/
 
     @Before
     public void before() {
@@ -65,6 +71,12 @@ public class MultiPersistenceUnitsTest {
         multiPersistenceUnitsService.generateUserData(count);
         Assert.assertEquals("Invalid generated users count", count, userRepository.count());
         Assert.assertEquals("Invalid generated user data count", count, userDataRepository.count());
+        try {
+            multiPersistenceUnitsService.generateUserDataWithRollback(100);
+        } catch (Exception e) {
+            logger.error("Error", e);
+        }
+        Assert.assertEquals("Invalid generated user data count after rollback", count, userDataRepository.count());
         userRepository.deleteAll();
         userDataRepository.deleteAll();
     }

@@ -16,29 +16,31 @@
  * limitations under the License.
  */
 
-package com.google.code.guice.repository.testing.runner;
+package com.google.code.guice.repository.testing.junit.direct;
 
 import com.google.code.guice.repository.configuration.JpaRepositoryModule;
 import com.google.code.guice.repository.configuration.RepositoryBinder;
 import com.google.code.guice.repository.testing.common.GuiceTestRunner;
-import com.google.code.guice.repository.testing.repo.AccountRepository;
-import com.google.code.guice.repository.testing.repo.CustomerRepository;
-import com.google.code.guice.repository.testing.repo.CustomerRepositoryImpl;
-import com.google.code.guice.repository.testing.repo.UserRepository;
 import org.junit.runners.model.InitializationError;
 
-public class ManualBindRepoTestRunner extends GuiceTestRunner {
+/**
+ * DirectEntityManagerTestRunner - TODO: description
+ *
+ * @author Alexey Krylov (lexx)
+ * @since 07.12.12
+ */
+public class DirectEntityManagerTestRunner extends GuiceTestRunner {
 
-    /*===========================================[ CLASS METHODS ]==============*/
+    /*===========================================[ CONSTRUCTORS ]===============*/
 
-    public ManualBindRepoTestRunner(Class<?> classToRun) throws InitializationError {
-        super(classToRun, new JpaRepositoryModule("test-h2") {
+    public DirectEntityManagerTestRunner(Class<?> classToRun) throws InitializationError {
+        super(classToRun, new JpaRepositoryModule("test-h2", "test-h2-secondary") {
             @Override
             protected void bindRepositories(RepositoryBinder binder) {
-                binder.bind(UserRepository.class);
-                binder.bind(AccountRepository.class);
-                binder.bind(CustomerRepository.class).withCustomImplementation(CustomerRepositoryImpl.class);
+
             }
-        });
+        }
+        );
     }
 }
+

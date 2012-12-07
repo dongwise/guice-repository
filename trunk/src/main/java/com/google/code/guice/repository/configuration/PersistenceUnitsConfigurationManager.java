@@ -18,6 +18,7 @@
 
 package com.google.code.guice.repository.configuration;
 
+import com.google.code.guice.repository.configuration.PersistenceUnitConfiguration;
 import net.jcip.annotations.ThreadSafe;
 
 import java.util.Collection;
@@ -57,7 +58,7 @@ public class PersistenceUnitsConfigurationManager {
     }
 
     public PersistenceUnitConfiguration getPersistenceUnitConfiguration(String persistenceUnitName) {
-        if (persistenceUnitName == null) {
+        if (persistenceUnitName == null || persistenceUnitName.isEmpty()) {
             return defaultConfiguration;
         } else {
             return configurations.get(persistenceUnitName);

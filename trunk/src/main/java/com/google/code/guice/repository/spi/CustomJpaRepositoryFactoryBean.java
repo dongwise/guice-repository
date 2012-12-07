@@ -3,7 +3,7 @@
  * Use is subject to license terms.
  */
 
-package com.google.code.guice.repository.support;
+package com.google.code.guice.repository.spi;
 
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;

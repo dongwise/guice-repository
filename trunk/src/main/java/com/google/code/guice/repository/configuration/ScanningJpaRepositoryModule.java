@@ -79,8 +79,7 @@ public class ScanningJpaRepositoryModule extends JpaRepositoryModule {
     /*===========================================[ CLASS METHODS ]==============*/
 
     @Override
-    protected void configureRepositories() {
-
+    protected void bindRepositories(RepositoryBinder binder) {
         Set<URL> urls = new HashSet<URL>();
 
         for (String targetScanPackage : targetScanPackages) {

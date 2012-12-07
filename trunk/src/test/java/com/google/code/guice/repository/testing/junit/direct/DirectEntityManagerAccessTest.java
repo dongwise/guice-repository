@@ -18,15 +18,50 @@
 
 package com.google.code.guice.repository.testing.junit.direct;
 
+import com.google.code.guice.repository.testing.model.User;
+import com.google.code.guice.repository.testing.model.UserData;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import java.util.List;
+
 /**
  * DirectEntityManagerAccessTest - TODO: description
  *
  * @author Alexey Krylov (lexx)
  * @since 06.12.12
  */
+@RunWith(DirectEntityManagerTestRunner.class)
 public class DirectEntityManagerAccessTest {
-/*===========================================[ STATIC VARIABLES ]=============*/
-/*===========================================[ INSTANCE VARIABLES ]===========*/
-/*===========================================[ CONSTRUCTORS ]=================*/
-/*===========================================[ CLASS METHODS ]================*/
+
+    /*===========================================[ INSTANCE VARIABLES ]===========*/
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    @PersistenceContext(unitName = "test-h2-secondary")
+    private EntityManager secondaryEntityManager;
+
+    //TODO
+    /*===========================================[ CLASS METHODS ]================*/
+
+    @Test
+    @Transactional
+    public void testPrimaryEntityManager() {
+        entityManager.persist(new User());
+        List resultList = entityManager.createQuery("from User").getResultList();
+        Assert.assertEquals(1, resultList.size());
+    }
+
+    @Test
+    @Transactional("test-h2-secondary")
+    public void testSecondaryEntityManager() {
+        secondaryEntityManager.persist(new UserData());
+        List resultList = secondaryEntityManager.createQuery("from UserData").getResultList();
+        Assert.assertEquals(1, resultList.size());
+    }
 }

@@ -22,6 +22,9 @@ import com.google.code.guice.repository.BatchStoreJpaRepository;
 import com.google.code.guice.repository.EntityManagerProvider;
 import com.google.code.guice.repository.testing.model.UserData;
 
+import javax.persistence.PersistenceContext;
+
+@PersistenceContext(unitName = "test-h2-secondary")
 public interface UserDataRepository extends BatchStoreJpaRepository<UserData, Long>,
         EntityManagerProvider {
 }

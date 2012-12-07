@@ -18,15 +18,19 @@
 
 package com.google.code.guice.repository.testing.runner;
 
+import com.google.code.guice.repository.configuration.RepositoryGroup;
 import com.google.code.guice.repository.configuration.ScanningJpaRepositoryModule;
 import com.google.code.guice.repository.testing.common.GuiceTestRunner;
 import org.junit.runners.model.InitializationError;
 
+import java.util.Arrays;
+
+//TODO: scanning with multiple repo
 public class AutoBindRepoTestRunner extends GuiceTestRunner {
 
     /*===========================================[ CLASS METHODS ]==============*/
 
     public AutoBindRepoTestRunner(Class<?> classToRun) throws InitializationError {
-        super(classToRun, new ScanningJpaRepositoryModule("com.google.code.guice.repository.testing.repo", "test-h2"));
+        super(classToRun, new ScanningJpaRepositoryModule(Arrays.asList(new RepositoryGroup("com.google.code.guice.repository.testing.repo", "test-h2"))));
     }
 }

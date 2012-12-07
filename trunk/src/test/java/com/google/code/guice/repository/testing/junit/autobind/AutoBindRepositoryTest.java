@@ -21,8 +21,10 @@ package com.google.code.guice.repository.testing.junit.autobind;
 import com.google.code.guice.repository.testing.model.Account;
 import com.google.code.guice.repository.testing.model.Customer;
 import com.google.code.guice.repository.testing.model.User;
+import com.google.code.guice.repository.testing.model.UserData;
 import com.google.code.guice.repository.testing.repo.AccountRepository;
 import com.google.code.guice.repository.testing.repo.CustomerRepository;
+import com.google.code.guice.repository.testing.repo.UserDataRepository;
 import com.google.code.guice.repository.testing.repo.UserRepository;
 import com.google.code.guice.repository.testing.runner.AutoBindRepoTestRunner;
 import org.junit.Test;
@@ -34,7 +36,6 @@ import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-@SuppressWarnings({"MagicNumber"})
 @RunWith(AutoBindRepoTestRunner.class)
 public class AutoBindRepositoryTest {
 
@@ -48,6 +49,9 @@ public class AutoBindRepositoryTest {
 
     @Inject
     private CustomerRepository customerRepository;
+
+    @Inject
+    private UserDataRepository userDataRepository;
 
     /*===========================================[ CLASS METHODS ]==============*/
 
@@ -79,5 +83,13 @@ public class AutoBindRepositoryTest {
         assertEquals("Invalid repository size", 1, customerRepository.count());
         customerRepository.deleteAll();
         assertEquals("Invalid repository size", 0, customerRepository.count());
+    }
+
+    @Test
+    public void testUserDataRepository() {
+        userDataRepository.save(new UserData());
+        assertEquals("Invalid repository size", 1, userDataRepository.count());
+        userDataRepository.deleteAll();
+        assertEquals("Invalid repository size", 0, userDataRepository.count());
     }
 }

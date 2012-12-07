@@ -19,7 +19,6 @@
 package com.google.code.guice.repository.configuration;
 
 import com.google.code.guice.repository.BatchStoreJpaRepository;
-import com.google.code.guice.repository.JpaRepositoryProvider;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import org.reflections.Reflections;
@@ -32,6 +31,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.PersistenceContext;
 import java.net.URL;
 import java.util.*;
 
@@ -52,11 +52,12 @@ import static com.google.common.collect.Collections2.filter;
  * @version 1.0.0
  * @since 10.04.2012
  */
+@SuppressWarnings("CollectionContainsUrl")
 public class ScanningJpaRepositoryModule extends JpaRepositoryModule {
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
-    private Iterable<String> targetScanPackages;
+    private Collection<RepositoryGroup> repositoryGroups;
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
@@ -65,63 +66,87 @@ public class ScanningJpaRepositoryModule extends JpaRepositoryModule {
      */
     public ScanningJpaRepositoryModule(String targetScanPackage, String... persistenceUnitName) {
         super(persistenceUnitName);
-        targetScanPackages = Arrays.asList(targetScanPackage);
+        repositoryGroups = new ArrayList<RepositoryGroup>();
+        repositoryGroups.add(new RepositoryGroup(targetScanPackage, persistenceUnitsNames[0]));
     }
 
-    /**
-     * @param targetScanPackages packages to scan for repositories.
-     */
-    public ScanningJpaRepositoryModule(Iterable<String> targetScanPackages, String... persistenceUnitName) {
-        super(persistenceUnitName);
-        this.targetScanPackages = Lists.newArrayList(targetScanPackages);
-
+    public ScanningJpaRepositoryModule(Collection<RepositoryGroup> repositoryGroups) {
+        super(extractPersistenceUnitsNames(repositoryGroups));
+        this.repositoryGroups = Lists.newArrayList(repositoryGroups);
     }
-    /*===========================================[ CLASS METHODS ]==============*/
 
-    @Override
-    protected void bindRepositories(RepositoryBinder binder) {
-        Set<URL> urls = new HashSet<URL>();
-
-        for (String targetScanPackage : targetScanPackages) {
-            urls.addAll(ClasspathHelper.forPackage(targetScanPackage));
+    private static String[] extractPersistenceUnitsNames(Collection<RepositoryGroup> repositoryGroups) {
+        Collection<String> persistenceUnitsNames = new ArrayList<String>();
+        for (RepositoryGroup repositoryGroup : repositoryGroups) {
+            persistenceUnitsNames.add(repositoryGroup.getPersistenceUnitName());
         }
 
-        ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
-        configurationBuilder.setUrls(urls);
-        configurationBuilder.setScanners(new TypeAnnotationsScanner(), new SubTypesScanner());
+        return persistenceUnitsNames.toArray(new String[persistenceUnitsNames.size()]);
+    }
 
-        Reflections reflections = new Reflections(configurationBuilder);
+    /*===========================================[ CLASS METHODS ]==============*/
+    //TODO exclusion filter for AutoBind Test
+    @Override
+    protected void bindRepositories(RepositoryBinder binder) {
+        //TODO: check that all registered groups linked to already bound PersistenceUnits
+        for (RepositoryGroup repositoryGroup : repositoryGroups) {
+            Set<URL> urls = new HashSet<URL>();
+            Collection<String> packageNames = repositoryGroup.getPackageNames();
+            for (String packageName : packageNames) {
+                urls.addAll(ClasspathHelper.forPackage(packageName));
+            }
+
+            Set<Class<?>> repositoryClasses = findRepositories(urls);
+
+            // Extraction of real Repository implementations (Classes)
+            Collection<Class<?>> implementations = filter(repositoryClasses, new Predicate<Class<?>>() {
+                @Override
+                public boolean apply(Class<?> input) {
+                    return !input.isInterface();
+                }
+            });
+
+            for (final Class<?> repositoryClass : repositoryClasses) {
+                // Autobind only for interfaces
+                if (repositoryClass.isInterface()) {
+                    Collection<Class<?>> repoImplementations = filter(implementations, new Predicate<Class<?>>() {
+                        @Override
+                        public boolean apply(Class<?> input) {
+                            return repositoryClass.isAssignableFrom(input);
+                        }
+                    });
+
+                    Iterator<Class<?>> iterator = repoImplementations.iterator();
+                    Class<?> implementation = iterator.hasNext() ? iterator.next() : null;
+                    getLogger().info(String.format("Found repository: [%s]", repositoryClass.getName()));
+                    //TODO: resolving with annotation/top @Transactional
+                    String persistenceUnitName = repositoryGroup.getPersistenceUnitName();
+                    PersistenceContext persistenceContext = repositoryClass.getAnnotation(PersistenceContext.class);
+                    if (persistenceContext != null) {
+                        persistenceUnitName = persistenceContext.unitName();
+                    }
+                    binder.bind(repositoryClass).withCustomImplementation(implementation).attachedTo(persistenceUnitName);
+                }
+            }
+        }
+    }
+
+    protected Set<Class<?>> findRepositories(Set<URL> scanUrls) {
+        Reflections reflections = createReflections(scanUrls);
         Set<Class<?>> repositoryClasses = new HashSet<Class<?>>();
-
         repositoryClasses.addAll(reflections.getTypesAnnotatedWith(Repository.class));
         repositoryClasses.addAll(reflections.getSubTypesOf(org.springframework.data.repository.Repository.class));
         repositoryClasses.addAll(reflections.getSubTypesOf(CrudRepository.class));
         repositoryClasses.addAll(reflections.getSubTypesOf(PagingAndSortingRepository.class));
         repositoryClasses.addAll(reflections.getSubTypesOf(JpaRepository.class));
         repositoryClasses.addAll(reflections.getSubTypesOf(BatchStoreJpaRepository.class));
+        return repositoryClasses;
+    }
 
-        // Extraction of real Repository implementations (Classes)
-        Collection<Class<?>> implementations = filter(repositoryClasses, new Predicate<Class<?>>() {
-            public boolean apply(Class<?> input) {
-                return !input.isInterface();
-            }
-        });
-
-        for (final Class<?> repositoryClass : repositoryClasses) {
-            // Autobind only for interfaces
-            if (repositoryClass.isInterface()) {
-                Collection<Class<?>> repoImplementations = filter(implementations, new Predicate<Class<?>>() {
-                    public boolean apply(Class<?> input) {
-                        return repositoryClass.isAssignableFrom(input);
-                    }
-                });
-
-                Iterator<Class<?>> iterator = repoImplementations.iterator();
-                Class<?> implementation = iterator.hasNext() ? iterator.next() : null;
-                getLogger().info(String.format("Found repository: [%s]", repositoryClass.getName()));
-                //TODO: resolving with annotation/top @Transactional
-                bind(repositoryClass).toProvider(new JpaRepositoryProvider(repositoryClass, implementation, null));
-            }
-        }
+    protected Reflections createReflections(Set<URL> urls) {
+        ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
+        configurationBuilder.setUrls(urls);
+        configurationBuilder.setScanners(new TypeAnnotationsScanner(), new SubTypesScanner());
+        return new Reflections(configurationBuilder);
     }
 }

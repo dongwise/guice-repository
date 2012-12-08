@@ -26,6 +26,10 @@ import com.google.code.guice.repository.testing.repo.CustomerRepository;
 import com.google.code.guice.repository.testing.repo.CustomerRepositoryImpl;
 import com.google.code.guice.repository.testing.repo.UserRepository;
 import org.junit.runners.model.InitializationError;
+import org.springframework.orm.jpa.vendor.HibernateJpaDialect;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ManualBindRepoTestRunner extends GuiceTestRunner {
 
@@ -38,6 +42,17 @@ public class ManualBindRepoTestRunner extends GuiceTestRunner {
                 binder.bind(UserRepository.class);
                 binder.bind(AccountRepository.class);
                 binder.bind(CustomerRepository.class).withCustomImplementation(CustomerRepositoryImpl.class);
+            }
+
+            @Override
+            protected Map<String, Object> getAdditionalEMFProperties(String persistenceUnitName) {
+                Map<String, Object> properties = new HashMap<String, Object>();
+                if ("test-h2".equals(persistenceUnitName)){
+                    properties.put("jpaDialect", new HibernateJpaDialect());
+                    return properties;
+
+                }
+                return properties;
             }
         });
     }

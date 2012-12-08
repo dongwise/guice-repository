@@ -19,10 +19,12 @@
 package com.google.code.guice.repository.spi;
 
 import com.google.code.guice.repository.SimpleBatchStoreJpaRepository;
+import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactory;
-import org.springframework.data.jpa.repository.support.QueryDslJpaRepository;
+import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.core.RepositoryMetadata;
 
@@ -42,10 +44,19 @@ import static org.springframework.data.querydsl.QueryDslUtils.QUERY_DSL_PRESENT;
  */
 public class CustomJpaRepositoryFactory extends JpaRepositoryFactory {
 
+    private SimpleQueryDslJpaRepositoryFactory queryDslJpaRepositoryFactory;
+    private SimpleBatchStoreJpaRepositoryFactory batchRepositoryFactory;
+
+    //TODO assisted-inject
     /*===========================================[ CONSTRUCTORS ]===============*/
 
-    public CustomJpaRepositoryFactory(EntityManager entityManager) {
+    @Inject
+    public CustomJpaRepositoryFactory(@Assisted EntityManager entityManager,
+                                      SimpleBatchStoreJpaRepositoryFactory batchRepositoryFactory,
+                                      SimpleQueryDslJpaRepositoryFactory queryDslJpaRepositoryFactory) {
         super(entityManager);
+        this.batchRepositoryFactory = batchRepositoryFactory;
+        this.queryDslJpaRepositoryFactory = queryDslJpaRepositoryFactory;
     }
 
     /*===========================================[ CLASS METHODS ]==============*/
@@ -55,17 +66,20 @@ public class CustomJpaRepositoryFactory extends JpaRepositoryFactory {
         Class<?> repositoryInterface = metadata.getRepositoryInterface();
         JpaEntityInformation<?, Serializable> entityInformation = getEntityInformation(metadata.getDomainType());
 
+        SimpleJpaRepository repo = null;
         if (isQueryDslExecutor(repositoryInterface)) {
-            return new QueryDslJpaRepository(entityInformation, entityManager);
+            repo = queryDslJpaRepositoryFactory.create(entityInformation, entityManager);
         } else {
-            return new SimpleBatchStoreJpaRepository(entityInformation, entityManager);
+            repo = batchRepositoryFactory.create(entityInformation, entityManager);
         }
+
+        return repo;
     }
 
     @Override
     protected Class<?> getRepositoryBaseClass(RepositoryMetadata metadata) {
         if (isQueryDslExecutor(metadata.getRepositoryInterface())) {
-            return QueryDslJpaRepository.class;
+            return SimpleQueryDslJpaRepositoryFactory.class;
         } else {
             return SimpleBatchStoreJpaRepository.class;
         }

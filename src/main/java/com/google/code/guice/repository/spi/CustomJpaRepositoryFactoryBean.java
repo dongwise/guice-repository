@@ -5,6 +5,7 @@
 
 package com.google.code.guice.repository.spi;
 
+import com.google.inject.Inject;
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
 
@@ -19,9 +20,11 @@ import javax.persistence.EntityManager;
 public class CustomJpaRepositoryFactoryBean extends JpaRepositoryFactoryBean {
 
     /*===========================================[ CLASS METHODS ]==============*/
+    @Inject
+    private CustomJpaRepositoryFactoryCreator factoryCreator;
 
     @Override
     protected RepositoryFactorySupport createRepositoryFactory(EntityManager entityManager) {
-        return new CustomJpaRepositoryFactory(entityManager);
+        return factoryCreator.create(entityManager);
     }
 }

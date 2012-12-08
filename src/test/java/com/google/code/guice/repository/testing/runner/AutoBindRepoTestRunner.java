@@ -23,10 +23,15 @@ import com.google.code.guice.repository.configuration.ScanningJpaRepositoryModul
 import com.google.code.guice.repository.testing.common.GuiceTestRunner;
 import com.google.code.guice.repository.testing.repo.UserDataRepository;
 import com.google.common.base.Predicate;
+import com.google.inject.AbstractModule;
+import com.google.inject.matcher.Matchers;
 import org.junit.runners.model.InitializationError;
+import org.springframework.orm.jpa.vendor.HibernateJpaDialect;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AutoBindRepoTestRunner extends GuiceTestRunner {
 
@@ -49,6 +54,22 @@ public class AutoBindRepoTestRunner extends GuiceTestRunner {
                                 }).
                                 attachedTo("test-h2-secondary").
                                 build()
-                )));
+                )){
+            @Override
+            protected Map<String, Object> getAdditionalEMFProperties(String persistenceUnitName) {
+                Map<String, Object> properties = new HashMap<String, Object>();
+                if ("test-h2".equals(persistenceUnitName)){
+                    properties.put("jpaDialect", new HibernateJpaDialect());
+                    return properties;
+
+                }
+                return properties;
+            }
+        }, new AbstractModule() {
+                    @Override
+                    protected void configure() {
+                        bindInterceptor(Matchers.any(), Matchers.any(), new TestInterceptor());
+                    }
+                });
     }
 }

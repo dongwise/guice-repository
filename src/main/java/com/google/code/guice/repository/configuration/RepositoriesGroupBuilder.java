@@ -18,21 +18,27 @@ import java.util.Collection;
  * @since 08.12.12
  */
 public class RepositoriesGroupBuilder {
-    private String persistenceUnitName;
-    private Predicate<String> exclusionsFilter;
-    private Collection<String> repositoriesPackages;
-    private Predicate<String> inclusionsFilter;
-    private String exclusionsPattern;
-    private String inclusionsPattern;
+
     /*===========================================[ STATIC VARIABLES ]=============*/
 
+
+
     /*===========================================[ INSTANCE VARIABLES ]===========*/
-/*===========================================[ CONSTRUCTORS ]=================*/
+
+    private String persistenceUnitName;
+    private Collection<String> repositoriesPackages;
+    private String inclusionPattern;
+    private String exclusionPattern;
+    private Predicate<Class> inclusionPredicate;
+    private Predicate<Class> exclusionPredicate;
+
+    /*===========================================[ CONSTRUCTORS ]=================*/
+
     protected RepositoriesGroupBuilder(Collection<String> repositoriesPackages) {
         this.repositoriesPackages = new ArrayList<String>(repositoriesPackages);
     }
 
-/*===========================================[ CLASS METHODS ]================*/
+    /*===========================================[ CLASS METHODS ]================*/
 
     public RepositoriesGroupBuilder withRepositoriesPackages(Collection<String> repositoriesPackages) {
         this.repositoriesPackages.addAll(repositoriesPackages);
@@ -44,24 +50,23 @@ public class RepositoriesGroupBuilder {
         return this;
     }
 
-    //TODO class??
-    public RepositoriesGroupBuilder withExclusionsFilter(Predicate<String> exclusionsFilter) {
-        this.exclusionsFilter = exclusionsFilter;
+    public RepositoriesGroupBuilder withInclusionPattern(String inclusionPattern) {
+        this.inclusionPattern = inclusionPattern;
         return this;
     }
 
-    public RepositoriesGroupBuilder withInclusionsFilter(Predicate<String> inclusionsFilter) {
-        this.inclusionsFilter = inclusionsFilter;
+    public RepositoriesGroupBuilder withExclusionPattern(String exclusionPattern) {
+        this.exclusionPattern = exclusionPattern;
         return this;
     }
 
-    public RepositoriesGroupBuilder withExclusionsPattern(String exclusionsPattern) {
-        this.exclusionsPattern = exclusionsPattern;
+    public RepositoriesGroupBuilder withInclusionFilterPredicate(Predicate<Class> inclusionPredicate) {
+        this.inclusionPredicate = inclusionPredicate;
         return this;
     }
 
-    public RepositoriesGroupBuilder withInclusionsPattern(String inclusionsPattern) {
-        this.inclusionsPattern = inclusionsPattern;
+    public RepositoriesGroupBuilder withExclusionFilter(Predicate<Class> exclusionPredicate) {
+        this.exclusionPredicate = exclusionPredicate;
         return this;
     }
 
@@ -74,6 +79,11 @@ public class RepositoriesGroupBuilder {
     }
 
     public RepositoriesGroup build() {
-        return new RepositoriesGroup(repositoriesPackages, persistenceUnitName);
+        RepositoriesGroup repositoriesGroup = new RepositoriesGroup(repositoriesPackages, persistenceUnitName);
+        repositoriesGroup.setIncusionPattern(inclusionPattern);
+        repositoriesGroup.setExclusionPattern(exclusionPattern);
+        repositoriesGroup.setInclusionFilterPredicate(inclusionPredicate);
+        repositoriesGroup.setExclusionFilterPredicate(exclusionPredicate);
+        return repositoriesGroup;
     }
 }

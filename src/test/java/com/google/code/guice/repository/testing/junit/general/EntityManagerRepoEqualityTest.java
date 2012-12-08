@@ -18,13 +18,13 @@
 
 package com.google.code.guice.repository.testing.junit.general;
 
-import com.google.code.guice.repository.testing.repo.AccountRepository;
 import com.google.code.guice.repository.testing.junit.RepoTestBase;
+import com.google.code.guice.repository.testing.repo.AccountRepository;
 import com.google.inject.Inject;
 import org.junit.Test;
 
-import javax.inject.Provider;
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 import static org.junit.Assert.assertTrue;
 
@@ -40,13 +40,13 @@ public class EntityManagerRepoEqualityTest extends RepoTestBase {
     @Inject
     private AccountRepository accountRepository;
 
-    @Inject
-    private Provider<EntityManager> entityManager;
+    @PersistenceContext
+    private EntityManager entityManager;
 
     /*===========================================[ CLASS METHODS ]==============*/
 
     @Test
     public void testRepo() throws Exception {
-        assertTrue("EntityManager's is not equal", accountRepository.getEntityManager().equals(entityManager.get()));
+        assertTrue("EntityManager's is not equal", accountRepository.getEntityManager().equals(entityManager));
     }
 }

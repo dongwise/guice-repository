@@ -23,6 +23,7 @@ import com.google.code.guice.repository.testing.model.UserData;
 import com.google.code.guice.repository.testing.repo.UserDataRepository;
 import com.google.code.guice.repository.testing.repo.UserRepository;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,6 +31,8 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.UUID;
 
 /**
@@ -55,6 +58,19 @@ public class MultiPersistenceUnitsTest {
 
     @Inject
     private MultiPersistenceUnitsService multiPersistenceUnitsService;
+
+    @Inject
+    private EntityManager entityManager;
+
+    @Inject
+    @Named("test-h2-secondary")
+    private EntityManager secondaryEntityManager;
+
+    @PersistenceContext
+    private EntityManager pcEntityManager;
+
+    @PersistenceContext(unitName = "test-h2-secondary")
+    private EntityManager pcSecondaryEntityManager;
 
     /*===========================================[ CLASS METHODS ]===============*/
 
@@ -93,11 +109,19 @@ public class MultiPersistenceUnitsTest {
 
     @Test
     public void complexTest() {
-        // TODO: http://blog.springsource.org/2011/04/26/advanced-spring-data-jpa-specifications-and-querydsl/#comment-198835
-        //TODO: 1. создать разные экземпляры TransactionManager
         userRepository.save(new User("user", "surname", 1));
         userDataRepository.save(new UserData(UUID.randomUUID().toString()));
         Assert.assertEquals("No User saved", 1, userRepository.count());
         Assert.assertEquals("No UserData saved", 1, userDataRepository.count());
+    }
+
+    @Test
+    public void testEntityManagersInjected(){
+        Assert.assertNotNull("Injected primary em is null", entityManager);
+        Assert.assertNotNull("Injected secondary em is null", secondaryEntityManager);
+        Assert.assertNotNull("Injected by PersistenceContext em is null", pcEntityManager);
+        Assert.assertNotNull("Injected by PersistenceContext secondary em is null", pcSecondaryEntityManager);
+        Assert.assertEquals("Primary em is not equals for different injection types",entityManager, pcEntityManager);
+        Assert.assertEquals("Secondary em is not equals for different injection types", secondaryEntityManager, pcSecondaryEntityManager);
     }
 }

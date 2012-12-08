@@ -22,9 +22,15 @@ import com.google.code.guice.repository.SimpleBatchStoreJpaRepository;
 import com.google.code.guice.repository.testing.model.Customer;
 import org.junit.Assert;
 
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 
 public class CustomerRepositoryImpl extends SimpleBatchStoreJpaRepository<Customer,Long> implements CustomerRepository {
+
+    /*===========================================[ INSTANCE VARIABLES ]=========*/
+
+    @Inject
+    private EntityManager entityManager;
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
@@ -35,6 +41,7 @@ public class CustomerRepositoryImpl extends SimpleBatchStoreJpaRepository<Custom
 
     public void sharedCustomMethod(Long customerID) {
         Assert.assertNotNull("CustomerID is null", customerID);
+        Assert.assertNotNull("Injected entityManager is null", entityManager);
         System.out.println("customerID = " + customerID);
     }
 }

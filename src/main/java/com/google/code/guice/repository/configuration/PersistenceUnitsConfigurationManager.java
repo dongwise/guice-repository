@@ -53,7 +53,7 @@ public class PersistenceUnitsConfigurationManager {
             defaultConfiguration.setDefault(true);
         }
 
-        configurations.put(persistenceUnitConfiguration.getName(), persistenceUnitConfiguration);
+        configurations.put(persistenceUnitConfiguration.getPersistenceUnitName(), persistenceUnitConfiguration);
     }
 
     public PersistenceUnitConfiguration getPersistenceUnitConfiguration(String persistenceUnitName) {
@@ -77,5 +77,9 @@ public class PersistenceUnitsConfigurationManager {
             return true;
         }
         return configurations.get(persistenceUnitName) != null;
+    }
+
+    public Collection<PersistenceUnitConfiguration> getConfigurations() {
+        return configurations.values();
     }
 }

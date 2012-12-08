@@ -40,7 +40,6 @@ public class BasicTransactionService {
 
     /*===========================================[ CLASS METHODS ]==============*/
 
-    //TODO unstable
     @Transactional(rollbackFor = Exception.class)
     public void generateUsers(int usersCount) throws Exception {
         for (int i = 0; i < usersCount; i++) {

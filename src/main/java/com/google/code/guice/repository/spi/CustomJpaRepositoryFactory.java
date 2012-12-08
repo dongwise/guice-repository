@@ -49,7 +49,7 @@ public class CustomJpaRepositoryFactory extends JpaRepositoryFactory {
     }
 
     /*===========================================[ CLASS METHODS ]==============*/
-    //todo think about guice-based instantiation
+
     @Override
     protected JpaRepository<?, ?> getTargetRepository(RepositoryMetadata metadata, EntityManager entityManager) {
         Class<?> repositoryInterface = metadata.getRepositoryInterface();

@@ -84,12 +84,16 @@ public class ScanningJpaRepositoryModule extends JpaRepositoryModule {
     }
 
     /*===========================================[ CLASS METHODS ]==============*/
-    //TODO exclusion filter for AutoBind Test
+
     @Override
     protected void bindRepositories(RepositoryBinder binder) {
-        for (RepositoriesGroup repositoriesGroup : repositoriesGroups) {
+        for (final RepositoriesGroup group : repositoriesGroups) {
+            String persistenceUnitName = group.getPersistenceUnitName();
+
             Set<URL> urls = new HashSet<URL>();
-            Collection<String> packagesToScan = repositoriesGroup.getRepositoriesPackages();
+            Collection<String> packagesToScan = group.getRepositoriesPackages();
+            getLogger().info(String.format("Scanning %s for [%s]", packagesToScan, persistenceUnitName));
+
             for (String packageName : packagesToScan) {
                 urls.addAll(ClasspathHelper.forPackage(packageName));
             }
@@ -105,8 +109,9 @@ public class ScanningJpaRepositoryModule extends JpaRepositoryModule {
             });
 
             for (final Class<?> repositoryClass : repositoryClasses) {
-                // Autobind only for interfaces
-                if (repositoryClass.isInterface()) {
+                // Autobind only for interfaces matched with group filters/patterns
+                if (repositoryClass.isInterface() && group.matches(repositoryClass)) {
+                    // Custom implementations
                     Collection<Class<?>> repoImplementations = filter(implementations, new Predicate<Class<?>>() {
                         @Override
                         public boolean apply(Class<?> input) {
@@ -117,7 +122,6 @@ public class ScanningJpaRepositoryModule extends JpaRepositoryModule {
                     Iterator<Class<?>> iterator = repoImplementations.iterator();
                     Class<?> implementation = iterator.hasNext() ? iterator.next() : null;
                     getLogger().info(String.format("Found repository: [%s]", repositoryClass.getName()));
-                    String persistenceUnitName = repositoriesGroup.getPersistenceUnitName();
                     binder.bind(repositoryClass).withCustomImplementation(implementation).attachedTo(persistenceUnitName);
                 }
             }

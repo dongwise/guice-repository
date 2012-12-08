@@ -60,7 +60,7 @@ public class AutoBindRepositoryTest {
         userRepository.save(new User("name", "surname", 42));
         assertEquals("Invalid repository size", 1, userRepository.count());
         userRepository.deleteOtherUsers();
-        assertEquals(0, userRepository.count());
+        assertEquals("Invalid repository size", 0, userRepository.count());
         userRepository.someCustomMethod(new User());
     }
 

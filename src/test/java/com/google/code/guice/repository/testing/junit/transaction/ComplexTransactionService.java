@@ -22,7 +22,6 @@ import com.google.code.guice.repository.testing.model.Account;
 import com.google.code.guice.repository.testing.model.User;
 import com.google.code.guice.repository.testing.repo.AccountRepository;
 import com.google.code.guice.repository.testing.repo.UserRepository;
-import com.google.inject.Provider;
 import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -48,14 +48,14 @@ public class ComplexTransactionService {
     @Inject
     private AccountRepository accountRepository;
 
-    @Inject
-    private Provider<EntityManager> entityManager;
+    @PersistenceContext
+    private EntityManager entityManager;
 
     /*===========================================[ CLASS METHODS ]==============*/
 
     @Transactional(rollbackFor = Exception.class)
     public void performFirstComplexTransaction() throws Exception {
-        logger.info("EM for performComplexTransaction: " + entityManager.get());
+        logger.info("EM for performComplexTransaction: " + entityManager);
         logger.info("DeleteAll");
         userRepository.deleteAll();
         logger.info("Save1");
@@ -74,7 +74,7 @@ public class ComplexTransactionService {
     public void performSecondComplexTransaction() throws Exception {
         logger.info("Checking size");
         Assert.assertEquals("Invalid repository size", 0, userRepository.count());
-        logger.info("EM for performSecondComplexTransaction: " + entityManager.get());
+        logger.info("EM for performSecondComplexTransaction: " + entityManager);
         logger.info("Save3");
         userRepository.save(new User("1", "1", 1));
         logger.info("Count2");

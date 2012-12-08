@@ -18,11 +18,11 @@
 
 package com.google.code.guice.repository.configuration;
 
-import com.google.code.guice.repository.spi.JpaRepositoryProvider;
 import com.google.code.guice.repository.spi.*;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 import com.google.inject.matcher.Matchers;
+import com.google.inject.name.Names;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -151,20 +151,13 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         bindInterceptor(Matchers.any(), Matchers.annotatedWith(Transactional.class), transactionInterceptor);
         bindInterceptor(Matchers.annotatedWith(Transactional.class), Matchers.any(), transactionInterceptor);
 
-        // Support for EntityManager with @PersistenceContext injections
-        PersistenceContextTypeListener persistenceContextTypeListener = new PersistenceContextTypeListener();
-        requestInjection(persistenceContextTypeListener);
-        bindListener(Matchers.any(), persistenceContextTypeListener);
-
-        // Support for EntityManagerFactory with @PersistenceUnit injections
-        PersistenceUnitTypeListener persistenceUnitTypeListener = new PersistenceUnitTypeListener();
-        requestInjection(persistenceUnitTypeListener);
-        bindListener(Matchers.any(), persistenceUnitTypeListener);
+        // Support for EntityManager and EntityManagerFactory injections
+        bindPersistence(configurationManager);
 
         // TODO rename
-        DefaultRepositoryBinder repositoryBinder = createRepositoryBinder();
+        AccessibleRepositoryBinder repositoryBinder = createRepositoryBinder();
+        logger.info("Binding repositories...");
         bindRepositories(repositoryBinder);
-
         Collection<AccessibleRepositoryBinding> bindings = repositoryBinder.getBindings();
         for (AccessibleRepositoryBinding binding : bindings) {
             Class<? extends Repository> repositoryClass = binding.getRepositoryClass();
@@ -183,13 +176,37 @@ public abstract class JpaRepositoryModule extends AbstractModule {
 
             bind(repositoryClass).toProvider(new JpaRepositoryProvider(repositoryClass, customRepositoryClass, persistenceUnitName));
 
-            logger.info(String.format("[%s] %s attached to [%s] available for injection",
+            logger.info(String.format("[%s] %s attached to [%s] and available for injection",
                     repositoryClass.getName(),
                     customRepositoryClass != null ? "(" + customRepositoryClass.getName() + ")" : "",
                     persistenceUnitName));
         }
 
         logger.info(String.format("[%s] configured", moduleName));
+    }
+
+    protected void bindPersistence(PersistenceUnitsConfigurationManager configurationManager) {
+        // Support for EntityManager with @PersistenceContext injections
+        PersistenceContextTypeListener persistenceContextTypeListener = new PersistenceContextTypeListener();
+        requestInjection(persistenceContextTypeListener);
+        bindListener(Matchers.any(), persistenceContextTypeListener);
+
+
+        // Support for EntityManagerFactory with @PersistenceUnit injections
+        PersistenceUnitTypeListener persistenceUnitTypeListener = new PersistenceUnitTypeListener();
+        requestInjection(persistenceUnitTypeListener);
+        bindListener(Matchers.any(), persistenceUnitTypeListener);
+
+        Collection<PersistenceUnitConfiguration> configurations = configurationManager.getConfigurations();
+        for (PersistenceUnitConfiguration configuration : configurations) {
+            bind(EntityManager.class).annotatedWith(Names.named(configuration.getPersistenceUnitName())).toInstance(configuration.getEntityManager());
+            bind(EntityManagerFactory.class).annotatedWith(Names.named(configuration.getPersistenceUnitName())).toInstance(configuration.getEntityManagerFactory());
+        }
+
+        // binding default EntityManager & EntityManagerFactory
+        PersistenceUnitConfiguration defaultConfiguration = configurationManager.getDefaultConfiguration();
+        bind(EntityManager.class).toInstance(defaultConfiguration.getEntityManager());
+        bind(EntityManagerFactory.class).toInstance(defaultConfiguration.getEntityManagerFactory());
     }
 
     protected String extractAnnotationsPersistenceUnitName(Class<? extends Repository> repositoryClass) {
@@ -224,8 +241,8 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         return persistenceUnitName;
     }
 
-    protected DefaultRepositoryBinder createRepositoryBinder() {
-        return new DefaultRepositoryBinder();
+    protected AccessibleRepositoryBinder createRepositoryBinder() {
+        return new AccessibleRepositoryBinder();
     }
 
     protected PersistenceUnitsConfigurationManager createPersistenceUnitsConfigurationManager(String... persistenceUnits) {
@@ -244,19 +261,17 @@ public abstract class JpaRepositoryModule extends AbstractModule {
     @SuppressWarnings("UnnecessaryLocalVariable")
     protected ApplicationContext createApplicationContext(Collection<PersistenceUnitConfiguration> persistenceUnits, TransactionAttributeSource tas) {
         GenericApplicationContext context = new GenericApplicationContext();
-        // TODO http://blog.springsource.org/2011/04/26/advanced-spring-data-jpa-specifications-and-querydsl/#comment-198835
         //TODO customization for dialect & etc
-        // TODO: https://github.com/SpringSource/spring-data-jpa/blob/master/src/test/resources/multiple-entity-manager-integration-context.xml
         String abstractEMFBeanName = "abstractEntityManagerFactory";
         context.registerBeanDefinition(abstractEMFBeanName, BeanDefinitionBuilder.
                 genericBeanDefinition(LocalContainerEntityManagerFactoryBean.class).
                 //addPropertyReference("jpaVendorAdapter", "jpaVendorAdapter").
-                //        addPropertyReference("jpaDialect", "jpaDialect").
+                        //        addPropertyReference("jpaDialect", "jpaDialect").
                         //addPropertyValue("persistenceXmlLocation", "classpath:META-INF/persistence.xml").
                         setAbstract(true).getBeanDefinition());
 
         for (PersistenceUnitConfiguration configuration : persistenceUnits) {
-            String persistenceUnitName = configuration.getName();
+            String persistenceUnitName = configuration.getPersistenceUnitName();
             // Naming is important - it's needed for later TransactionManager resolution based on @Transactional value with persistenceUnitName
             String transactionManagerName = persistenceUnitName;
             Properties props = configuration.getProperties();

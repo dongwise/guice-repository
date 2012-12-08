@@ -17,6 +17,9 @@ import javax.persistence.EntityManager;
 * @since 06.12.12
 */
 public class CustomJpaRepositoryFactoryBean extends JpaRepositoryFactoryBean {
+
+    /*===========================================[ CLASS METHODS ]==============*/
+
     @Override
     protected RepositoryFactorySupport createRepositoryFactory(EntityManager entityManager) {
         return new CustomJpaRepositoryFactory(entityManager);

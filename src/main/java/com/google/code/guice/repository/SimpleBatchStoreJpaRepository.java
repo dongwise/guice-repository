@@ -63,8 +63,8 @@ public class SimpleBatchStoreJpaRepository<T, ID extends Serializable> extends S
         this(JpaEntityInformationSupport.getMetadata(domainClass, entityManager), entityManager);
     }
 
-    public SimpleBatchStoreJpaRepository(JpaEntityInformation<T, ?> entityMetadata, EntityManager entityManager) {
-        super(entityMetadata, entityManager);
+    public SimpleBatchStoreJpaRepository(JpaEntityInformation<T, ?> entityInformation, EntityManager entityManager) {
+        super(entityInformation, entityManager);
         this.entityManager = entityManager;
         logger = LoggerFactory.getLogger(getClass());
     }

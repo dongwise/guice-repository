@@ -22,11 +22,12 @@ import com.google.code.guice.repository.configuration.RepositoriesGroupBuilder;
 import com.google.code.guice.repository.configuration.ScanningJpaRepositoryModule;
 import com.google.code.guice.repository.testing.common.GuiceTestRunner;
 import com.google.code.guice.repository.testing.repo.UserDataRepository;
+import com.google.common.base.Predicate;
 import org.junit.runners.model.InitializationError;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 
-//TODO: scanning with multiple repo
 public class AutoBindRepoTestRunner extends GuiceTestRunner {
 
     /*===========================================[ CLASS METHODS ]==============*/
@@ -34,9 +35,20 @@ public class AutoBindRepoTestRunner extends GuiceTestRunner {
     public AutoBindRepoTestRunner(Class<?> classToRun) throws InitializationError {
         super(classToRun, new ScanningJpaRepositoryModule(
                 Arrays.asList(
-                        RepositoriesGroupBuilder.forPackage("com.google.code.guice.repository.testing.repo").
-                                withExclusionsPattern(".*" + UserDataRepository.class.getSimpleName() + ".*").
+                      RepositoriesGroupBuilder.forPackage("com.google.code.guice.repository.testing.repo").
+                                withExclusionPattern(".*" + UserDataRepository.class.getSimpleName() + ".*").
                                 attachedTo("test-h2").
-                                build())));
+                                build(),
+
+                        RepositoriesGroupBuilder.forPackage("com.google.code.guice.repository.testing.repo").
+                                withInclusionFilterPredicate(new Predicate<Class>() {
+                                    @Override
+                                    public boolean apply(@Nullable Class input) {
+                                        return UserDataRepository.class.isAssignableFrom(input);
+                                    }
+                                }).
+                                attachedTo("test-h2-secondary").
+                                build()
+                )));
     }
 }

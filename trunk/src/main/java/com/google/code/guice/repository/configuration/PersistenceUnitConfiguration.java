@@ -33,11 +33,10 @@ import java.util.Properties;
  */
 public class PersistenceUnitConfiguration {
 
-    /*===========================================[ STATIC VARIABLES ]=============*/
 
     /*===========================================[ INSTANCE VARIABLES ]===========*/
 
-    private String name;
+    private String persistenceUnitName;
     private Properties properties;
     private EntityManagerFactory entityManagerFactory;
     private EntityManager entityManager;
@@ -48,14 +47,14 @@ public class PersistenceUnitConfiguration {
 
     /*===========================================[ CONSTRUCTORS ]=================*/
 
-    public PersistenceUnitConfiguration(String name, Properties properties) {
-        this.name = name;
+    public PersistenceUnitConfiguration(String persistenceUnitName, Properties properties) {
+        this.persistenceUnitName = persistenceUnitName;
         this.properties = (Properties) properties.clone();
     }
     /*===========================================[ CLASS METHODS ]================*/
 
-    public String getName() {
-        return name;
+    public String getPersistenceUnitName() {
+        return persistenceUnitName;
     }
 
     public Properties getProperties() {
@@ -114,19 +113,19 @@ public class PersistenceUnitConfiguration {
 
         PersistenceUnitConfiguration persistenceUnitConfiguration = (PersistenceUnitConfiguration) obj;
 
-        return !(name != null ? !name.equals(persistenceUnitConfiguration.name) : persistenceUnitConfiguration.name != null);
+        return !(persistenceUnitName != null ? !persistenceUnitName.equals(persistenceUnitConfiguration.persistenceUnitName) : persistenceUnitConfiguration.persistenceUnitName != null);
     }
 
     @Override
     public int hashCode() {
-        return name != null ? name.hashCode() : 0;
+        return persistenceUnitName != null ? persistenceUnitName.hashCode() : 0;
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("PersistenceUnitConfiguration");
-        sb.append("{name='").append(name).append('\'');
+        sb.append("{name='").append(persistenceUnitName).append('\'');
         sb.append(", properties=").append(properties);
         sb.append(", transactionManagerName='").append(transactionManagerName).append('\'');
         sb.append('}');

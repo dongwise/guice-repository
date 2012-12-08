@@ -29,7 +29,4 @@ public interface RepositoryBinder {
     /*===========================================[ INTERFACE METHODS ]==============*/
 
     RepositoryBinding bind(Class repositoryClass);
-
-    void bindRepositoryGroup(RepositoriesGroup repositoriesGroup);
-    //TODO: bind package with exclusions
 }

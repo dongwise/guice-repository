@@ -18,7 +18,6 @@
 
 package com.google.code.guice.repository.spi;
 
-import com.google.code.guice.repository.configuration.RepositoriesGroup;
 import com.google.code.guice.repository.configuration.RepositoryBinder;
 import com.google.code.guice.repository.configuration.RepositoryBinding;
 import org.springframework.util.Assert;
@@ -33,7 +32,7 @@ import java.util.Collections;
  * @author Alexey Krylov (lexx)
  * @since 07.12.12
  */
-public class DefaultRepositoryBinder implements RepositoryBinder {
+public class AccessibleRepositoryBinder implements RepositoryBinder {
     /*===========================================[ STATIC VARIABLES ]=============*/
 
     /*===========================================[ INSTANCE VARIABLES ]===========*/
@@ -42,16 +41,11 @@ public class DefaultRepositoryBinder implements RepositoryBinder {
 
     /*===========================================[ CONSTRUCTORS ]=================*/
 
-    public DefaultRepositoryBinder() {
+    public AccessibleRepositoryBinder() {
         bindings = new ArrayList<AccessibleRepositoryBinding>();
     }
 
     /*===========================================[ CLASS METHODS ]================*/
-
-    @Override
-    public void bindRepositoryGroup(RepositoriesGroup repositoriesGroup) {
-
-    }
 
     @Override
     public RepositoryBinding bind(Class repositoryClass) {

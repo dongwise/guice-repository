@@ -19,6 +19,7 @@
 package com.google.code.guice.repository.spi;
 
 import net.jcip.annotations.ThreadSafe;
+import org.springframework.util.Assert;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -41,6 +42,11 @@ import java.util.List;
 @ThreadSafe
 public class TypeUtil {
 
+    /*===========================================[ CONSTRUCTORS ]===============*/
+
+    private TypeUtil() {
+    }
+
     /*===========================================[ CLASS METHODS ]==============*/
 
     /**
@@ -53,8 +59,7 @@ public class TypeUtil {
      * @throws IllegalArgumentException if specified <code>aClass</code> is null
      */
     public static Class getFirstTypeParameterClass(Class aClass) {
-        //Validate.noNullElements(Arrays.asList(aClass));
-
+        Assert.notNull(aClass);
         return getTypeParameterClass(aClass, 0);
     }
 
@@ -69,8 +74,8 @@ public class TypeUtil {
      * @throws IllegalArgumentException if specified <code>aClass</code> is null or <code>parameterIndex</code> &lt; 0
      */
     public static Class getTypeParameterClass(Class aClass, int parameterIndex) {
-        //Validate.notNull(aClass);
-        //Validate.isTrue(parameterIndex >= 0);
+        Assert.notNull(aClass);
+        Assert.isTrue(parameterIndex >= 0);
 
         List<Type> types = new ArrayList<Type>();
 
@@ -109,8 +114,7 @@ public class TypeUtil {
      * @throws IllegalArgumentException if specified <code>aClass</code>  or <code>genericParameterClass</code> is null
      */
     public static <T> Class<T> getTypeParameterClass(Class aClass, Class<T> genericParameterClass) {
-        //TODO
-        //Assert.noNullElements(Arrays.asList(aClass, genericParameterClass));
+        Assert.noNullElements(new Object[]{aClass, genericParameterClass});
 
         List<Type> types = new ArrayList<Type>();
 

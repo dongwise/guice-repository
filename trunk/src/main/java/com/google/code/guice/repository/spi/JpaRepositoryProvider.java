@@ -82,6 +82,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
     private ApplicationContext context;
     private volatile R repository;
     private PersistenceUnitsConfigurationManager configurationManager;
+    private Injector injector;
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
@@ -130,7 +131,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
                      CustomRepositoryImplementationResolver implementationResolver,
                      ApplicationContext context,
                      PersistenceUnitsConfigurationManager configurationManager) {
-
+        this.injector = injector;
         if (repositoryClass == null) {
             repositoryClass = extractRepositoryClass(injector);
         }
@@ -223,7 +224,6 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
 
     protected Object instantiateCustomRepository(EntityManager entityManager) {
         Object customRepositoryImplementation = null;
-        //TODO instantiate with guice to allow injections
         /**
          * Watching a case when Repository implementation is a SimpleJpaRepository subclass -
          * we need to call a constructor with some parameters.
@@ -234,9 +234,10 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
             } else {
                 customRepositoryImplementation = customImplementationClass.newInstance();
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
             logger.error(String.format("Unable to instantiate custom repository implementation. Repository class is [%s]", customImplementationClass.getName()), e);
         }
+        injector.injectMembers(customRepositoryImplementation);
         return customRepositoryImplementation;
     }
 }

@@ -114,4 +114,39 @@ public class MultiThreadedRepositoryTest extends RepoTestBase {
             }
         }
     }
+
+    @Test
+    public void testMultipleThreadsAndPersist() throws InterruptedException {
+        Collection<Callable<Object>> callables = new ArrayList<Callable<Object>>();
+        final int usersPerThread = 10;
+        final CountDownLatch usersToSave = new CountDownLatch(usersPerThread * MAX_CONCURRENT_THREADS);
+        for (int i = 0; i < MAX_CONCURRENT_THREADS; i++) {
+            final int finalI = i;
+            callables.add(Executors.callable(new Runnable() {
+                @Override
+                public void run() {
+                    for (int j = 0; j < usersPerThread; j++) {
+                        int index = finalI * j;
+                        userRepository.save(new User(String.valueOf(index), "Surname", index));
+                        usersToSave.countDown();
+                    }
+                }
+            }));
+        }
+
+        ExecutorService executorService = Executors.newFixedThreadPool(MAX_CONCURRENT_THREADS);
+        List<Future<Object>> futures = executorService.invokeAll(callables);
+        for (Future<Object> future : futures) {
+            try {
+                future.get();
+            } catch (ExecutionException e) {
+                logger.error("Error", e);
+                Assert.fail(e.getMessage());
+            }
+        }
+
+        usersToSave.await(1, TimeUnit.MINUTES);
+        Assert.assertEquals("Invalid concurrently saved users count", usersPerThread * MAX_CONCURRENT_THREADS,
+                userRepository.count());
+    }
 }

@@ -19,6 +19,8 @@
 package com.google.code.guice.repository;
 
 import com.google.common.collect.Lists;
+import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
 import net.jcip.annotations.ThreadSafe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +65,8 @@ public class SimpleBatchStoreJpaRepository<T, ID extends Serializable> extends S
         this(JpaEntityInformationSupport.getMetadata(domainClass, entityManager), entityManager);
     }
 
-    public SimpleBatchStoreJpaRepository(JpaEntityInformation<T, ?> entityInformation, EntityManager entityManager) {
+    @Inject
+    public SimpleBatchStoreJpaRepository(@Assisted JpaEntityInformation entityInformation, @Assisted EntityManager entityManager) {
         super(entityInformation, entityManager);
         this.entityManager = entityManager;
         logger = LoggerFactory.getLogger(getClass());

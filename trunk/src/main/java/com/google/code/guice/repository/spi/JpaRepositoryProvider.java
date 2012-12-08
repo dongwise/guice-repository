@@ -195,6 +195,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
                     jpaRepositoryFactoryBean.setBeanFactory(context);
                     jpaRepositoryFactoryBean.setEntityManager(entityManager);
                     jpaRepositoryFactoryBean.setRepositoryInterface(repositoryClass);
+                    //TODO named queries
                     //jpaRepositoryFactoryBean.setNamedQueries();
 
                     if (customImplementationClass != null) {
@@ -214,12 +215,11 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
         }
         return repo;
     }
-
     /**
      * Some instantiation example is <a href="https://jira.springsource.org/browse/DATAJPA-69">here</a>.
      */
     protected JpaRepositoryFactoryBean createJpaRepositoryFactoryBean() {
-        return new CustomJpaRepositoryFactoryBean();
+        return injector.getInstance(CustomJpaRepositoryFactoryBean.class);
     }
 
     protected Object instantiateCustomRepository(EntityManager entityManager) {

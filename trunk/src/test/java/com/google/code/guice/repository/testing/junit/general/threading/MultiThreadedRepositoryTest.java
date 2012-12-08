@@ -53,7 +53,7 @@ public class MultiThreadedRepositoryTest extends RepoTestBase {
         Runnable producer = new Runnable() {
             public void run() {
                 UserRepository instance = injector.getInstance(UserRepository.class);
-
+                try{
                 int hashCode = instance.hashCode();
                 if (repoHashes.isEmpty()) {
                     repoHashes.add(hashCode);
@@ -65,6 +65,9 @@ public class MultiThreadedRepositoryTest extends RepoTestBase {
                 for (int i = 0; i < COUNT_PER_THREAD; i++) {
                     instance.save(new User(UUID.randomUUID().toString(), UUID.randomUUID().toString(), i));
                     generateLatch.countDown();
+                }}catch (Exception e){
+                    logger.error("Error", e);
+                    Assert.fail(e.getMessage());
                 }
             }
         };

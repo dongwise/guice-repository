@@ -21,6 +21,7 @@ package com.google.code.guice.repository.configuration;
 import com.google.code.guice.repository.spi.*;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.name.Names;
 import org.slf4j.Logger;
@@ -46,6 +47,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -149,12 +151,15 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         CompositeTransactionInterceptor transactionInterceptor = new CompositeTransactionInterceptor();
         requestInjection(transactionInterceptor);
         bindInterceptor(Matchers.any(), Matchers.annotatedWith(Transactional.class), transactionInterceptor);
-        bindInterceptor(Matchers.annotatedWith(Transactional.class), Matchers.any(), transactionInterceptor);
+        //bindInterceptor(Matchers.annotatedWith(Transactional.class), Matchers.any(), transactionInterceptor);
+
+        install(new FactoryModuleBuilder().build(SimpleBatchStoreJpaRepositoryFactory.class));
+        install(new FactoryModuleBuilder().build(SimpleQueryDslJpaRepositoryFactory.class));
+        install(new FactoryModuleBuilder().build(CustomJpaRepositoryFactoryCreator.class));
 
         // Support for EntityManager and EntityManagerFactory injections
         bindPersistence(configurationManager);
 
-        // TODO rename
         AccessibleRepositoryBinder repositoryBinder = createRepositoryBinder();
         logger.info("Binding repositories...");
         bindRepositories(repositoryBinder);
@@ -190,7 +195,6 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         PersistenceContextTypeListener persistenceContextTypeListener = new PersistenceContextTypeListener();
         requestInjection(persistenceContextTypeListener);
         bindListener(Matchers.any(), persistenceContextTypeListener);
-
 
         // Support for EntityManagerFactory with @PersistenceUnit injections
         PersistenceUnitTypeListener persistenceUnitTypeListener = new PersistenceUnitTypeListener();
@@ -261,27 +265,38 @@ public abstract class JpaRepositoryModule extends AbstractModule {
     @SuppressWarnings("UnnecessaryLocalVariable")
     protected ApplicationContext createApplicationContext(Collection<PersistenceUnitConfiguration> persistenceUnits, TransactionAttributeSource tas) {
         GenericApplicationContext context = new GenericApplicationContext();
-        //TODO customization for dialect & etc
+
         String abstractEMFBeanName = "abstractEntityManagerFactory";
         context.registerBeanDefinition(abstractEMFBeanName, BeanDefinitionBuilder.
                 genericBeanDefinition(LocalContainerEntityManagerFactoryBean.class).
-                //addPropertyReference("jpaVendorAdapter", "jpaVendorAdapter").
-                        //        addPropertyReference("jpaDialect", "jpaDialect").
-                        //addPropertyValue("persistenceXmlLocation", "classpath:META-INF/persistence.xml").
-                        setAbstract(true).getBeanDefinition());
+                setAbstract(true).getBeanDefinition());
 
         for (PersistenceUnitConfiguration configuration : persistenceUnits) {
             String persistenceUnitName = configuration.getPersistenceUnitName();
+            logger.info(String.format("Processing persistence unit: [%s]", persistenceUnitName));
             // Naming is important - it's needed for later TransactionManager resolution based on @Transactional value with persistenceUnitName
             String transactionManagerName = persistenceUnitName;
             Properties props = configuration.getProperties();
 
             String entityManagerFactoryName = "entityManagerFactory#" + persistenceUnitName;
 
-            context.registerBeanDefinition(entityManagerFactoryName,
-                    BeanDefinitionBuilder.genericBeanDefinition().setParentName(abstractEMFBeanName).
-                            addPropertyValue("persistenceUnitName", persistenceUnitName).
-                            addPropertyValue("jpaProperties", props).getBeanDefinition());
+            BeanDefinitionBuilder emfFactoryDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition().setParentName(abstractEMFBeanName).
+                    addPropertyValue("persistenceUnitName", persistenceUnitName).
+                    addPropertyValue("jpaProperties", props);
+
+            // Additional EntityManagerFactory properties for Spring EMFBean initialization - s.a. jpaDialect, jpaVendorAdapter
+            Map<String, Object> properties = getAdditionalEMFProperties(persistenceUnitName);
+            if (properties != null) {
+                for (String propertyName : properties.keySet()) {
+                    Object value = properties.get(propertyName);
+                    if (value != null) {
+                        logger.info(String.format("Found additional EMF property: [%s] -> [%s]", propertyName, value));
+                        emfFactoryDefinitionBuilder.addPropertyValue(propertyName, value);
+                    }
+                }
+            }
+
+            context.registerBeanDefinition(entityManagerFactoryName, emfFactoryDefinitionBuilder.getBeanDefinition());
 
             context.registerBeanDefinition(transactionManagerName,
                     BeanDefinitionBuilder.genericBeanDefinition(JpaTransactionManager.class).
@@ -308,6 +323,10 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         }
 
         return context;
+    }
+
+    protected Map<String, Object> getAdditionalEMFProperties(String persistenceUnitName) {
+        return null;
     }
 
     /**

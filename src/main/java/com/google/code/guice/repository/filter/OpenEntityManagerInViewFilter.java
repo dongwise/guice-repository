@@ -20,7 +20,7 @@ import javax.persistence.EntityManagerFactory;
 public class OpenEntityManagerInViewFilter extends org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter {
 
     /*===========================================[ INSTANCE VARIABLES ]===========*/
-
+    //TODO: move to extensions project with spring-web dependency
     //TODO: need real sample & Guice-init for this filter
     @Inject
     private PersistenceUnitsConfigurationManager configurationManager;

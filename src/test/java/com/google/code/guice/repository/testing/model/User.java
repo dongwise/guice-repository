@@ -19,6 +19,9 @@
 package com.google.code.guice.repository.testing.model;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 @Entity
 public class User {
@@ -37,6 +40,13 @@ public class User {
 
     @Column
     private String surname;
+
+    @ElementCollection
+    //@CollectionTable(name="phone",joinColumns=@JoinColumn(name="customerid"))
+    //@MapKeyColumn(name="PhoneType")
+    //@Column(name="PhoneNumber")
+    @Basic(fetch = FetchType.LAZY)
+    private Collection<String> metadata;
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
@@ -73,5 +83,13 @@ public class User {
 
     public void setSurname(String surname) {
         this.surname = surname;
+    }
+
+    public Collection<String> getMetadata() {
+        return Collections.unmodifiableCollection(metadata);
+    }
+
+    public void setMetadata(Collection<String> metadata) {
+        this.metadata = new ArrayList<String>(metadata);
     }
 }

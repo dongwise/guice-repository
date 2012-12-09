@@ -22,7 +22,6 @@ import com.google.code.guice.repository.testing.junit.RepoTestBase;
 import com.google.code.guice.repository.testing.model.Account;
 import com.google.code.guice.repository.testing.repo.AccountRepository;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,7 +38,7 @@ public class BatchStoreRepositoryTest extends RepoTestBase {
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
     @Inject
-    private Provider<AccountRepository> accountRepositoryProvider;
+    private AccountRepository accountRepository;
     private Timer timer;
 
     /*===========================================[ CLASS METHODS ]==============*/
@@ -52,7 +51,7 @@ public class BatchStoreRepositoryTest extends RepoTestBase {
             public void run() {
                 try {
                     long free = Runtime.getRuntime().freeMemory() / (1024 * 1024);
-                    logger.info(String.format("Current count: [%d], free memory: [%d] mb", accountRepositoryProvider.get().count(),
+                    logger.info(String.format("Current count: [%d], free memory: [%d] mb", accountRepository.count(),
                             free));
                 } catch (Throwable e) {
                     logger.error("Error", e);
@@ -63,7 +62,6 @@ public class BatchStoreRepositoryTest extends RepoTestBase {
 
     @After
     public void after() {
-        AccountRepository accountRepository = accountRepositoryProvider.get();
         accountRepository.deleteAll();
         assertEquals("Invalid repository size", 0, accountRepository.count());
         timer.cancel();
@@ -78,7 +76,6 @@ public class BatchStoreRepositoryTest extends RepoTestBase {
         int batchSize = 1000;
         int iterationsCount = 50;
 
-        AccountRepository accountRepository = accountRepositoryProvider.get();
         for (int i = 0; i < iterationsCount; i++) {
             List<Account> accounts = generateBatch(batchSize);
             accountRepository.saveInBatch(accounts);
@@ -94,8 +91,6 @@ public class BatchStoreRepositoryTest extends RepoTestBase {
 
     @Test
     public void testPartialBatchSave() throws Exception {
-        AccountRepository accountRepository = accountRepositoryProvider.get();
-
         int totalSize = 10000;
 
         List<Account> accounts = generateBatch(totalSize);

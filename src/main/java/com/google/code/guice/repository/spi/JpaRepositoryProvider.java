@@ -231,13 +231,13 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
         try {
             if (SimpleJpaRepository.class.isAssignableFrom(customImplementationClass)) {
                 customRepositoryImplementation = customImplementationClass.getConstructor(Class.class, EntityManager.class).newInstance(domainClass, entityManager);
+                injector.injectMembers(customRepositoryImplementation);
             } else {
-                customRepositoryImplementation = customImplementationClass.newInstance();
+                customRepositoryImplementation = injector.getInstance(customImplementationClass);
             }
         } catch (Exception e) {
             logger.error(String.format("Unable to instantiate custom repository implementation. Repository class is [%s]", customImplementationClass.getName()), e);
         }
-        injector.injectMembers(customRepositoryImplementation);
         return customRepositoryImplementation;
     }
 }

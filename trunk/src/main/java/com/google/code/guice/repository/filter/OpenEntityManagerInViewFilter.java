@@ -35,6 +35,7 @@ public class OpenEntityManagerInViewFilter extends org.springframework.orm.jpa.s
     //TODO transactions for web and filter is unnesessary?
     @Override
     protected EntityManager createEntityManager(EntityManagerFactory emf) {
+        //TODO set into configuration
         return super.createEntityManager(emf);
     }
 }

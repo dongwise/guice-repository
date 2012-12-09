@@ -42,9 +42,6 @@ public class User {
     private String surname;
 
     @ElementCollection
-    //@CollectionTable(name="phone",joinColumns=@JoinColumn(name="customerid"))
-    //@MapKeyColumn(name="PhoneType")
-    //@Column(name="PhoneNumber")
     @Basic(fetch = FetchType.LAZY)
     private Collection<String> metadata;
 

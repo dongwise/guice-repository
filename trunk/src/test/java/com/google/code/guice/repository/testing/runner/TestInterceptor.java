@@ -8,6 +8,8 @@ package com.google.code.guice.repository.testing.runner;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
+import java.util.Arrays;
+
 
 /**
  * TestInterceptor - TODO: description
@@ -23,7 +25,11 @@ public class TestInterceptor implements MethodInterceptor {
 
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
-        //System.out.println("invocation = " + invocation.getMethod().getName());
+        Object[] arguments = invocation.getArguments();
+        System.out.println(String.format("method: [%s], args: ([%s]), this: [%s]",
+                invocation.getMethod().getName(),
+                arguments !=null? Arrays.asList(arguments):"void",
+                invocation.getThis()));
         return invocation.proceed();
     }
 }

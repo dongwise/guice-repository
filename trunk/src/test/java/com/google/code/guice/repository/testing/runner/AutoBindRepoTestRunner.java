@@ -27,6 +27,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.matcher.Matchers;
 import org.junit.runners.model.InitializationError;
 import org.springframework.orm.jpa.vendor.HibernateJpaDialect;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -68,7 +69,7 @@ public class AutoBindRepoTestRunner extends GuiceTestRunner {
         }, new AbstractModule() {
                     @Override
                     protected void configure() {
-                        bindInterceptor(Matchers.any(), Matchers.any(), new TestInterceptor());
+                        bindInterceptor(Matchers.any(), Matchers.annotatedWith(Transactional.class), new TestInterceptor());
                     }
                 });
     }

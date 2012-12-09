@@ -22,12 +22,13 @@ import com.google.code.guice.repository.testing.junit.RepoTestBase;
 import com.google.code.guice.repository.testing.model.User;
 import com.google.code.guice.repository.testing.repo.UserRepository;
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import org.junit.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -41,13 +42,12 @@ public class UserRepositoryTest extends RepoTestBase {
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
     @Inject
-    private Provider<UserRepository> userRepositoryProvider;
+    private UserRepository userRepository;
 
     /*===========================================[ CLASS METHODS ]==============*/
 
     @Test
     public void testRepo() throws Exception {
-        UserRepository userRepository = userRepositoryProvider.get();
         userRepository.someCustomMethod(new User("one", "two", 42));
 
         userRepository.deleteInactiveUsers();
@@ -59,7 +59,7 @@ public class UserRepositoryTest extends RepoTestBase {
         userRepository.save(new User("john", "smith", 42));
         userRepository.save(new User("alex", "johns", 33));
         userRepository.save(new User("sam", "brown", 22));
-        assertEquals("Invalid repository size", 3, userRepositoryProvider.get().count());
+        assertEquals("Invalid repository size", 3, userRepository.count());
 
         assertNotNull("User not found", userRepository.findUserByName("john"));
 
@@ -71,7 +71,7 @@ public class UserRepositoryTest extends RepoTestBase {
             public void run() {
                 try {
                     logger.info("Start concurrent thread");
-                    UserRepository anotherRepo = userRepositoryProvider.get();
+                    UserRepository anotherRepo = userRepository;
                     logger.info("count");
                     assertEquals("Invalid repository size", 3, anotherRepo.count());
                     logger.info("save");
@@ -90,5 +90,21 @@ public class UserRepositoryTest extends RepoTestBase {
         assertEquals("Invalid repository size", 0, userRepository.count());
 
         userRepository.someCustomMethod(new User("john", "smith", 42));
+    }
+
+    @Test
+    @Transactional
+    public void testLazyLoad(){
+        User user = new User("lazy", "lazy", 1);
+        String metadata = "lazy-metadata";
+        user.setMetadata(Arrays.asList(metadata));
+        userRepository.save(user);
+
+        User lazyUser = userRepository.findUserByName("lazy");
+        System.out.println("user");
+        Collection<String> lMetadata = lazyUser.getMetadata();
+
+        String loadedMetadata = lMetadata.iterator().next();
+        assertEquals(metadata, loadedMetadata);
     }
 }

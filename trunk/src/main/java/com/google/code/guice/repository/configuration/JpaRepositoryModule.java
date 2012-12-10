@@ -18,6 +18,7 @@
 
 package com.google.code.guice.repository.configuration;
 
+import com.google.code.guice.repository.filter.PersistFilter;
 import com.google.code.guice.repository.spi.*;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
@@ -171,18 +172,21 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         // Support for EntityManager and EntityManagerFactory injections
         bindPersistence(configurationManager);
 
-        AccessibleRepositoryBinder repositoryBinder = createRepositoryBinder();
+        RepositoryBinder repositoryBinder = createRepositoryBinder();
         logger.info("Binding repositories...");
         bindRepositories(repositoryBinder);
-        Collection<AccessibleRepositoryBinding> bindings = repositoryBinder.getBindings();
-        for (AccessibleRepositoryBinding binding : bindings) {
+        Collection<RepositoryBinding> bindings = repositoryBinder.getBindings();
+        for (RepositoryBinding binding : bindings) {
             Class<? extends Repository> repositoryClass = binding.getRepositoryClass();
             Class customRepositoryClass = binding.getCustomRepositoryClass();
             String persistenceUnitName = binding.getPersistenceUnitName();
-            String specificPersistenceUnitName = extractAnnotationsPersistenceUnitName(repositoryClass);
 
-            if (specificPersistenceUnitName != null && !specificPersistenceUnitName.isEmpty()) {
-                persistenceUnitName = specificPersistenceUnitName;
+            // Locate persistenceUnitName from annotation when no direct binding defined
+            if (persistenceUnitName == null || persistenceUnitName.isEmpty()) {
+                String specificPersistenceUnitName = extractAnnotationsPersistenceUnitName(repositoryClass);
+                if (specificPersistenceUnitName != null && !specificPersistenceUnitName.isEmpty()) {
+                    persistenceUnitName = specificPersistenceUnitName;
+                }
             }
 
             if (configurationManager.getConfiguration(persistenceUnitName) == null) {
@@ -218,7 +222,7 @@ public abstract class JpaRepositoryModule extends AbstractModule {
             /**
              * Provider bindings for EM needed for Web-mode - EM can be recreated
              * (& re-registered in PersistenceUnitConfiguration)
-             * in {@link com.google.code.guice.repository.filter.PersistFilter}
+             * in {@link PersistFilter}
              * */
             bind(EntityManager.class).annotatedWith(Names.named(configuration.getPersistenceUnitName())).toProvider(new Provider<EntityManager>() {
                 @Override
@@ -234,7 +238,7 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         /**
          * Provider bindings for EM needed for Web-mode - EM can be recreated
          * (& re-registered in PersistenceUnitConfiguration)
-         * in {@link com.google.code.guice.repository.filter.PersistFilter}
+         * in {@link PersistFilter}
          * */
         bind(EntityManager.class).toProvider(new Provider<EntityManager>() {
             @Override
@@ -277,7 +281,7 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         return persistenceUnitName;
     }
 
-    protected AccessibleRepositoryBinder createRepositoryBinder() {
+    protected RepositoryBinder createRepositoryBinder() {
         return new AccessibleRepositoryBinder();
     }
 

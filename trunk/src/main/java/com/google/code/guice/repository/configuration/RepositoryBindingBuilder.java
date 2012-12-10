@@ -18,19 +18,19 @@
 
 package com.google.code.guice.repository.configuration;
 
-import java.util.Collection;
-
 /**
- * RepositoryBinder - TODO: description
+ * RepositoryBinding - TODO: description
  *
  * @author Alexey Krylov (lexx)
  * @since 07.12.12
  */
-public interface RepositoryBinder {
+public interface RepositoryBindingBuilder {
 
     /*===========================================[ INTERFACE METHODS ]==============*/
 
-    RepositoryBindingBuilder bind(Class repositoryClass);
+    RepositoryBindingBuilder withCustomImplementation(Class customRepositoryClass);
 
-    Collection<RepositoryBinding> getBindings();
+    void to(String persistenceUnitName);
+
+    void withSelfDefinition();
 }

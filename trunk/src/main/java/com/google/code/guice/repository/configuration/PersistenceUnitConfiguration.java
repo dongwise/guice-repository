@@ -20,7 +20,6 @@ package com.google.code.guice.repository.configuration;
 
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
-import org.springframework.util.Assert;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -65,8 +64,7 @@ public class PersistenceUnitConfiguration {
         return entityManager;
     }
 
-    public void setEntityManager(EntityManager entityManager) {
-        Assert.notNull(entityManager);
+    protected void setEntityManager(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
@@ -101,6 +99,7 @@ public class PersistenceUnitConfiguration {
     protected void setDefault(boolean isDefault) {
         this.isDefault = isDefault;
     }
+
     public TransactionInterceptor getTransactionInterceptor() {
         return transactionInterceptor;
     }
@@ -108,7 +107,6 @@ public class PersistenceUnitConfiguration {
     protected void setTransactionInterceptor(TransactionInterceptor transactionInterceptor) {
         this.transactionInterceptor = transactionInterceptor;
     }
-
 
     @Override
     public boolean equals(Object obj) {

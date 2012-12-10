@@ -41,7 +41,7 @@ public class PersistFilter extends OpenEntityManagerInViewFilter {
     @Override
     protected EntityManager createEntityManager(EntityManagerFactory emf) {
         EntityManager entityManager = super.createEntityManager(emf);
-        configurationManager.getConfiguration(getPersistenceUnitName()).setEntityManager(entityManager);
+        configurationManager.changeEntityManager(getPersistenceUnitName(), entityManager);
         return entityManager;
     }
 }

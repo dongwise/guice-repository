@@ -20,6 +20,7 @@ package com.google.code.guice.repository.configuration;
 
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
+import org.springframework.util.Assert;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -64,7 +65,8 @@ public class PersistenceUnitConfiguration {
         return entityManager;
     }
 
-    protected void setEntityManager(EntityManager entityManager) {
+    public void setEntityManager(EntityManager entityManager) {
+        Assert.notNull(entityManager);
         this.entityManager = entityManager;
     }
 

@@ -18,7 +18,6 @@
 
 package com.google.code.guice.repository.configuration;
 
-import com.google.code.guice.repository.filter.OpenEntityManagerInViewFilter;
 import com.google.code.guice.repository.spi.*;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
@@ -219,7 +218,7 @@ public abstract class JpaRepositoryModule extends AbstractModule {
             /**
              * Provider bindings for EM needed for Web-mode - EM can be recreated
              * (& re-registered in PersistenceUnitConfiguration)
-             * in {@link OpenEntityManagerInViewFilter}
+             * in {@link com.google.code.guice.repository.filter.PersistFilter}
              * */
             bind(EntityManager.class).annotatedWith(Names.named(configuration.getPersistenceUnitName())).toProvider(new Provider<EntityManager>() {
                 @Override
@@ -235,7 +234,7 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         /**
          * Provider bindings for EM needed for Web-mode - EM can be recreated
          * (& re-registered in PersistenceUnitConfiguration)
-         * in {@link OpenEntityManagerInViewFilter}
+         * in {@link com.google.code.guice.repository.filter.PersistFilter}
          * */
         bind(EntityManager.class).toProvider(new Provider<EntityManager>() {
             @Override
@@ -295,7 +294,6 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         return manager;
     }
 
-    @SuppressWarnings("UnnecessaryLocalVariable")
     protected ApplicationContext createApplicationContext(Collection<PersistenceUnitConfiguration> persistenceUnits, TransactionAttributeSource tas) {
         GenericApplicationContext context = new GenericApplicationContext();
 
@@ -307,8 +305,6 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         for (PersistenceUnitConfiguration configuration : persistenceUnits) {
             String persistenceUnitName = configuration.getPersistenceUnitName();
             logger.info(String.format("Processing persistence unit: [%s]", persistenceUnitName));
-            // Naming is important - it's needed for later TransactionManager resolution based on @Transactional value with persistenceUnitName
-            String transactionManagerName = persistenceUnitName;
             Properties props = configuration.getProperties();
 
             String entityManagerFactoryName = "entityManagerFactory#" + persistenceUnitName;
@@ -331,11 +327,12 @@ public abstract class JpaRepositoryModule extends AbstractModule {
 
             context.registerBeanDefinition(entityManagerFactoryName, emfFactoryDefinitionBuilder.getBeanDefinition());
 
-            context.registerBeanDefinition(transactionManagerName,
+            // Naming is important - it's needed for later TransactionManager resolution based on @Transactional value with persistenceUnitName
+            context.registerBeanDefinition(persistenceUnitName,
                     BeanDefinitionBuilder.genericBeanDefinition(JpaTransactionManager.class).
                             addPropertyReference("entityManagerFactory", entityManagerFactoryName).getBeanDefinition());
 
-            PlatformTransactionManager transactionManager = context.getBean(transactionManagerName, PlatformTransactionManager.class);
+            PlatformTransactionManager transactionManager = context.getBean(persistenceUnitName, PlatformTransactionManager.class);
             TransactionInterceptor transactionInterceptor = new TransactionInterceptor(transactionManager, tas);
             transactionInterceptor.setBeanFactory(context);
 
@@ -345,7 +342,7 @@ public abstract class JpaRepositoryModule extends AbstractModule {
             configuration.setEntityManager(entityManager);
             configuration.setEntityManagerFactory(emf);
             configuration.setTransactionManager(transactionManager);
-            configuration.setTransactionManagerName(transactionManagerName);
+            configuration.setTransactionManagerName(persistenceUnitName);
             configuration.setTransactionInterceptor(transactionInterceptor);
 
             // Default bindings for EMF & Transaction Manager - they needed for repositories with @Transactional without value

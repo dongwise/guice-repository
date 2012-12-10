@@ -7,6 +7,7 @@ package com.google.code.guice.repository.filter;
 
 import com.google.code.guice.repository.configuration.PersistenceUnitsConfigurationManager;
 import com.google.inject.Inject;
+import org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -18,15 +19,14 @@ import javax.servlet.http.HttpServletRequest;
  * @author Alexey Krylov (AleX)
  * @since 08.12.12
  */
-public class OpenEntityManagerInViewFilter extends org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter {
+public class PersistFilter extends OpenEntityManagerInViewFilter {
 
     /*===========================================[ STATIC VARIABLES ]=============*/
 
     public static final String P_PERSISTENCE_UNIT_NAME = "persistenceUnitName";
 
     /*===========================================[ INSTANCE VARIABLES ]===========*/
-    //TODO: move to extensions project with spring-web dependency
-    //TODO: need real sample & Guice-init for this filter
+
     @Inject
     private PersistenceUnitsConfigurationManager configurationManager;
 
@@ -39,16 +39,9 @@ public class OpenEntityManagerInViewFilter extends org.springframework.orm.jpa.s
     }
 
     @Override
-    protected EntityManagerFactory lookupEntityManagerFactory() {
-        return configurationManager.getConfiguration(getPersistenceUnitName()).getEntityManagerFactory();
-    }
-
-    //TODO transactions for web and filter is unnesessary?
-    @Override
     protected EntityManager createEntityManager(EntityManagerFactory emf) {
         EntityManager entityManager = super.createEntityManager(emf);
-        //TODO
-        //configurationManager.getConfiguration(getPersistenceUnitName()).setEntityManager(entityManager);
+        configurationManager.getConfiguration(getPersistenceUnitName()).setEntityManager(entityManager);
         return entityManager;
     }
 }

@@ -13,7 +13,7 @@ import com.google.code.guice.repository.configuration.RepositoryBinding;
  * @author Alexey Krylov (AleX)
  * @since 11.12.12
  */
-public class AccesibleRepositoryBinding implements RepositoryBinding {
+public class AccessibleRepositoryBinding implements RepositoryBinding {
 /*===========================================[ STATIC VARIABLES ]=============*/
 /*===========================================[ INSTANCE VARIABLES ]===========*/
 
@@ -23,7 +23,7 @@ public class AccesibleRepositoryBinding implements RepositoryBinding {
 
 /*===========================================[ CONSTRUCTORS ]=================*/
 
-    public AccesibleRepositoryBinding(Class repositoryClass) {
+    public AccessibleRepositoryBinding(Class repositoryClass) {
         this.repositoryClass = repositoryClass;
     }
     /*===========================================[ CLASS METHODS ]================*/

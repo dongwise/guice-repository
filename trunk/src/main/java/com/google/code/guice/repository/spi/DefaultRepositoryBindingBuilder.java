@@ -62,7 +62,7 @@ public class DefaultRepositoryBindingBuilder implements RepositoryBindingBuilder
     }
 
     protected RepositoryBinding build() {
-        AccesibleRepositoryBinding binding = new AccesibleRepositoryBinding(repositoryClass);
+        AccessibleRepositoryBinding binding = new AccessibleRepositoryBinding(repositoryClass);
         binding.setCustomRepositoryClass(customRepositoryClass);
         binding.setPersistenceUnitName(persistenceUnitName);
         return binding;

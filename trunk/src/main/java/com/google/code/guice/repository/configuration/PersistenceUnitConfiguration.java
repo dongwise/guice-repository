@@ -33,7 +33,6 @@ import java.util.Properties;
  */
 public class PersistenceUnitConfiguration {
 
-
     /*===========================================[ INSTANCE VARIABLES ]===========*/
 
     private String persistenceUnitName;
@@ -100,6 +99,13 @@ public class PersistenceUnitConfiguration {
     protected void setDefault(boolean isDefault) {
         this.isDefault = isDefault;
     }
+    public TransactionInterceptor getTransactionInterceptor() {
+        return transactionInterceptor;
+    }
+
+    protected void setTransactionInterceptor(TransactionInterceptor transactionInterceptor) {
+        this.transactionInterceptor = transactionInterceptor;
+    }
 
 
     @Override
@@ -125,18 +131,11 @@ public class PersistenceUnitConfiguration {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("PersistenceUnitConfiguration");
-        sb.append("{name='").append(persistenceUnitName).append('\'');
-        sb.append(", properties=").append(properties);
+        sb.append("{persistenceUnitName='").append(persistenceUnitName).append('\'');
+        sb.append(", isDefault=").append(isDefault);
         sb.append(", transactionManagerName='").append(transactionManagerName).append('\'');
+        sb.append(", properties=").append(properties);
         sb.append('}');
         return sb.toString();
-    }
-
-    public TransactionInterceptor getTransactionInterceptor() {
-        return transactionInterceptor;
-    }
-
-    protected void setTransactionInterceptor(TransactionInterceptor transactionInterceptor) {
-        this.transactionInterceptor = transactionInterceptor;
     }
 }

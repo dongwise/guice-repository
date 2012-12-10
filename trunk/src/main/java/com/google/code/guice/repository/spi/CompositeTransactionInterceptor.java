@@ -57,7 +57,7 @@ public class CompositeTransactionInterceptor implements MethodInterceptor {
         TransactionAttribute txAttr = transactionAttributeSource.getTransactionAttribute(invocation.getMethod(), targetClass);
         String persistenceUnitName = txAttr.getQualifier();
 
-        PersistenceUnitConfiguration configuration = configurationManager.getPersistenceUnitConfiguration(persistenceUnitName);
+        PersistenceUnitConfiguration configuration = configurationManager.getConfiguration(persistenceUnitName);
         return configuration.getTransactionInterceptor().invoke(invocation);
     }
 }

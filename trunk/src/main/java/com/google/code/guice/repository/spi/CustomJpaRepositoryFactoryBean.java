@@ -19,9 +19,12 @@ import javax.persistence.EntityManager;
 */
 public class CustomJpaRepositoryFactoryBean extends JpaRepositoryFactoryBean {
 
-    /*===========================================[ CLASS METHODS ]==============*/
+    /*===========================================[ INSTANCE VARIABLES ]=========*/
+
     @Inject
     private CustomJpaRepositoryFactoryCreator factoryCreator;
+
+    /*===========================================[ CLASS METHODS ]==============*/
 
     @Override
     protected RepositoryFactorySupport createRepositoryFactory(EntityManager entityManager) {

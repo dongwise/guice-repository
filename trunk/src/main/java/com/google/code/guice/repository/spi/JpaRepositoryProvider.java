@@ -185,8 +185,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
                 repo = repository;
                 if (repo == null) {
                     JpaRepositoryFactoryBean jpaRepositoryFactoryBean = createJpaRepositoryFactoryBean();
-
-                    PersistenceUnitConfiguration configuration = configurationManager.getPersistenceUnitConfiguration(persistenceUnitName);
+                    PersistenceUnitConfiguration configuration = configurationManager.getConfiguration(persistenceUnitName);
 
                     EntityManager entityManager = configuration.getEntityManager();
                     // Needs to be set first
@@ -195,8 +194,6 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
                     jpaRepositoryFactoryBean.setBeanFactory(context);
                     jpaRepositoryFactoryBean.setEntityManager(entityManager);
                     jpaRepositoryFactoryBean.setRepositoryInterface(repositoryClass);
-                    //TODO named queries
-                    //jpaRepositoryFactoryBean.setNamedQueries();
 
                     if (customImplementationClass != null) {
                         Object customRepositoryImplementation = instantiateCustomRepository(entityManager);
@@ -215,6 +212,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
         }
         return repo;
     }
+
     /**
      * Some instantiation example is <a href="https://jira.springsource.org/browse/DATAJPA-69">here</a>.
      */

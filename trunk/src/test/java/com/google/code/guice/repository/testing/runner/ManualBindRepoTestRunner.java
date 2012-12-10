@@ -36,7 +36,7 @@ public class ManualBindRepoTestRunner extends GuiceTestRunner {
     /*===========================================[ CLASS METHODS ]==============*/
 
     public ManualBindRepoTestRunner(Class<?> classToRun) throws InitializationError {
-        super(classToRun, new JpaRepositoryModule("test-h2") {
+        super(classToRun, new JpaRepositoryModule("test-h2", "test-h2-secondary") {
             @Override
             protected void bindRepositories(RepositoryBinder binder) {
                 binder.bind(UserRepository.class);

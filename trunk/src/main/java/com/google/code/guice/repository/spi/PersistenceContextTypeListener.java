@@ -52,7 +52,7 @@ public class PersistenceContextTypeListener implements TypeListener {
                         && field.isAnnotationPresent(PersistenceContext.class)) {
                     PersistenceContext persistenceContext = field.getAnnotation(PersistenceContext.class);
                     String persistenceUnitName = persistenceContext.unitName();
-                    PersistenceUnitConfiguration configuration = configurationManager.getPersistenceUnitConfiguration(persistenceUnitName);
+                    PersistenceUnitConfiguration configuration = configurationManager.getConfiguration(persistenceUnitName);
                     encounter.register(new EntityManagerMembersInjector<T>(field, configuration.getEntityManager()));
                 }
             }

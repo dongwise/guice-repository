@@ -47,7 +47,7 @@ public class PersistenceUnitsConfigurationManager {
 
     /*===========================================[ CLASS METHODS ]================*/
 
-    public void registerPersistenceUnitConfiguration(PersistenceUnitConfiguration persistenceUnitConfiguration, boolean asDefault) {
+    public void registerConfiguration(PersistenceUnitConfiguration persistenceUnitConfiguration, boolean asDefault) {
         if (asDefault) {
             defaultConfiguration = persistenceUnitConfiguration;
             defaultConfiguration.setDefault(true);
@@ -56,20 +56,20 @@ public class PersistenceUnitsConfigurationManager {
         configurations.put(persistenceUnitConfiguration.getPersistenceUnitName(), persistenceUnitConfiguration);
     }
 
-    public PersistenceUnitConfiguration getPersistenceUnitConfiguration(String persistenceUnitName) {
+    public PersistenceUnitConfiguration getConfiguration(String persistenceUnitName) {
         if (persistenceUnitName == null || persistenceUnitName.isEmpty()) {
             return defaultConfiguration;
         } else {
-            return configurations.get(persistenceUnitName);
+            PersistenceUnitConfiguration persistenceUnitConfiguration = configurations.get(persistenceUnitName);
+            if (persistenceUnitConfiguration == null) {
+                throw new IllegalStateException(String.format("Persistence configuration for [%s] is not registered", persistenceUnitName));
+            }
+            return persistenceUnitConfiguration;
         }
     }
 
     public PersistenceUnitConfiguration getDefaultConfiguration() {
         return defaultConfiguration;
-    }
-
-    public Collection<PersistenceUnitConfiguration> getPersistenceUnitsConfigurations() {
-        return Collections.unmodifiableCollection(configurations.values());
     }
 
     public boolean containsSpecificConfiguration(String persistenceUnitName) {

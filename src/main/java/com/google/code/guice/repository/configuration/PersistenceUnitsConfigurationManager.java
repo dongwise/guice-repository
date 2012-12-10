@@ -19,7 +19,9 @@
 package com.google.code.guice.repository.configuration;
 
 import net.jcip.annotations.ThreadSafe;
+import org.springframework.util.Assert;
 
+import javax.persistence.EntityManager;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -81,5 +83,10 @@ public class PersistenceUnitsConfigurationManager {
 
     public Collection<PersistenceUnitConfiguration> getConfigurations() {
         return configurations.values();
+    }
+
+    public void changeEntityManager(String persistenceUnitName, EntityManager entityManager) {
+        Assert.notNull(entityManager);
+        getConfiguration(persistenceUnitName).setEntityManager(entityManager);
     }
 }

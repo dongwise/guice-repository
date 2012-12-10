@@ -19,7 +19,7 @@
 package com.google.code.guice.repository.spi;
 
 import com.google.code.guice.repository.configuration.RepositoryBinding;
-import org.springframework.util.Assert;
+import com.google.code.guice.repository.configuration.RepositoryBindingBuilder;
 
 /**
  * RepositoryBindingImpl - TODO: description
@@ -27,40 +27,44 @@ import org.springframework.util.Assert;
  * @author Alexey Krylov (lexx)
  * @since 07.12.12
  */
-public class AccessibleRepositoryBinding implements RepositoryBinding {
-/*===========================================[ STATIC VARIABLES ]=============*/
-/*===========================================[ INSTANCE VARIABLES ]===========*/
+public class DefaultRepositoryBindingBuilder implements RepositoryBindingBuilder {
+    /*===========================================[ STATIC VARIABLES ]=============*/
+    //todo params
+
+    /*===========================================[ INSTANCE VARIABLES ]===========*/
+
     private String persistenceUnitName;
     private Class repositoryClass;
     private Class customRepositoryClass;
-/*===========================================[ CONSTRUCTORS ]=================*/
 
-    protected AccessibleRepositoryBinding(Class repositoryClass) {
+    /*===========================================[ CONSTRUCTORS ]=================*/
+
+    protected DefaultRepositoryBindingBuilder(Class repositoryClass) {
         this.repositoryClass = repositoryClass;
     }
     /*===========================================[ CLASS METHODS ]================*/
 
     @Override
-    public RepositoryBinding withCustomImplementation(Class customRepositoryClass) {
+    public RepositoryBindingBuilder withCustomImplementation(Class customRepositoryClass) {
         this.customRepositoryClass = customRepositoryClass;
         return this;
     }
 
     @Override
-    public RepositoryBinding attachedTo(String persistenceUnitName) {
+    public void to(String persistenceUnitName) {
         this.persistenceUnitName = persistenceUnitName;
-        return this;
+        build();
     }
 
-    public Class getRepositoryClass() {
-        return repositoryClass;
+    @Override
+    public void withSelfDefinition() {
+        build();
     }
 
-    public Class getCustomRepositoryClass() {
-        return customRepositoryClass;
-    }
-
-    public String getPersistenceUnitName() {
-        return persistenceUnitName;
+    protected RepositoryBinding build() {
+        AccesibleRepositoryBinding binding = new AccesibleRepositoryBinding(repositoryClass);
+        binding.setCustomRepositoryClass(customRepositoryClass);
+        binding.setPersistenceUnitName(persistenceUnitName);
+        return binding;
     }
 }

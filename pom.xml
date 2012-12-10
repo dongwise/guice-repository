@@ -68,22 +68,25 @@
 
         <!-- Spring stuff -->
 
-        <version.spring>3.1.3.RELEASE</version.spring>
+        <version.spring>3.1.2.RELEASE</version.spring>
+
+        <!-- Spring-Data JPA -->
+
         <version.spring-data-jpa>1.2.0.RELEASE</version.spring-data-jpa>
+
+        <!-- Spring-Data JPA Additional-->
+
+        <version.querydsl>2.9.0</version.querydsl>
 
         <!-- Servlet API-->
 
         <version.servlet-api>2.5</version.servlet-api>
 
-        <!-- Persistence implementation API -->
-
-        <version.hibernate>4.1.8.Final</version.hibernate>
-
         <!-- Test stuff -->
 
         <version.junit>4.10</version.junit>
         <version.h2>1.3.170</version.h2>
-        <version.querydsl>2.9.0</version.querydsl>
+        <version.hibernate>4.1.8.Final</version.hibernate>
 
         <!-- Plugins -->
 
@@ -151,7 +154,7 @@
             <version>${version.slf4j}</version>
         </dependency>
 
-        <!-- Spring stuff -->
+        <!-- Spring-Data JPA -->
 
         <dependency>
             <groupId>org.springframework.data</groupId>
@@ -159,14 +162,15 @@
             <version>${version.spring-data-jpa}</version>
         </dependency>
 
+        <!-- Spring stuff -->
+
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
             <version>${version.spring}</version>
-            <scope>provided</scope>
         </dependency>
 
-        <!-- QueryDSL stuff -->
+        <!-- Spring-Data JPA Additional-->
 
         <dependency>
             <groupId>com.mysema.querydsl</groupId>

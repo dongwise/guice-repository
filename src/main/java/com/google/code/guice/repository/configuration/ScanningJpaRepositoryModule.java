@@ -122,7 +122,7 @@ public class ScanningJpaRepositoryModule extends JpaRepositoryModule {
                     Iterator<Class<?>> iterator = repoImplementations.iterator();
                     Class<?> implementation = iterator.hasNext() ? iterator.next() : null;
                     getLogger().info(String.format("Found repository: [%s]", repositoryClass.getName()));
-                    binder.bind(repositoryClass).withCustomImplementation(implementation).attachedTo(persistenceUnitName);
+                    binder.bind(repositoryClass).withCustomImplementation(implementation).to(persistenceUnitName);
                 }
             }
         }

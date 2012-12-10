@@ -18,8 +18,10 @@
 
 package com.google.code.guice.repository.configuration;
 
+import com.google.code.guice.repository.filter.OpenEntityManagerInViewFilter;
 import com.google.code.guice.repository.spi.*;
 import com.google.inject.AbstractModule;
+import com.google.inject.Provider;
 import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.matcher.Matchers;
@@ -51,13 +53,13 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * Guice module with Repository support. Repository bindings should be made in <code>configureRepositories</code>
+ * Guice module with Repository support. Repository bindings should be made in {@code configureRepositories}
  * method. Module uses JpaPersistModule from guice-persist, which is requires persistence-unit name as an input
  * parameter. There is three options to specify persistence-unit name: <ol> <li> constructor parameter. For example:
  * new
  * JpaRepositoryModule("my-persistence-unit") </li> <li> system property 'persistence-unit-name'. For example: launch
  * an
- * application with -Dpersistence-unit-name=my-persistence-unit </li> <li>override <code>getPersistenceUnitName</code>
+ * application with -Dpersistence-unit-name=my-persistence-unit </li> <li>override {@code getPersistenceUnitName}
  * method. For example:
  * <pre>
  *          new JpaRepositoryModule(){
@@ -82,7 +84,17 @@ public abstract class JpaRepositoryModule extends AbstractModule {
 
     /*===========================================[ STATIC VARIABLES ]=============*/
 
+    /**
+     * System property with attached persistence units.
+     * <pre>
+     *     -Dpersistence-units=unit1,unit2,unit3
+     * </pre>
+     */
     public static final String P_PERSISTENCE_UNITS = "persistence-units";
+
+    /**
+     * Persistence units split regex - can be used for outside property value construction
+     */
     public static final String PERSISTENCE_UNITS_SPLIT_REGEX = ",|;";
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
@@ -144,7 +156,7 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         bind(TransactionAttributeSource.class).toInstance(tas);
 
         // Initializing Spring Context
-        ApplicationContext applicationContext = createApplicationContext(configurationManager.getPersistenceUnitsConfigurations(), tas);
+        ApplicationContext applicationContext = createApplicationContext(configurationManager.getConfigurations(), tas);
         bind(ApplicationContext.class).toInstance(applicationContext);
 
         // Initializing interceptor for components created by Guice and marked with @Transactional
@@ -174,7 +186,7 @@ public abstract class JpaRepositoryModule extends AbstractModule {
                 persistenceUnitName = specificPersistenceUnitName;
             }
 
-            if (configurationManager.getPersistenceUnitConfiguration(persistenceUnitName) == null) {
+            if (configurationManager.getConfiguration(persistenceUnitName) == null) {
                 throw new IllegalStateException(String.format("Unable to register repository [%s] - persistence unit [%s] is not registered",
                         repositoryClass.getName(), persistenceUnitName));
             }
@@ -202,14 +214,35 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         bindListener(Matchers.any(), persistenceUnitTypeListener);
 
         Collection<PersistenceUnitConfiguration> configurations = configurationManager.getConfigurations();
-        for (PersistenceUnitConfiguration configuration : configurations) {
-            bind(EntityManager.class).annotatedWith(Names.named(configuration.getPersistenceUnitName())).toInstance(configuration.getEntityManager());
+
+        for (final PersistenceUnitConfiguration configuration : configurations) {
+            /**
+             * Provider bindings for EM needed for Web-mode - EM can be recreated
+             * (& re-registered in PersistenceUnitConfiguration)
+             * in {@link OpenEntityManagerInViewFilter}
+             * */
+            bind(EntityManager.class).annotatedWith(Names.named(configuration.getPersistenceUnitName())).toProvider(new Provider<EntityManager>() {
+                @Override
+                public EntityManager get() {
+                    return configuration.getEntityManager();
+                }
+            });
             bind(EntityManagerFactory.class).annotatedWith(Names.named(configuration.getPersistenceUnitName())).toInstance(configuration.getEntityManagerFactory());
         }
 
         // binding default EntityManager & EntityManagerFactory
-        PersistenceUnitConfiguration defaultConfiguration = configurationManager.getDefaultConfiguration();
-        bind(EntityManager.class).toInstance(defaultConfiguration.getEntityManager());
+        final PersistenceUnitConfiguration defaultConfiguration = configurationManager.getDefaultConfiguration();
+        /**
+         * Provider bindings for EM needed for Web-mode - EM can be recreated
+         * (& re-registered in PersistenceUnitConfiguration)
+         * in {@link OpenEntityManagerInViewFilter}
+         * */
+        bind(EntityManager.class).toProvider(new Provider<EntityManager>() {
+            @Override
+            public EntityManager get() {
+                return defaultConfiguration.getEntityManager();
+            }
+        });
         bind(EntityManagerFactory.class).toInstance(defaultConfiguration.getEntityManagerFactory());
     }
 
@@ -256,7 +289,7 @@ public abstract class JpaRepositoryModule extends AbstractModule {
             Properties persistenceUnitProperties = getPersistenceUnitProperties(persistenceUnitName);
             // First persistence unit will be "default"
             boolean isDefaultConfiguration = i == 0;
-            manager.registerPersistenceUnitConfiguration(
+            manager.registerConfiguration(
                     new PersistenceUnitConfiguration(persistenceUnitName, persistenceUnitProperties), isDefaultConfiguration);
         }
         return manager;

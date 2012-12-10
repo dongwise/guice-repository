@@ -28,6 +28,7 @@
 
     <persistence-unit name="test-h2-secondary">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <class>com.google.code.guice.repository.testing.model.User</class>
         <class>com.google.code.guice.repository.testing.model.UserData</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
     </persistence-unit>

@@ -87,7 +87,7 @@ public class ScanningJpaRepositoryModule extends JpaRepositoryModule {
 
     @Override
     protected void bindRepositories(RepositoryBinder binder) {
-        for (final RepositoriesGroup group : repositoriesGroups) {
+        for (RepositoriesGroup group : repositoriesGroups) {
             String persistenceUnitName = group.getPersistenceUnitName();
 
             Set<URL> urls = new HashSet<URL>();

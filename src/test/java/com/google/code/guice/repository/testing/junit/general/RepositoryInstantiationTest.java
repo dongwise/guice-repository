@@ -31,7 +31,7 @@ public class RepositoryInstantiationTest extends RepoTestBase {
 
     /*===========================================[ STATIC VARIABLES ]=============*/
 
-    private static final int TEST_DURATION_SECONDS = 5;
+    private static final int TEST_DURATION_SECONDS = 10;
 
     /*===========================================[ CLASS METHODS ]==============*/
 

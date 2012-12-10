@@ -22,13 +22,18 @@ import com.google.code.guice.repository.testing.junit.RepoTestBase;
 import com.google.code.guice.repository.testing.model.User;
 import com.google.code.guice.repository.testing.repo.UserRepository;
 import com.google.inject.Inject;
+import com.google.inject.Provider;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -44,11 +49,24 @@ public class UserRepositoryTest extends RepoTestBase {
     @Inject
     private UserRepository userRepository;
 
+    @Inject
+    private Provider<UserRepository> userRepositoryProvider;
+
+    @PersistenceContext(unitName = "test-h2-secondary")
+    private EntityManager secondaryEntityManager;
+
+
     /*===========================================[ CLASS METHODS ]==============*/
 
+    @Override
+    @Before
+    public void baseBefore() {
+        logger = LoggerFactory.getLogger(getClass());
+    }
+
     @Test
-    @Ignore
     public void testRepo() throws Exception {
+        userRepository.deleteAll();
         userRepository.someCustomMethod(new User("one", "two", 42));
 
         userRepository.deleteInactiveUsers();
@@ -80,7 +98,7 @@ public class UserRepositoryTest extends RepoTestBase {
                     assertEquals("Invalid repository size", 4, anotherRepo.count());
                     logger.info("Stored 4");
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error("Error", e);
                 }
             }
         })));
@@ -92,25 +110,20 @@ public class UserRepositoryTest extends RepoTestBase {
 
         userRepository.someCustomMethod(new User("john", "smith", 42));
     }
-     //TODO fix
+
     @Test
-    public void testLazyLoad(){
+    public void testPrepareLazyUser() {
         User user = new User("lazy", "lazy", 1);
-        String metadata = "lazy-metadata";
+        String metadata = "lazy";
         user.setMetadata(Arrays.asList(metadata));
         userRepository.save(user);
+        assertEquals("Invalid repository size", 1, userRepository.count());
+    }
 
-        List<User> all = userRepository.findAll();
-        for (User user1 : all) {
-            System.out.println(user1.getMetadata());
-        }
-/*
-        User lazyUser = all;
-        System.out.println("user");
-        Collection<String> lMetadata = lazyUser.getMetadata();
-
-        String loadedMetadata = lMetadata.iterator().next();
-        assertEquals(metadata, loadedMetadata);
-*/
+    @Test
+    @Transactional
+    public void testLoadLazyUser() {
+        User lazy = userRepository.findUserByName("lazy");
+        assertEquals("Lazy-loadable metadata is not found", "lazy", lazy.getMetadata().iterator().next());
     }
 }

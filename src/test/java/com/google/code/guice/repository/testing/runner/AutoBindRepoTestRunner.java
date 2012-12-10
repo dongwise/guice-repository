@@ -19,6 +19,7 @@
 package com.google.code.guice.repository.testing.runner;
 
 import com.google.code.guice.repository.configuration.RepositoriesGroupBuilder;
+import com.google.code.guice.repository.configuration.RepositoryBinder;
 import com.google.code.guice.repository.configuration.ScanningJpaRepositoryModule;
 import com.google.code.guice.repository.testing.common.GuiceTestRunner;
 import com.google.code.guice.repository.testing.repo.UserDataRepository;
@@ -40,37 +41,44 @@ public class AutoBindRepoTestRunner extends GuiceTestRunner {
 
     public AutoBindRepoTestRunner(Class<?> classToRun) throws InitializationError {
         super(classToRun, new ScanningJpaRepositoryModule(
-                Arrays.asList(
-                      RepositoriesGroupBuilder.forPackage("com.google.code.guice.repository.testing.repo").
-                                withExclusionPattern(".*" + UserDataRepository.class.getSimpleName() + ".*").
-                                attachedTo("test-h2").
-                                build(),
+                        Arrays.asList(
+                                RepositoriesGroupBuilder.forPackage("com.google.code.guice.repository.testing.repo").
+                                        withExclusionPattern(".*" + UserDataRepository.class.getSimpleName() + ".*").
+                                        attachedTo("test-h2").
+                                        build(),
 
-                        RepositoriesGroupBuilder.forPackage("com.google.code.guice.repository.testing.repo").
-                                withInclusionFilterPredicate(new Predicate<Class>() {
-                                    @Override
-                                    public boolean apply(@Nullable Class input) {
-                                        return UserDataRepository.class.isAssignableFrom(input);
-                                    }
-                                }).
-                                attachedTo("test-h2-secondary").
-                                build()
-                )){
-            @Override
-            protected Map<String, Object> getAdditionalEMFProperties(String persistenceUnitName) {
-                Map<String, Object> properties = new HashMap<String, Object>();
-                if ("test-h2".equals(persistenceUnitName)){
-                    properties.put("jpaDialect", new HibernateJpaDialect());
-                    return properties;
+                                RepositoriesGroupBuilder.forPackage("com.google.code.guice.repository.testing.repo").
+                                        withInclusionFilterPredicate(new Predicate<Class>() {
+                                            @Override
+                                            public boolean apply(@Nullable Class input) {
+                                                return UserDataRepository.class.isAssignableFrom(input);
+                                            }
+                                        }).
+                                        attachedTo("test-h2-secondary").
+                                        build()
+                        )) {
+                    @Override
+                    protected Map<String, Object> getAdditionalEMFProperties(String persistenceUnitName) {
+                        Map<String, Object> properties = new HashMap<String, Object>();
+                        if ("test-h2".equals(persistenceUnitName)) {
+                            properties.put("jpaDialect", new HibernateJpaDialect());
+                            return properties;
 
-                }
-                return properties;
-            }
-        }, new AbstractModule() {
+                        }
+                        return properties;
+                    }
+
+                    @Override
+                    protected void bindRepositories(RepositoryBinder binder) {
+                        super.bindRepositories(binder);
+                        // manual bind specific repositories
+                    }
+                }, new AbstractModule() {
                     @Override
                     protected void configure() {
                         bindInterceptor(Matchers.any(), Matchers.annotatedWith(Transactional.class), new TestInterceptor());
                     }
-                });
+                }
+        );
     }
 }

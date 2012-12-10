@@ -51,8 +51,7 @@ public abstract class RepoTestBase {
     @Transactional
     public void baseBefore() {
         logger = LoggerFactory.getLogger(getClass());
-        UserRepository userRepository = injector.getInstance(UserRepository.class);
-        userRepository.deleteAll();
+        injector.getInstance(UserRepository.class).deleteAll();
         injector.getInstance(AccountRepository.class).deleteAll();
         injector.getInstance(CustomerRepository.class).deleteAll();
     }

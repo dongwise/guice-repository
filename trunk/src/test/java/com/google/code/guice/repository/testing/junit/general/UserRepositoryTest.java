@@ -30,8 +30,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.Arrays;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -50,10 +48,6 @@ public class UserRepositoryTest extends RepoTestBase {
 
     @Inject
     private Provider<UserRepository> userRepositoryProvider;
-
-    @PersistenceContext(unitName = "test-h2-secondary")
-    private EntityManager secondaryEntityManager;
-
 
     /*===========================================[ CLASS METHODS ]==============*/
 

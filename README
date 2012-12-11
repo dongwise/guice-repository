@@ -7,14 +7,23 @@ Theory can be found here:
 - http://msdn.microsoft.com/en-us/library/ff649690.aspx
 - http://design-pattern.ru/patterns/repository.html
 
+Features:
 
-Features
-
-- Full support of 1.1-1.4, 2.2-2.4 origial spring-data-jpa documentation parts
-- Support for batch store (see SimpleBatchStoreJpaRepository?)
-- Allow access to EntityManager? (see EntityManagerProvider?)
-- Auto-binder possibilities - no need to do manual .bind() (see ScanningJpaRepositoryModule?)
-- Significant test coverage
+- Full support of original 1.1-1.4, 2.2-2.5 spring-data-jpa documentation parts;
+- Support of original 2.6, 2.7 parts in manual programmatic Spring wiring mode;
+- Support for batch store (see SimpleBatchStoreJpaRepository);
+- Full support for @Transactional methods for all Guice-instantiated entities (NEW in 2.0);
+- Support for multiple persistence units (NEW in 2.0);
+- Support for direct injection of EntityManager/EntityManagerFactory with @PersistenceContext/@PersistenceUnit/@Inject&@Named annotations (NEW in 2.0);
+- Support for injections in repositories/custom implementations (NEW in 2.0);
+- PersistFilter as implementation of "Open EntityManager in View"/"session-in-view"/"session-per-http-request" pattern (NEW in 2.0);
+- More natural way of Repository binding process (NEW in 2.0);
+- Auto-binder possibilities with exclusion/inclusion filters - see ScanningJpaRepositoryModule (filters is NEW in 2.0);
+- Ability to bind interceptor to catch Repository methods with @Transactional (NEW in 2.0);
+- Significant performance improvements (NEW in 2.0);
+- Support for all settable properties of JpaRepositoryFactoryBean: namedQueries & queryLookupStrategyKey (see RepositoryBindingBuilder) (NEW in 2.0);
+- Allow access to EntityManager (see EntityManagerProvider);
+- Significant test coverage.
 
 Quickstart
 
@@ -31,8 +40,8 @@ public interface AccountRepository extends JpaRepository<Account, Long>,
 2. Install a Guice-module
 install(new JpaRepositoryModule("my-persistence-unit") {
             @Override
-            protected void bindRepositories() {
-                bind(AccountRepository.class).toProvider(new JpaRepositoryProvider<AccountRepository>());
+            protected void bindRepositories(RepositoryBinder binder) {
+                binder.bind(AccountRepository.class).to("my-persistence-unit");
             }
         });
 

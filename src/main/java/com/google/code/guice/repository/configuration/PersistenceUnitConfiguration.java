@@ -26,9 +26,12 @@ import javax.persistence.EntityManagerFactory;
 import java.util.Properties;
 
 /**
- * PersistenceUnitDescriptor - TODO: description
+ * Represents persistence unit configuration with all related environment.
+ * Configurations created in {@link JpaRepositoryModule#createPersistenceUnitsConfigurationManager(String...)} and
+ * managed by {@link PersistenceUnitsConfigurationManager}.
  *
- * @author Alexey Krylov (lexx)
+ * @author Alexey Krylov
+ * @see PersistenceUnitsConfigurationManager
  * @since 06.12.12
  */
 public class PersistenceUnitConfiguration {

@@ -23,7 +23,7 @@ import javax.persistence.*;
 /**
  * UserInfo -
  *
- * @author Alexey Krylov (AleX)
+ * @author Alexey Krylov
  * @since 03.12.12
  */
 @Entity

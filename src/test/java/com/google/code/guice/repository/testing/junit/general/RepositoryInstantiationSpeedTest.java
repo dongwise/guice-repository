@@ -27,11 +27,11 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class RepositoryInstantiationTest extends RepoTestBase {
+public class RepositoryInstantiationSpeedTest extends RepoTestBase {
 
     /*===========================================[ STATIC VARIABLES ]=============*/
 
-    private static final int TEST_DURATION_SECONDS = 10;
+    private static final int TEST_DURATION_SECONDS = 5;
 
     /*===========================================[ CLASS METHODS ]==============*/
 

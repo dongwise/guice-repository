@@ -28,6 +28,9 @@ import java.util.List;
 
 /**
  * Uses Guice to inject JUnit4 tests.
+ *
+ * @author Alexey Krylov
+ * @since 10.04.2012
  */
 public class GuiceTestRunner extends BlockJUnit4ClassRunner {
     private final Injector injector;
@@ -39,8 +42,7 @@ public class GuiceTestRunner extends BlockJUnit4ClassRunner {
      * @param classToRun the test class to run
      * @param modules    the Guice modules
      *
-     * @throws InitializationError
-     *          if the test class is malformed
+     * @throws InitializationError if the test class is malformed
      */
     public GuiceTestRunner(Class<?> classToRun, Module... modules) throws InitializationError {
         super(classToRun);

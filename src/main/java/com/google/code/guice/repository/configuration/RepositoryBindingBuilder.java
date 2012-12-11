@@ -18,10 +18,22 @@
 
 package com.google.code.guice.repository.configuration;
 
+import org.springframework.data.repository.core.NamedQueries;
+import org.springframework.data.repository.query.QueryLookupStrategy;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.PersistenceContext;
+
 /**
- * RepositoryBinding - TODO: description
+ * Builder of {@link RepositoryBinding}. Builder instance constructed when you invoke {@link
+ * RepositoryBinder#bind(Class)}.
+ * <p>
+ * Each binding process should be finished with {@link RepositoryBindingBuilder#to(String)} or {@link
+ * RepositoryBindingBuilder#withSelfDefinition()}
+ * </p>
  *
- * @author Alexey Krylov (lexx)
+ * @author Alexey Krylov
+ * @see RepositoryBinder
  * @since 07.12.12
  */
 public interface RepositoryBindingBuilder {
@@ -30,7 +42,17 @@ public interface RepositoryBindingBuilder {
 
     RepositoryBindingBuilder withCustomImplementation(Class customRepositoryClass);
 
+    RepositoryBindingBuilder withNamedQueries(NamedQueries namedQueries);
+
+    RepositoryBindingBuilder withQueryLookupStrategyKey(QueryLookupStrategy.Key key);
+
     void to(String persistenceUnitName);
 
+    /**
+     * Use this method to finish building process when you don't want to specify {@code persistenceUnitName}. In this
+     * case persistence unit name will be resolved by {@link JpaRepositoryModule#extractAnnotationsPersistenceUnitName(Class)}.
+     * If repository interface has no {@link PersistenceContext} or {@link Transactional} annotations then default
+     * persistence unit will be used.
+     */
     void withSelfDefinition();
 }

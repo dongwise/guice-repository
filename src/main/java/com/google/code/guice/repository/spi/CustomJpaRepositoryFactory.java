@@ -34,11 +34,11 @@ import java.io.Serializable;
 import static org.springframework.data.querydsl.QueryDslUtils.QUERY_DSL_PRESENT;
 
 /**
- * Spring-data specifics - we need this because our "base" Repository implementation is not a SimpleJpaRepository, but
+ * Spring-data specifics - we need this because our "base" Repository implementation is not a {@link
+ * SimpleJpaRepository}, but
  * Repository with batch-store support.
  *
  * @author Alexey Krylov
- * @version 1.0.0
  * @see SimpleBatchStoreJpaRepository
  * @since 10.04.2012
  */
@@ -47,13 +47,12 @@ public class CustomJpaRepositoryFactory extends JpaRepositoryFactory {
     private SimpleQueryDslJpaRepositoryFactory queryDslJpaRepositoryFactory;
     private SimpleBatchStoreJpaRepositoryFactory batchRepositoryFactory;
 
-    //TODO assisted-inject
     /*===========================================[ CONSTRUCTORS ]===============*/
 
     @Inject
-    public CustomJpaRepositoryFactory(@Assisted EntityManager entityManager,
-                                      SimpleBatchStoreJpaRepositoryFactory batchRepositoryFactory,
-                                      SimpleQueryDslJpaRepositoryFactory queryDslJpaRepositoryFactory) {
+    protected CustomJpaRepositoryFactory(@Assisted EntityManager entityManager,
+                                         SimpleBatchStoreJpaRepositoryFactory batchRepositoryFactory,
+                                         SimpleQueryDslJpaRepositoryFactory queryDslJpaRepositoryFactory) {
         super(entityManager);
         this.batchRepositoryFactory = batchRepositoryFactory;
         this.queryDslJpaRepositoryFactory = queryDslJpaRepositoryFactory;
@@ -66,7 +65,7 @@ public class CustomJpaRepositoryFactory extends JpaRepositoryFactory {
         Class<?> repositoryInterface = metadata.getRepositoryInterface();
         JpaEntityInformation<?, Serializable> entityInformation = getEntityInformation(metadata.getDomainType());
 
-        SimpleJpaRepository repo = null;
+        SimpleJpaRepository repo;
         if (isQueryDslExecutor(repositoryInterface)) {
             repo = queryDslJpaRepositoryFactory.create(entityInformation, entityManager);
         } else {

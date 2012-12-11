@@ -28,13 +28,14 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * DefaultRepositoryBinder - TODO: description
+ * Default implementation of {@link RepositoryBinder}. All bindings after {@link RepositoryBindingBuilder#to(String)}
+ * or {@link RepositoryBindingBuilder#withSelfDefinition()} passed into bindings collection available through {@link
+ * #getBindings()}.
  *
- * @author Alexey Krylov (lexx)
+ * @author Alexey Krylov
  * @since 07.12.12
  */
-public class AccessibleRepositoryBinder implements RepositoryBinder {
-    /*===========================================[ STATIC VARIABLES ]=============*/
+public class DefaultRepositoryBinder implements RepositoryBinder {
 
     /*===========================================[ INSTANCE VARIABLES ]===========*/
 
@@ -42,7 +43,7 @@ public class AccessibleRepositoryBinder implements RepositoryBinder {
 
     /*===========================================[ CONSTRUCTORS ]=================*/
 
-    public AccessibleRepositoryBinder() {
+    public DefaultRepositoryBinder() {
         bindings = new ArrayList<RepositoryBinding>();
     }
 
@@ -51,7 +52,7 @@ public class AccessibleRepositoryBinder implements RepositoryBinder {
     @Override
     public RepositoryBindingBuilder bind(Class repositoryClass) {
         Assert.notNull(repositoryClass);
-        return new DefaultRepositoryBindingBuilder(repositoryClass){
+        return new DefaultRepositoryBindingBuilder(repositoryClass) {
             @Override
             protected RepositoryBinding build() {
                 RepositoryBinding binding = super.build();
@@ -61,6 +62,7 @@ public class AccessibleRepositoryBinder implements RepositoryBinder {
         };
     }
 
+    @Override
     public Collection<RepositoryBinding> getBindings() {
         return Collections.unmodifiableCollection(bindings);
     }

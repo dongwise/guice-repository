@@ -28,12 +28,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-//import org.apache.commons.lang3.Validate;
-
 /**
  * Utility for resolving actual classes of type parameters.
  *
- * @author Alexey Krylov (lexx)
+ * @author Alexey Krylov
  * @see #getFirstTypeParameterClass(Class)
  * @see #getTypeParameterClass(Class, int)
  * @see #getTypeParameterClass(Class, Class)
@@ -54,9 +52,9 @@ public class TypeUtil {
      *
      * @param aClass generic class
      *
-     * @return parameter class or <code>null</code> if parameter can't be found
+     * @return parameter class or {@code null} if parameter can't be found
      *
-     * @throws IllegalArgumentException if specified <code>aClass</code> is null
+     * @throws IllegalArgumentException if specified {@code aClass} is null
      */
     public static Class getFirstTypeParameterClass(Class aClass) {
         Assert.notNull(aClass);
@@ -69,9 +67,9 @@ public class TypeUtil {
      * @param aClass         generic class
      * @param parameterIndex parameter index
      *
-     * @return parameter class or <code>null</code> if parameter can't be found
+     * @return parameter class or {@code null} if parameter can't be found
      *
-     * @throws IllegalArgumentException if specified <code>aClass</code> is null or <code>parameterIndex</code> &lt; 0
+     * @throws IllegalArgumentException if specified <code>aClass</code> is null or {@code parameterIndex} &lt; 0
      */
     public static Class getTypeParameterClass(Class aClass, int parameterIndex) {
         Assert.notNull(aClass);
@@ -109,9 +107,9 @@ public class TypeUtil {
      * @param aClass                generic class
      * @param genericParameterClass generic parametrization class
      *
-     * @return parameter class or <code>null</code> if parameter can't be found
+     * @return parameter class or {@code null} if parameter can't be found
      *
-     * @throws IllegalArgumentException if specified <code>aClass</code>  or <code>genericParameterClass</code> is null
+     * @throws IllegalArgumentException if specified <code>aClass</code>  or {@code genericParameterClass} is null
      */
     public static <T> Class<T> getTypeParameterClass(Class aClass, Class<T> genericParameterClass) {
         Assert.noNullElements(new Object[]{aClass, genericParameterClass});

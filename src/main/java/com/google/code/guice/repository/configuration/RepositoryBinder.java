@@ -18,12 +18,23 @@
 
 package com.google.code.guice.repository.configuration;
 
+import com.google.code.guice.repository.spi.JpaRepositoryProvider;
+import com.google.inject.Injector;
+
 import java.util.Collection;
 
 /**
- * RepositoryBinder - TODO: description
+ * Collects binding configuration information which will be used in {@link Injector} creation
+ * process.
+ * Example:
+ * <pre>
+ * bind(MyRepository.class).to("persistence-unit1");
+ * bind(MyCustomerRepository.class).withCustomImplementation(MyCustomerRepositoryImpl.class).withSelfDefinition();
+ * </pre>
  *
- * @author Alexey Krylov (lexx)
+ * @author Alexey Krylov
+ * @see JpaRepositoryModule#configure()
+ * @see JpaRepositoryProvider
  * @since 07.12.12
  */
 public interface RepositoryBinder {

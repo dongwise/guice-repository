@@ -62,20 +62,18 @@
         <version.jsr305>1.3.9</version.jsr305>
         <version.reflections>0.9.8</version.reflections>
 
-        <!-- Logging -->
-
-        <version.logback>1.0.0</version.logback>
-        <version.slf4j>1.7.2</version.slf4j>
-
         <!-- Spring stuff -->
 
         <version.spring>3.1.2.RELEASE</version.spring>
-        <version.querydsl>2.9.0</version.querydsl>
 
         <!-- Spring-Data JPA -->
 
         <version.spring-data-jpa>1.2.0.RELEASE</version.spring-data-jpa>
         <version.hibernate-jpa-2.0-api>1.0.0.Final</version.hibernate-jpa-2.0-api>
+
+        <!-- QueryDSL stuff -->
+
+        <version.querydsl>2.9.0</version.querydsl>
 
         <!-- Servlet API-->
 
@@ -83,9 +81,10 @@
 
         <!-- Test stuff -->
 
+        <version.logback>1.0.0</version.logback>
         <version.junit>4.10</version.junit>
-        <version.h2>1.3.170</version.h2>
         <version.hibernate>4.1.8.Final</version.hibernate>
+        <version.h2>1.3.170</version.h2>
 
         <!-- Plugins -->
 
@@ -151,14 +150,6 @@
             </exclusions>
         </dependency>
 
-        <!-- Logging -->
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${version.slf4j}</version>
-        </dependency>
-
         <!-- Spring-Data JPA -->
 
         <dependency>
@@ -178,9 +169,16 @@
 
         <dependency>
             <groupId>com.mysema.querydsl</groupId>
-            <artifactId>querydsl-core</artifactId>
+            <artifactId>querydsl-apt</artifactId>
             <version>${version.querydsl}</version>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.mysema.querydsl</groupId>
+            <artifactId>querydsl-jpa</artifactId>
+            <version>${version.querydsl}</version>
+            <optional>true</optional>
         </dependency>
 
         <!-- Spring stuff -->

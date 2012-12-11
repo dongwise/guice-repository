@@ -30,9 +30,15 @@ import javax.persistence.PersistenceUnit;
 import java.lang.reflect.Field;
 
 /**
- * PersistenceContextTypeListener - TODO: description
+ * Support listener to inject EntityManagerFactory into Guice-instantiated entities.
+ * EntityManagerFactory should be annotated with {@link PersistenceUnit} with {@link PersistenceUnit#unitName()}:
+ * <pre>
+ *    {@literal @}PersistenceUnit(unitName="persistence-unit1")
+ *     private EntityManagerFactory entityManagerFactory;
+ * </pre>
+ * To inject default EntityManagerFactory
  *
- * @author Alexey Krylov (lexx)
+ * @author Alexey Krylov
  * @since 07.12.12
  */
 public class PersistenceUnitTypeListener implements TypeListener {

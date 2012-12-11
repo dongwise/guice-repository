@@ -21,9 +21,9 @@ package com.google.code.guice.repository.spi;
 import javax.persistence.EntityManager;
 
 /**
- * CustomeJpaRepositoryFactoryCreator - TODO: description
+ * "Factory" for Guice-instantiation of {@link CustomJpaRepositoryFactory} via assisted-inject.
  *
- * @author Alexey Krylov (AleX)
+ * @author Alexey Krylov
  * @since 09.12.12
  */
 public interface CustomJpaRepositoryFactoryCreator {

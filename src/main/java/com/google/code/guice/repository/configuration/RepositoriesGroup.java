@@ -28,13 +28,14 @@ import java.util.Collections;
 import java.util.regex.Pattern;
 
 /**
- * RepositoryGroup - TODO: description
+ * Represents set of Repository search criterias bound to persistence unit.
+ * Should be created via {@link RepositoriesGroupBuilder}.
+ * Used tighly in {@link ScanningJpaRepositoryModule}.
  *
- * @author Alexey Krylov (lexx)
+ * @author Alexey Krylov
  * @since 07.12.12
  */
 public class RepositoriesGroup {
-
 
     /*===========================================[ INSTANCE VARIABLES ]===========*/
 
@@ -119,12 +120,12 @@ public class RepositoriesGroup {
         String className = repositoryClass.getName();
 
         boolean matches = false;
-        if (inclusionPatternMatches(className) || inclustionFilterPredicateMatches(repositoryClass)) {
+        if (isInclusionPatternMatches(className) || isInclusionFilterPredicateMatches(repositoryClass)) {
             matches = true;
         }
 
         if (matches) {
-            if (exclusionPatternMatches(className) || exclusionFilterPredicateMatches(repositoryClass)) {
+            if (isExclusionPatternMatches(className) || isXxclusionFilterPredicateMatches(repositoryClass)) {
                 matches = false;
             }
         }
@@ -132,19 +133,76 @@ public class RepositoriesGroup {
         return matches;
     }
 
-    private boolean inclusionPatternMatches(String className) {
+    private boolean isInclusionPatternMatches(String className) {
         return inclusionPattern == null || inclusionPattern.matcher(className).matches();
     }
 
-    private boolean inclustionFilterPredicateMatches(Class<?> repositoryClass) {
+    private boolean isInclusionFilterPredicateMatches(Class<?> repositoryClass) {
         return inclusionPredicate == null || inclusionPredicate.apply(repositoryClass);
     }
 
-    private boolean exclusionPatternMatches(String className) {
+    private boolean isExclusionPatternMatches(String className) {
         return exclusionPattern != null && exclusionPattern.matcher(className).matches();
     }
 
-    private boolean exclusionFilterPredicateMatches(Class<?> repositoryClass) {
+    private boolean isXxclusionFilterPredicateMatches(Class<?> repositoryClass) {
         return exclusionPredicate != null && exclusionPredicate.apply(repositoryClass);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof RepositoriesGroup)) {
+            return false;
+        }
+
+        RepositoriesGroup repositoriesGroup = (RepositoriesGroup) o;
+
+        if (exclusionPattern != null ? !exclusionPattern.equals(repositoriesGroup.exclusionPattern) : repositoriesGroup.exclusionPattern != null) {
+            return false;
+        }
+        if (exclusionPredicate != null ? !exclusionPredicate.equals(repositoriesGroup.exclusionPredicate) : repositoriesGroup.exclusionPredicate != null) {
+            return false;
+        }
+        if (inclusionPattern != null ? !inclusionPattern.equals(repositoriesGroup.inclusionPattern) : repositoriesGroup.inclusionPattern != null) {
+            return false;
+        }
+        if (inclusionPredicate != null ? !inclusionPredicate.equals(repositoriesGroup.inclusionPredicate) : repositoriesGroup.inclusionPredicate != null) {
+            return false;
+        }
+        if (persistenceUnitName != null ? !persistenceUnitName.equals(repositoriesGroup.persistenceUnitName) : repositoriesGroup.persistenceUnitName != null) {
+            return false;
+        }
+        if (repositoriesPackages != null ? !repositoriesPackages.equals(repositoriesGroup.repositoriesPackages) : repositoriesGroup.repositoriesPackages != null) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = persistenceUnitName != null ? persistenceUnitName.hashCode() : 0;
+        result = 31 * result + (repositoriesPackages != null ? repositoriesPackages.hashCode() : 0);
+        result = 31 * result + (inclusionPattern != null ? inclusionPattern.hashCode() : 0);
+        result = 31 * result + (exclusionPattern != null ? exclusionPattern.hashCode() : 0);
+        result = 31 * result + (inclusionPredicate != null ? inclusionPredicate.hashCode() : 0);
+        result = 31 * result + (exclusionPredicate != null ? exclusionPredicate.hashCode() : 0);
+        return result;
+    }
+
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("RepositoriesGroup");
+        sb.append("{persistenceUnitName='").append(persistenceUnitName).append('\'');
+        sb.append(", repositoriesPackages=").append(repositoriesPackages);
+        sb.append(", inclusionPattern=").append(inclusionPattern);
+        sb.append(", exclusionPattern=").append(exclusionPattern);
+        sb.append('}');
+        return sb.toString();
     }
 }

@@ -24,9 +24,9 @@ import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import javax.persistence.EntityManager;
 
 /**
- * SimpleQueryDslJpaRepositoryFactory - TODO: description
+ * "Factory" for Guice-instantiation of {@link SimpleQueryDslJpaRepository} via assisted-inject.
  *
- * @author Alexey Krylov (AleX)
+ * @author Alexey Krylov
  * @since 09.12.12
  */
 public interface SimpleQueryDslJpaRepositoryFactory {

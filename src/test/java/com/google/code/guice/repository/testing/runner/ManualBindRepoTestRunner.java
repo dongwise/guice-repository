@@ -28,6 +28,8 @@ import com.google.code.guice.repository.testing.repo.UserRepository;
 import org.junit.runners.model.InitializationError;
 import org.springframework.orm.jpa.vendor.HibernateJpaDialect;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,7 +38,7 @@ public class ManualBindRepoTestRunner extends GuiceTestRunner {
     /*===========================================[ CLASS METHODS ]==============*/
 
     public ManualBindRepoTestRunner(Class<?> classToRun) throws InitializationError {
-        super(classToRun, new JpaRepositoryModule("test-h2", "test-h2-secondary") {
+        super(classToRun, new JpaRepositoryModule() {
             @Override
             protected void bindRepositories(RepositoryBinder binder) {
                 binder.bind(UserRepository.class).to("test-h2");
@@ -53,6 +55,11 @@ public class ManualBindRepoTestRunner extends GuiceTestRunner {
 
                 }
                 return properties;
+            }
+
+            @Override
+            protected Collection<String> getPersistenceUnitsNames() {
+                return Arrays.asList("test-h2", "test-h2-secondary");
             }
         });
     }

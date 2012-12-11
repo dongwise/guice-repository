@@ -20,33 +20,48 @@ package com.google.code.guice.repository.spi;
 
 import com.google.code.guice.repository.configuration.RepositoryBinding;
 import com.google.code.guice.repository.configuration.RepositoryBindingBuilder;
+import org.springframework.data.repository.core.NamedQueries;
+import org.springframework.data.repository.query.QueryLookupStrategy;
 
 /**
- * RepositoryBindingImpl - TODO: description
+ * Default implementation of {@link RepositoryBindingBuilder}.
  *
- * @author Alexey Krylov (lexx)
+ * @author Alexey Krylov
  * @since 07.12.12
  */
 public class DefaultRepositoryBindingBuilder implements RepositoryBindingBuilder {
-    /*===========================================[ STATIC VARIABLES ]=============*/
-    //todo params
 
     /*===========================================[ INSTANCE VARIABLES ]===========*/
 
-    private String persistenceUnitName;
     private Class repositoryClass;
     private Class customRepositoryClass;
+    private NamedQueries namedQueries;
+    private QueryLookupStrategy.Key key;
+    private String persistenceUnitName;
 
     /*===========================================[ CONSTRUCTORS ]=================*/
 
     protected DefaultRepositoryBindingBuilder(Class repositoryClass) {
         this.repositoryClass = repositoryClass;
     }
+
     /*===========================================[ CLASS METHODS ]================*/
 
     @Override
     public RepositoryBindingBuilder withCustomImplementation(Class customRepositoryClass) {
         this.customRepositoryClass = customRepositoryClass;
+        return this;
+    }
+
+    @Override
+    public RepositoryBindingBuilder withNamedQueries(NamedQueries namedQueries) {
+        this.namedQueries = namedQueries;
+        return this;
+    }
+
+    @Override
+    public RepositoryBindingBuilder withQueryLookupStrategyKey(QueryLookupStrategy.Key key) {
+        this.key = key;
         return this;
     }
 
@@ -64,6 +79,8 @@ public class DefaultRepositoryBindingBuilder implements RepositoryBindingBuilder
     protected RepositoryBinding build() {
         AccessibleRepositoryBinding binding = new AccessibleRepositoryBinding(repositoryClass);
         binding.setCustomRepositoryClass(customRepositoryClass);
+        binding.setNamedQueries(namedQueries);
+        binding.setQueryLookupStrategyKey(key);
         binding.setPersistenceUnitName(persistenceUnitName);
         return binding;
     }

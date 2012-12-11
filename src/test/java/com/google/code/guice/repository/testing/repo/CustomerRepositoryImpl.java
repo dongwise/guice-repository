@@ -39,6 +39,7 @@ public class CustomerRepositoryImpl extends SimpleBatchStoreJpaRepository<Custom
     }
     /*===========================================[ CLASS METHODS ]==============*/
 
+    @Override
     public void sharedCustomMethod(Long customerID) {
         Assert.assertNotNull("CustomerID is null", customerID);
         Assert.assertNotNull("Injected entityManager is null", entityManager);

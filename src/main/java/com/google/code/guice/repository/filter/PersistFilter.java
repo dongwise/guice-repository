@@ -20,6 +20,8 @@ package com.google.code.guice.repository.filter;
 
 import com.google.code.guice.repository.configuration.PersistenceUnitsConfigurationManager;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import net.jcip.annotations.ThreadSafe;
 import org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter;
 
 import javax.persistence.EntityManager;
@@ -27,15 +29,55 @@ import javax.persistence.EntityManagerFactory;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * OpenEntityManagerInViewFilter - TODO: description
+ * <p>
+ * <b>guice-repository</b> adopted version of {@link OpenEntityManagerInViewFilter}.
+ * This filter binds a JPA EntityManager to the thread for the entire processing of the request.
+ * Intended for the "Open EntityManager in View"/<a href="http://code.google.com/p/google-guice/wiki/JPA">session-in-view/session-per-http-request</a>
+ * pattern, i.e. to allow for lazy loading in web views despite the original transactions already being completed.
+ * </p>
+ * <p> To be able to use mentioned above pattern,
+ * register this filter <b>once</b> in your Guice {@code ServletModule}. It is
+ * important that you register this filter before any other filter.
+ * <p/>
+ * Example configuration:
+ * <pre>{@code
+ *  public class MyModule extends ServletModule {
+ *    public void configureServlets() {
+ *      filter("/*").through(PersistFilter.class);
+ *      serve("/index.html").with(MyHtmlServlet.class);
+ *      // Etc.
+ *    }
+ *  }
+ * }</pre>
+ * <p>
+ * For single persistence unit you can configure your filter with {@link #setPersistenceUnitName(String)} (through
+ * web.xml/programmatically).
+ * Also you can just skip this parameter - in this case default persistence ({@link
+ * PersistenceUnitsConfigurationManager#getDefaultConfiguration()} unit configuration will be used.
+ * <p/>
+ * <p>
+ * For multiple persistence units, you should register your custom filter before this filter.
+ * Your custom filter should set parameter {@link #P_PERSISTENCE_UNIT_NAME} into {@link HttpServletRequest}.
+ * </p>
+ * <p>
+ * This filter requires the <a href="http://code.google.com/p/google-guice/wiki/Servlets">Guice Servlet</a> extension.
+ * </p>
  *
- * @author Alexey Krylov (AleX)
+ * @author Alexey Krylov
+ * @see OpenEntityManagerInViewFilter
+ * @see <a href="http://code.google.com/p/google-guice/wiki/ServletModule">ServletModule</a>
  * @since 08.12.12
  */
+@Singleton
+@ThreadSafe
 public class PersistFilter extends OpenEntityManagerInViewFilter {
 
     /*===========================================[ STATIC VARIABLES ]=============*/
 
+    /**
+     * This HttpServletRequest parameter describes persistence unit to use.
+     * Use means EntityManager opening/closing in doFilter try/finally.
+     */
     public static final String P_PERSISTENCE_UNIT_NAME = "persistenceUnitName";
 
     /*===========================================[ INSTANCE VARIABLES ]===========*/
@@ -47,8 +89,9 @@ public class PersistFilter extends OpenEntityManagerInViewFilter {
 
     @Override
     protected EntityManagerFactory lookupEntityManagerFactory(HttpServletRequest request) {
+        // check for Filter configuration parameter presence
         String persistenceUnitName = getPersistenceUnitName();
-        if(persistenceUnitName == null) {
+        if (persistenceUnitName == null) {
             persistenceUnitName = request.getParameter(P_PERSISTENCE_UNIT_NAME);
         }
         // persistenceUnitName can still be null - in this case default configuration will be used

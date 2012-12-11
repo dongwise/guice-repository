@@ -44,7 +44,6 @@ import java.util.Set;
  * </pre>
  *
  * @author Alexey Krylov
- * @version 1.0.0
  * @since 10.04.2012
  */
 public class CustomRepositoryImplementationResolver {
@@ -62,7 +61,7 @@ public class CustomRepositoryImplementationResolver {
     /*===========================================[ CONSTRUCTORS ]===============*/
 
     @Inject
-    public void init(Injector injector) {
+    protected void init(Injector injector) {
         this.injector = injector;
         exclusions = new HashSet<Class>();
         addExclusions(exclusions);
@@ -94,7 +93,6 @@ public class CustomRepositoryImplementationResolver {
         if (!superTypes.isEmpty()) {
             Class customRepositoryClass = superTypes.iterator().next();
             Reflections reflections = new Reflections(customRepositoryClass.getPackage().getName());
-
             Set<Class> subTypesOf = reflections.getSubTypesOf(customRepositoryClass);
             for (Class aClass : subTypesOf) {
                 if (!aClass.isInterface()) {

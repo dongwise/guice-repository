@@ -27,9 +27,9 @@ import org.junit.Assert;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * MultiUnitsService - TODO: description
+ * Multiple persistence units usage example.
  *
- * @author Alexey Krylov (AleX)
+ * @author Alexey Krylov
  * @since 04.12.12
  */
 public class MultiPersistenceUnitsService {

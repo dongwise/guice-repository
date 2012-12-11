@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 
-@SuppressWarnings({"MagicNumber"})
+@SuppressWarnings("MagicNumber")
 public class BasicTransactionService {
 
     /*===========================================[ STATIC VARIABLES ]=============*/

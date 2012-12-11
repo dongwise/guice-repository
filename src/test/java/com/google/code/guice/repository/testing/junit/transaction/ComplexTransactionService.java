@@ -33,7 +33,7 @@ import javax.persistence.PersistenceContext;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-@SuppressWarnings({"MagicNumber"})
+@SuppressWarnings("MagicNumber")
 public class ComplexTransactionService {
 
     /*===========================================[ STATIC VARIABLES ]=============*/

@@ -84,7 +84,7 @@ public class CustomJpaRepositoryFactory extends JpaRepositoryFactory {
         }
     }
 
-    @SuppressWarnings("MethodOverridesPrivateMethodOfSuperclass")
+    @SuppressWarnings({"MethodOverridesPrivateMethodOfSuperclass", "OverloadedMethodsWithSameNumberOfParameters"})
     private static boolean isQueryDslExecutor(Class<?> repositoryInterface) {
         return QUERY_DSL_PRESENT && QueryDslPredicateExecutor.class.isAssignableFrom(repositoryInterface);
     }

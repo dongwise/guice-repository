@@ -69,7 +69,7 @@ public class TypeUtil {
      *
      * @return parameter class or {@code null} if parameter can't be found
      *
-     * @throws IllegalArgumentException if specified <code>aClass</code> is null or {@code parameterIndex} &lt; 0
+     * @throws IllegalArgumentException if specified {@code aClass} is null or {@code parameterIndex} &lt; 0
      */
     public static Class getTypeParameterClass(Class aClass, int parameterIndex) {
         Assert.notNull(aClass);
@@ -109,7 +109,7 @@ public class TypeUtil {
      *
      * @return parameter class or {@code null} if parameter can't be found
      *
-     * @throws IllegalArgumentException if specified <code>aClass</code>  or {@code genericParameterClass} is null
+     * @throws IllegalArgumentException if specified {@code aClass}  or {@code genericParameterClass} is null
      */
     public static <T> Class<T> getTypeParameterClass(Class aClass, Class<T> genericParameterClass) {
         Assert.noNullElements(new Object[]{aClass, genericParameterClass});

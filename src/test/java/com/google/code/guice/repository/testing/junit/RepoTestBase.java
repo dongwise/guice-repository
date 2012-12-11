@@ -38,14 +38,14 @@ public abstract class RepoTestBase {
 
     protected static final int MAX_CONCURRENT_THREADS = 10;
 
-    /*===========================================[ INSTANCE VARIABLES ]=========*/
+    /*===========================================[ INSTANCE VARIABLES ]===========*/
 
     protected Logger logger;
 
     @Inject
     protected Injector injector;
 
-    /*===========================================[ CLASS METHODS ]==============*/
+    /*===========================================[ CLASS METHODS ]================*/
 
     @Before
     @Transactional

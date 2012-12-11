@@ -67,11 +67,11 @@ import static com.google.common.collect.Collections2.filter;
 @SuppressWarnings("CollectionContainsUrl")
 public class ScanningJpaRepositoryModule extends JpaRepositoryModule {
 
-    /*===========================================[ INSTANCE VARIABLES ]=========*/
+    /*===========================================[ INSTANCE VARIABLES ]===========*/
 
     private Collection<RepositoriesGroup> repositoriesGroups;
 
-    /*===========================================[ CONSTRUCTORS ]===============*/
+    /*===========================================[ CONSTRUCTORS ]=================*/
 
     /**
      * @param targetScanPackage package to scan for repositories.
@@ -87,7 +87,7 @@ public class ScanningJpaRepositoryModule extends JpaRepositoryModule {
         this.repositoriesGroups = Lists.newArrayList(repositoriesGroups);
     }
 
-    /*===========================================[ CLASS METHODS ]==============*/
+    /*===========================================[ CLASS METHODS ]================*/
 
     private static String[] extractPersistenceUnitsNames(Collection<RepositoriesGroup> repositoriesGroups) {
         Collection<String> persistenceUnitsNames = new ArrayList<String>();

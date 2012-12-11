@@ -35,13 +35,13 @@ import static org.junit.Assert.assertTrue;
 @SuppressWarnings("MagicNumber")
 public class BatchStoreRepositoryTest extends RepoTestBase {
 
-    /*===========================================[ INSTANCE VARIABLES ]=========*/
+    /*===========================================[ INSTANCE VARIABLES ]===========*/
 
     @Inject
     private AccountRepository accountRepository;
     private Timer timer;
 
-    /*===========================================[ CLASS METHODS ]==============*/
+    /*===========================================[ CLASS METHODS ]================*/
 
     @Before
     public void before() {

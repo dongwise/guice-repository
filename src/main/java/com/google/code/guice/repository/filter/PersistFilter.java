@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * <p>
- * <b>guice-repository</b> adopted version of {@link OpenEntityManagerInViewFilter}.
+ * <b>guice-repository</b> adapted version of {@link OpenEntityManagerInViewFilter}.
  * This filter binds a JPA EntityManager to the thread for the entire processing of the request.
  * Intended for the "Open EntityManager in View"/<a href="http://code.google.com/p/google-guice/wiki/JPA">session-in-view/session-per-http-request</a>
  * pattern, i.e. to allow for lazy loading in web views despite the original transactions already being completed.
@@ -72,7 +72,7 @@ import javax.servlet.http.HttpServletRequest;
 @ThreadSafe
 public class PersistFilter extends OpenEntityManagerInViewFilter {
 
-    /*===========================================[ STATIC VARIABLES ]=============*/
+
 
     /**
      * This HttpServletRequest parameter describes persistence unit to use.
@@ -89,7 +89,7 @@ public class PersistFilter extends OpenEntityManagerInViewFilter {
 
     @Override
     protected EntityManagerFactory lookupEntityManagerFactory(HttpServletRequest request) {
-        // check for Filter configuration parameter presence
+/*===========================================[ STATIC VARIABLES ]=============*/        // check for Filter configuration parameter presence
         String persistenceUnitName = getPersistenceUnitName();
         if (persistenceUnitName == null) {
             persistenceUnitName = request.getParameter(P_PERSISTENCE_UNIT_NAME);

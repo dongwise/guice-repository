@@ -31,7 +31,7 @@ import org.junit.runners.model.InitializationError;
  */
 public class DirectEntityManagerTestRunner extends GuiceTestRunner {
 
-    /*===========================================[ CONSTRUCTORS ]===============*/
+    /*===========================================[ CONSTRUCTORS ]=================*/
 
     public DirectEntityManagerTestRunner(Class<?> classToRun) throws InitializationError {
         super(classToRun, new JpaRepositoryModule("test-h2", "test-h2-secondary") {

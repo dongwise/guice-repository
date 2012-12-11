@@ -35,7 +35,7 @@ import java.util.Map;
 
 public class ManualBindRepoTestRunner extends GuiceTestRunner {
 
-    /*===========================================[ CLASS METHODS ]==============*/
+    /*===========================================[ CLASS METHODS ]================*/
 
     public ManualBindRepoTestRunner(Class<?> classToRun) throws InitializationError {
         super(classToRun, new JpaRepositoryModule() {

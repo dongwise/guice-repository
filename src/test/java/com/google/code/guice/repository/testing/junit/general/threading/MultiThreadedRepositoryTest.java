@@ -35,12 +35,12 @@ public class MultiThreadedRepositoryTest extends RepoTestBase {
 
     private static final int COUNT_PER_THREAD = 100;
 
-    /*===========================================[ INSTANCE VARIABLES ]=========*/
+    /*===========================================[ INSTANCE VARIABLES ]===========*/
 
     @Inject
     private UserRepository userRepository;
 
-    /*===========================================[ CLASS METHODS ]==============*/
+    /*===========================================[ CLASS METHODS ]================*/
 
     @SuppressWarnings("MagicNumber")
     @Test

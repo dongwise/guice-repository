@@ -26,7 +26,7 @@ import org.junit.Test;
 
 public class BasicTransactionServiceTest extends RepoTestBase {
 
-    /*===========================================[ INSTANCE VARIABLES ]=========*/
+    /*===========================================[ INSTANCE VARIABLES ]===========*/
 
     @Inject
     private BasicTransactionService basicTransactionService;
@@ -34,7 +34,7 @@ public class BasicTransactionServiceTest extends RepoTestBase {
     @Inject
     private UserRepository repository;
 
-    /*===========================================[ CLASS METHODS ]==============*/
+    /*===========================================[ CLASS METHODS ]================*/
 
     @Test
     public void testTransactions() throws Exception {

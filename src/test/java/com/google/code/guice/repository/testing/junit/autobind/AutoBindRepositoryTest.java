@@ -39,7 +39,7 @@ import static org.junit.Assert.assertNotNull;
 @RunWith(AutoBindRepoTestRunner.class)
 public class AutoBindRepositoryTest {
 
-    /*===========================================[ INSTANCE VARIABLES ]=========*/
+    /*===========================================[ INSTANCE VARIABLES ]===========*/
 
     @Inject
     private UserRepository userRepository;
@@ -53,7 +53,7 @@ public class AutoBindRepositoryTest {
     @Inject
     private UserDataRepository userDataRepository;
 
-    /*===========================================[ CLASS METHODS ]==============*/
+    /*===========================================[ CLASS METHODS ]================*/
 
     @Test
     public void testUserRepository() {

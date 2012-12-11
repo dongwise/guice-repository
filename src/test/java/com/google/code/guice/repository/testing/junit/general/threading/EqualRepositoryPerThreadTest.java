@@ -31,7 +31,7 @@ import java.util.concurrent.*;
 
 public class EqualRepositoryPerThreadTest extends RepoTestBase {
 
-    /*===========================================[ CLASS METHODS ]==============*/
+    /*===========================================[ CLASS METHODS ]================*/
 
     @Test
     public void testRepositoryPerThreadEquality() throws InterruptedException {

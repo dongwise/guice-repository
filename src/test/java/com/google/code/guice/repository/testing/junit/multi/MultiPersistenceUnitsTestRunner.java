@@ -34,7 +34,7 @@ import org.junit.runners.model.InitializationError;
  */
 public class MultiPersistenceUnitsTestRunner extends GuiceTestRunner {
 
-    /*===========================================[ CONSTRUCTORS ]===============*/
+    /*===========================================[ CONSTRUCTORS ]=================*/
 
     public MultiPersistenceUnitsTestRunner(Class<?> classToRun) throws InitializationError {
         super(classToRun, new JpaRepositoryModule("test-h2", "test-h2-secondary") {

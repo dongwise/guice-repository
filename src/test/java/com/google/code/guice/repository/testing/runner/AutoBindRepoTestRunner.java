@@ -37,7 +37,7 @@ import java.util.Map;
 
 public class AutoBindRepoTestRunner extends GuiceTestRunner {
 
-    /*===========================================[ CLASS METHODS ]==============*/
+    /*===========================================[ CLASS METHODS ]================*/
 
     public AutoBindRepoTestRunner(Class<?> classToRun) throws InitializationError {
         super(classToRun, new ScanningJpaRepositoryModule(

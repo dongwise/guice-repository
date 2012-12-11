@@ -30,12 +30,12 @@ import static org.junit.Assert.assertEquals;
 @SuppressWarnings("MagicNumber")
 public class CustomerRepositoryTest extends RepoTestBase {
 
-    /*===========================================[ INSTANCE VARIABLES ]=========*/
+    /*===========================================[ INSTANCE VARIABLES ]===========*/
 
     @Inject
     private CustomerRepository customerRepository;
 
-    /*===========================================[ CLASS METHODS ]==============*/
+    /*===========================================[ CLASS METHODS ]================*/
 
     @Test
     public void testRepo() throws Exception {

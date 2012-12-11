@@ -29,7 +29,7 @@ import javax.persistence.*;
 @Entity
 public class UserData {
 
-    /*===========================================[ INSTANCE VARIABLES ]=========*/
+    /*===========================================[ INSTANCE VARIABLES ]===========*/
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -38,7 +38,7 @@ public class UserData {
     @Column
     private String data;
 
-    /*===========================================[ CONSTRUCTORS ]===============*/
+    /*===========================================[ CONSTRUCTORS ]=================*/
 
     public UserData(String data) {
         this.data = data;
@@ -47,7 +47,7 @@ public class UserData {
     public UserData() {
     }
 
-    /*===========================================[ CLASS METHODS ]==============*/
+    /*===========================================[ CLASS METHODS ]================*/
 
     public String getData() {
         return data;

@@ -28,12 +28,12 @@ import javax.persistence.PersistenceContext;
 
 public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 
-    /*===========================================[ INSTANCE VARIABLES ]=========*/
+    /*===========================================[ INSTANCE VARIABLES ]===========*/
 
     @PersistenceContext
     private EntityManager entityManager;
 
-    /*===========================================[ CLASS METHODS ]==============*/
+    /*===========================================[ CLASS METHODS ]================*/
 
     @Override
     @Transactional

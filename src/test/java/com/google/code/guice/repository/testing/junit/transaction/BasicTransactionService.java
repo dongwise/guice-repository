@@ -33,12 +33,12 @@ public class BasicTransactionService {
 
     private static final Logger logger = LoggerFactory.getLogger(BasicTransactionService.class);
 
-    /*===========================================[ INSTANCE VARIABLES ]=========*/
+    /*===========================================[ INSTANCE VARIABLES ]===========*/
 
     @Inject
     private UserRepository userRepository;
 
-    /*===========================================[ CLASS METHODS ]==============*/
+    /*===========================================[ CLASS METHODS ]================*/
 
     @Transactional(rollbackFor = Exception.class)
     public void generateUsers(int usersCount) throws Exception {

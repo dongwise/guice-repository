@@ -108,12 +108,12 @@ public abstract class JpaRepositoryModule extends AbstractModule {
      */
     public static final String PERSISTENCE_UNITS_SPLIT_REGEX = ",|;";
 
-    /*===========================================[ INSTANCE VARIABLES ]=========*/
+    /*===========================================[ INSTANCE VARIABLES ]===========*/
 
     private Logger logger;
     protected String[] persistenceUnitsNames;
 
-    /*===========================================[ CONSTRUCTORS ]===============*/
+    /*===========================================[ CONSTRUCTORS ]=================*/
 
     protected JpaRepositoryModule(String... persistenceUnitsNames) {
         logger = LoggerFactory.getLogger(getClass());
@@ -140,7 +140,7 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         this.persistenceUnitsNames = foundPersistenceUnitsNames;
     }
 
-    /*===========================================[ CLASS METHODS ]==============*/
+    /*===========================================[ CLASS METHODS ]================*/
 
     /**
      * A way to provide persistence-unit name.

@@ -40,7 +40,7 @@ public class ComplexTransactionService {
 
     private static final Logger logger = LoggerFactory.getLogger(ComplexTransactionService.class);
 
-    /*===========================================[ INSTANCE VARIABLES ]=========*/
+    /*===========================================[ INSTANCE VARIABLES ]===========*/
 
     @Inject
     private UserRepository userRepository;
@@ -51,7 +51,7 @@ public class ComplexTransactionService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    /*===========================================[ CLASS METHODS ]==============*/
+    /*===========================================[ CLASS METHODS ]================*/
 
     @Transactional(rollbackFor = Exception.class)
     public void performFirstComplexTransaction() throws Exception {

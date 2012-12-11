@@ -47,7 +47,7 @@ public class CustomJpaRepositoryFactory extends JpaRepositoryFactory {
     private SimpleQueryDslJpaRepositoryFactory queryDslJpaRepositoryFactory;
     private SimpleBatchStoreJpaRepositoryFactory batchRepositoryFactory;
 
-    /*===========================================[ CONSTRUCTORS ]===============*/
+    /*===========================================[ CONSTRUCTORS ]=================*/
 
     @Inject
     protected CustomJpaRepositoryFactory(@Assisted EntityManager entityManager,
@@ -58,7 +58,7 @@ public class CustomJpaRepositoryFactory extends JpaRepositoryFactory {
         this.queryDslJpaRepositoryFactory = queryDslJpaRepositoryFactory;
     }
 
-    /*===========================================[ CLASS METHODS ]==============*/
+    /*===========================================[ CLASS METHODS ]================*/
 
     @Override
     protected JpaRepository<?, ?> getTargetRepository(RepositoryMetadata metadata, EntityManager entityManager) {

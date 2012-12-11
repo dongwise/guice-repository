@@ -31,7 +31,7 @@ import java.util.UUID;
 
 public class MultipleRepositoryUsageTest extends RepoTestBase {
 
-    /*===========================================[ INSTANCE VARIABLES ]=========*/
+    /*===========================================[ INSTANCE VARIABLES ]===========*/
 
     @Inject
     private UserRepository userRepository;
@@ -39,7 +39,7 @@ public class MultipleRepositoryUsageTest extends RepoTestBase {
     @Inject
     private AccountRepository accountRepository;
 
-    /*===========================================[ CLASS METHODS ]==============*/
+    /*===========================================[ CLASS METHODS ]================*/
 
     @Test
     public void testRepositories() throws Exception {

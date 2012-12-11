@@ -40,12 +40,12 @@ import java.util.List;
 @ThreadSafe
 public class TypeUtil {
 
-    /*===========================================[ CONSTRUCTORS ]===============*/
+    /*===========================================[ CONSTRUCTORS ]=================*/
 
     private TypeUtil() {
     }
 
-    /*===========================================[ CLASS METHODS ]==============*/
+    /*===========================================[ CLASS METHODS ]================*/
 
     /**
      * Finds and returns class of first parametrization parameter.

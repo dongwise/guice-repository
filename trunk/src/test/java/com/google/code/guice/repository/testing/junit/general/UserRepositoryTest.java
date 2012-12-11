@@ -41,7 +41,7 @@ import static org.junit.Assert.assertNotNull;
 @SuppressWarnings("MagicNumber")
 public class UserRepositoryTest extends RepoTestBase {
 
-    /*===========================================[ INSTANCE VARIABLES ]=========*/
+    /*===========================================[ INSTANCE VARIABLES ]===========*/
 
     @Inject
     private UserRepository userRepository;
@@ -49,7 +49,7 @@ public class UserRepositoryTest extends RepoTestBase {
     @Inject
     private Provider<UserRepository> userRepositoryProvider;
 
-    /*===========================================[ CLASS METHODS ]==============*/
+    /*===========================================[ CLASS METHODS ]================*/
 
     @Override
     @Before

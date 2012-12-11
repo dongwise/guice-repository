@@ -33,7 +33,7 @@ public class RepositoryInstantiationSpeedTest extends RepoTestBase {
 
     private static final int TEST_DURATION_SECONDS = 5;
 
-    /*===========================================[ CLASS METHODS ]==============*/
+    /*===========================================[ CLASS METHODS ]================*/
 
     @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "JUnitTestMethodWithNoAssertions"})
     @Test

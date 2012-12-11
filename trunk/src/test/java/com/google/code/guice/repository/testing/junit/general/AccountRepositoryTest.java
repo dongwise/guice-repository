@@ -38,12 +38,12 @@ import static org.junit.Assert.assertNotNull;
  */
 public class AccountRepositoryTest extends RepoTestBase {
 
-    /*===========================================[ INSTANCE VARIABLES ]=========*/
+    /*===========================================[ INSTANCE VARIABLES ]===========*/
 
     @Inject
     private AccountRepository accountRepository;
 
-    /*===========================================[ CLASS METHODS ]==============*/
+    /*===========================================[ CLASS METHODS ]================*/
 
     @Test
     public void testRepo() throws Exception {

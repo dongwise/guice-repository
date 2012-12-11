@@ -26,7 +26,7 @@ import java.util.Collections;
 @Entity
 public class User {
 
-    /*===========================================[ INSTANCE VARIABLES ]=========*/
+    /*===========================================[ INSTANCE VARIABLES ]===========*/
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -45,7 +45,7 @@ public class User {
     @Basic(fetch = FetchType.LAZY)
     private Collection<String> metadata;
 
-    /*===========================================[ CONSTRUCTORS ]===============*/
+    /*===========================================[ CONSTRUCTORS ]=================*/
 
     public User() {
     }
@@ -56,7 +56,7 @@ public class User {
         this.age = age;
     }
 
-    /*===========================================[ CLASS METHODS ]==============*/
+    /*===========================================[ CLASS METHODS ]================*/
 
     public int getAge() {
         return age;

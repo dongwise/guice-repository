@@ -27,17 +27,17 @@ import javax.persistence.EntityManager;
 
 public class CustomerRepositoryImpl extends SimpleBatchStoreJpaRepository<Customer,Long> implements CustomerRepository {
 
-    /*===========================================[ INSTANCE VARIABLES ]=========*/
+    /*===========================================[ INSTANCE VARIABLES ]===========*/
 
     @Inject
     private EntityManager entityManager;
 
-    /*===========================================[ CONSTRUCTORS ]===============*/
+    /*===========================================[ CONSTRUCTORS ]=================*/
 
     public CustomerRepositoryImpl(Class<Customer> domainClass, EntityManager em) {
         super(domainClass, em);
     }
-    /*===========================================[ CLASS METHODS ]==============*/
+    /*===========================================[ CLASS METHODS ]================*/
 
     @Override
     public void sharedCustomMethod(Long customerID) {

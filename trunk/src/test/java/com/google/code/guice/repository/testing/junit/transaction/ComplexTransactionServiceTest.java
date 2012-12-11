@@ -32,7 +32,7 @@ import java.util.UUID;
 
 public class ComplexTransactionServiceTest extends RepoTestBase {
 
-    /*===========================================[ INSTANCE VARIABLES ]=========*/
+    /*===========================================[ INSTANCE VARIABLES ]===========*/
 
     @Inject
     private ComplexTransactionService complexTransactionService;
@@ -43,7 +43,7 @@ public class ComplexTransactionServiceTest extends RepoTestBase {
     @Inject
     private AccountRepository accountRepository;
 
-    /*===========================================[ CLASS METHODS ]==============*/
+    /*===========================================[ CLASS METHODS ]================*/
 
     @Test
     public void testCompositeTransactions() throws Exception {

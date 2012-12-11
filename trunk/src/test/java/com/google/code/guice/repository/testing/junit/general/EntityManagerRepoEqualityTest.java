@@ -35,7 +35,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class EntityManagerRepoEqualityTest extends RepoTestBase {
 
-    /*===========================================[ INSTANCE VARIABLES ]=========*/
+    /*===========================================[ INSTANCE VARIABLES ]===========*/
 
     @Inject
     private AccountRepository accountRepository;
@@ -43,7 +43,7 @@ public class EntityManagerRepoEqualityTest extends RepoTestBase {
     @PersistenceContext
     private EntityManager entityManager;
 
-    /*===========================================[ CLASS METHODS ]==============*/
+    /*===========================================[ CLASS METHODS ]================*/
 
     @Test
     public void testRepo() throws Exception {

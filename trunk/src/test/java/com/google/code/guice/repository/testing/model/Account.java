@@ -23,7 +23,7 @@ import javax.persistence.*;
 @Entity
 public class Account {
 
-    /*===========================================[ INSTANCE VARIABLES ]=========*/
+    /*===========================================[ INSTANCE VARIABLES ]===========*/
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -35,7 +35,7 @@ public class Account {
     @Column
     private String name;
 
-    /*===========================================[ CONSTRUCTORS ]===============*/
+    /*===========================================[ CONSTRUCTORS ]=================*/
 
     public Account(String uuid, String name) {
         this.uuid = uuid;
@@ -45,7 +45,7 @@ public class Account {
     public Account() {
     }
 
-    /*===========================================[ CLASS METHODS ]==============*/
+    /*===========================================[ CLASS METHODS ]================*/
 
     public String getUuid() {
         return uuid;

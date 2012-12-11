@@ -41,15 +41,15 @@ import javax.persistence.EntityManager;
  * @author Alexey Krylov
  * @since 10.04.2012
  */
-@SuppressWarnings({"SynchronizeOnThis", "FieldAccessedSynchronizedAndUnsynchronized"})
 @ThreadSafe
+@SuppressWarnings("FieldAccessedSynchronizedAndUnsynchronized")
 public class JpaRepositoryProvider<R extends Repository> implements Provider<R> {
 
     /*===========================================[ STATIC VARIABLES ]=============*/
 
     private static final Logger logger = LoggerFactory.getLogger(JpaRepositoryProvider.class);
 
-    /*===========================================[ INSTANCE VARIABLES ]=========*/
+    /*===========================================[ INSTANCE VARIABLES ]===========*/
 
     private RepositoryBinding binding;
     private String persistenceUnitName;
@@ -64,30 +64,37 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
 
     private volatile R repository;
 
-    /*===========================================[ CONSTRUCTORS ]===============*/
+    /*===========================================[ CONSTRUCTORS ]=================*/
 
     /**
+     * Default provider constructor. Used in {@link JpaRepositoryModule#configure()}.
+     *
      * @param binding             repository binding parameters container
      * @param persistenceUnitName persistence unit
+     *
+     * @throws IllegalArgumentException if domain class can't be resolved for specified repository in {@code binding}
      */
     public JpaRepositoryProvider(RepositoryBinding binding, String persistenceUnitName) {
         this.binding = binding;
         this.persistenceUnitName = persistenceUnitName;
+        repositoryClass = binding.getRepositoryClass();
+        customImplementationClass = binding.getCustomRepositoryClass();
+        domainClass = TypeUtil.getFirstTypeParameterClass(repositoryClass);
+
+        if (domainClass == null) {
+            throw new IllegalArgumentException(String.format("Unable to resolve domain class for repository [%s]",
+                    repositoryClass.getName()));
+        }
     }
 
-    /*===========================================[ CLASS METHODS ]==============*/
+    /*===========================================[ CLASS METHODS ]================*/
 
     @Inject
     public void init(Injector injector,
-                     CustomRepositoryImplementationResolver implementationResolver,
                      ApplicationContext context,
+                     CustomRepositoryImplementationResolver implementationResolver,
                      PersistenceUnitsConfigurationManager configurationManager) {
-
-        repositoryClass = binding.getRepositoryClass();
-        customImplementationClass = binding.getCustomRepositoryClass();
-
         this.injector = injector;
-        domainClass = TypeUtil.getFirstTypeParameterClass(repositoryClass);
         this.context = context;
 
         if (customImplementationClass == null) {

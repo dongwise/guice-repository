@@ -48,7 +48,7 @@ public class MultiPersistenceUnitsTest {
 
     private static final Logger logger = LoggerFactory.getLogger(MultiPersistenceUnitsTest.class);
 
-    /*===========================================[ INSTANCE VARIABLES ]==========*/
+    /*===========================================[ INSTANCE VARIABLES ]===========*/
 
     @Inject
     private UserRepository userRepository;

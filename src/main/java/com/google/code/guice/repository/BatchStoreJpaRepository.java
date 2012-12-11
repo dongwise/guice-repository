@@ -18,7 +18,6 @@
 
 package com.google.code.guice.repository;
 
-import net.jcip.annotations.ThreadSafe;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.io.Serializable;
@@ -31,7 +30,6 @@ import java.io.Serializable;
  * @author Alexey Krylov
  * @since 10.04.2012
  */
-@ThreadSafe
 public interface BatchStoreJpaRepository<T, ID extends Serializable> extends JpaRepository<T, ID> {
 
     /*===========================================[ INTERFACE METHODS ]==============*/

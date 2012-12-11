@@ -18,8 +18,6 @@
 
 package com.google.code.guice.repository;
 
-import net.jcip.annotations.ThreadSafe;
-
 import javax.persistence.EntityManager;
 
 /**
@@ -30,7 +28,6 @@ import javax.persistence.EntityManager;
  * @author Alexey Krylov
  * @since 10.04.2012
  */
-@ThreadSafe
 public interface EntityManagerProvider {
 
     /*===========================================[ INTERFACE METHODS ]==============*/

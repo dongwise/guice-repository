@@ -19,6 +19,7 @@
 package com.google.code.guice.repository.configuration;
 
 import com.google.common.base.Predicate;
+import net.jcip.annotations.NotThreadSafe;
 import org.springframework.util.Assert;
 
 import java.util.ArrayList;
@@ -48,6 +49,7 @@ import java.util.Collection;
  * @author Alexey Krylov
  * @since 08.12.12
  */
+@NotThreadSafe
 public class RepositoriesGroupBuilder {
 
     /*===========================================[ INSTANCE VARIABLES ]===========*/

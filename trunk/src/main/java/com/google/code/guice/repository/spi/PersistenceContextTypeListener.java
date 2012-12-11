@@ -30,9 +30,14 @@ import javax.persistence.PersistenceContext;
 import java.lang.reflect.Field;
 
 /**
- * PersistenceContextTypeListener - TODO: description
+ * Support listener to inject EntityManager into Guice-instantiated entities.
+ * EntityManager should be annotated with {@link PersistenceContext} with {@link PersistenceContext#unitName()}:
+ * <pre>
+ *    {@literal @}PersistenceContext(unitName="persistence-unit1")
+ *     private EntityManager entityManager;
+ * </pre>
  *
- * @author Alexey Krylov (lexx)
+ * @author Alexey Krylov
  * @since 07.12.12
  */
 public class PersistenceContextTypeListener implements TypeListener {

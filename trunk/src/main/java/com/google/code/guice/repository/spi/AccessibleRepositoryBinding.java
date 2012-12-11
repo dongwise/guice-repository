@@ -1,31 +1,50 @@
 /*
- * Copyright (c) 2012, i-Free. All Rights Reserved.
- * Use is subject to license terms.
+ * Copyright (C) 2012 the original author or authors.
+ * See the notice.md file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.google.code.guice.repository.spi;
 
 import com.google.code.guice.repository.configuration.RepositoryBinding;
+import org.springframework.data.repository.core.NamedQueries;
+import org.springframework.data.repository.query.QueryLookupStrategy;
 
 /**
- * AccesibleRepositoryBinding - TODO: description
+ * Implementation of {@link RepositoryBinding} with protected setters used by {@link
+ * DefaultRepositoryBindingBuilder#build()}.
  *
- * @author Alexey Krylov (AleX)
+ * @author Alexey Krylov
  * @since 11.12.12
  */
 public class AccessibleRepositoryBinding implements RepositoryBinding {
-/*===========================================[ STATIC VARIABLES ]=============*/
-/*===========================================[ INSTANCE VARIABLES ]===========*/
 
-    private String persistenceUnitName;
+    /*===========================================[ INSTANCE VARIABLES ]===========*/
+
     private Class repositoryClass;
     private Class customRepositoryClass;
+    private NamedQueries namedQueries;
+    private QueryLookupStrategy.Key key;
+    private String persistenceUnitName;
 
-/*===========================================[ CONSTRUCTORS ]=================*/
+    /*===========================================[ CONSTRUCTORS ]=================*/
 
-    public AccessibleRepositoryBinding(Class repositoryClass) {
+    protected AccessibleRepositoryBinding(Class repositoryClass) {
         this.repositoryClass = repositoryClass;
     }
+
     /*===========================================[ CLASS METHODS ]================*/
 
     @Override
@@ -38,16 +57,78 @@ public class AccessibleRepositoryBinding implements RepositoryBinding {
         return customRepositoryClass;
     }
 
+    protected void setCustomRepositoryClass(Class customRepositoryClass) {
+        this.customRepositoryClass = customRepositoryClass;
+    }
+
     @Override
     public String getPersistenceUnitName() {
         return persistenceUnitName;
     }
 
-    public void setCustomRepositoryClass(Class customRepositoryClass) {
-        this.customRepositoryClass = customRepositoryClass;
+    protected void setPersistenceUnitName(String persistenceUnitName) {
+        this.persistenceUnitName = persistenceUnitName;
     }
 
-    public void setPersistenceUnitName(String persistenceUnitName) {
-        this.persistenceUnitName = persistenceUnitName;
+    @Override
+    public NamedQueries getNamedQueries() {
+        return namedQueries;
+    }
+
+    protected void setNamedQueries(NamedQueries namedQueries) {
+        this.namedQueries = namedQueries;
+    }
+
+    @Override
+    public QueryLookupStrategy.Key getQueryLookupStrategyKey() {
+        return key;
+    }
+
+    protected void setQueryLookupStrategyKey(QueryLookupStrategy.Key key) {
+        this.key = key;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof AccessibleRepositoryBinding)) {
+            return false;
+        }
+
+        AccessibleRepositoryBinding repositoryBinding = (AccessibleRepositoryBinding) o;
+
+        if (customRepositoryClass != null ? !customRepositoryClass.equals(repositoryBinding.customRepositoryClass) : repositoryBinding.customRepositoryClass != null) {
+            return false;
+        }
+        if (persistenceUnitName != null ? !persistenceUnitName.equals(repositoryBinding.persistenceUnitName) : repositoryBinding.persistenceUnitName != null) {
+            return false;
+        }
+        if (repositoryClass != null ? !repositoryClass.equals(repositoryBinding.repositoryClass) : repositoryBinding.repositoryClass != null) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = repositoryClass != null ? repositoryClass.hashCode() : 0;
+        result = 31 * result + (customRepositoryClass != null ? customRepositoryClass.hashCode() : 0);
+        result = 31 * result + (persistenceUnitName != null ? persistenceUnitName.hashCode() : 0);
+        return result;
+    }
+
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("AccessibleRepositoryBinding");
+        sb.append("{repositoryClass=").append(repositoryClass);
+        sb.append(", customRepositoryClass=").append(customRepositoryClass);
+        sb.append(", persistenceUnitName='").append(persistenceUnitName).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

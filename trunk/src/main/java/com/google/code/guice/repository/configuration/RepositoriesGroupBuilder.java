@@ -1,27 +1,54 @@
 /*
- * Copyright (c) 2012, i-Free. All Rights Reserved.
- * Use is subject to license terms.
+ * Copyright (C) 2012 the original author or authors.
+ * See the notice.md file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.google.code.guice.repository.configuration;
 
 import com.google.common.base.Predicate;
+import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
 /**
- * RepositoryGroupBuilder - TODO: description
+ * Builds instance of {@link RepositoriesGroup}.
+ * Examples:
+ * <pre>
+ *     RepositoriesGroupBuilder.forPackage("com.mycorp.repo").
+ *             withExclusionPattern(".*" + UserDataRepository.class.getSimpleName() + ".*").
+ *             attachedTo("persistence-unit1").
+ *             build();
  *
- * @author Alexey Krylov (AleX)
+ *   RepositoriesGroupBuilder.forPackage("com.mycorp.repo").
+ *         withInclusionFilterPredicate(new Predicate&lt;Class&gt;() {
+ *             {@literal @}Override
+ *             public boolean apply(@Nullable Class input) {
+ *                 return UserDataRepository.class.isAssignableFrom(input);
+ *             }
+ *         }).
+ *         attachedTo("persistence-unit2").
+ *         build();
+ * </pre>
+ *
+ * @author Alexey Krylov
  * @since 08.12.12
  */
 public class RepositoriesGroupBuilder {
-
-    /*===========================================[ STATIC VARIABLES ]=============*/
-
-
 
     /*===========================================[ INSTANCE VARIABLES ]===========*/
 
@@ -40,7 +67,25 @@ public class RepositoriesGroupBuilder {
 
     /*===========================================[ CLASS METHODS ]================*/
 
-    public RepositoriesGroupBuilder withRepositoriesPackages(Collection<String> repositoriesPackages) {
+    public static RepositoriesGroupBuilder forPackage(String packageName) {
+        Assert.notNull(packageName);
+        return forPackages(Arrays.asList(packageName));
+    }
+
+    public static RepositoriesGroupBuilder forPackages(Collection<String> repositoriesPackages) {
+        Assert.notEmpty(repositoriesPackages);
+        Assert.noNullElements(repositoriesPackages.toArray(new String[repositoriesPackages.size()]));
+        return new RepositoriesGroupBuilder(repositoriesPackages);
+    }
+
+    public RepositoriesGroupBuilder withPackage(String packageName) {
+        Assert.notNull(packageName);
+        repositoriesPackages.add(packageName);
+        return this;
+    }
+
+    public RepositoriesGroupBuilder withPackages(Collection<String> repositoriesPackages) {
+        Assert.noNullElements(repositoriesPackages.toArray(new String[repositoriesPackages.size()]));
         this.repositoriesPackages.addAll(repositoriesPackages);
         return this;
     }
@@ -65,17 +110,9 @@ public class RepositoriesGroupBuilder {
         return this;
     }
 
-    public RepositoriesGroupBuilder withExclusionFilter(Predicate<Class> exclusionPredicate) {
+    public RepositoriesGroupBuilder withExclusionFilterPredicate(Predicate<Class> exclusionPredicate) {
         this.exclusionPredicate = exclusionPredicate;
         return this;
-    }
-
-    public static RepositoriesGroupBuilder forPackage(String packageName) {
-        return forPackages(Arrays.asList(packageName));
-    }
-
-    public static RepositoriesGroupBuilder forPackages(Collection<String> repositoriesPackages) {
-        return new RepositoriesGroupBuilder(repositoriesPackages);
     }
 
     public RepositoriesGroup build() {

@@ -37,18 +37,31 @@ import java.util.*;
 import static com.google.common.collect.Collections2.filter;
 
 /**
- * Guice module with Repository support and auto Repository-scanning abilities. With this module there is no need to
+ * Guice module with Repository support and auto Repository scanning abilities. With this module there is no need to
  * manual binding of any Repositories - just specify target repository package :
  * <pre>
- *     install(new ScanningJpaRepositoryModule("com.mycorp.repo"){
- *        protected String getPersistenceUnitName(){
- *            return "my-persistence-unit";
- *        }
- *     });
+ *     install(new ScanningJpaRepositoryModule(
+ *                     Arrays.asList(
+ *                                 RepositoriesGroupBuilder.forPackage("com.mycorp.repo").
+ *                                 withExclusionPattern(".*" + UserDataRepository.class.getSimpleName() + ".*").
+ *                                 attachedTo("persistence-unit1").
+ *                                 build();
+ *                               ));
+ * </pre>
+ * <p/>
+ * Also there is an option to combine auto-binding with manual binding. For this case just override {@link
+ * #bindRepositories(RepositoryBinder)} with 'super' call:
+ * <pre>
+ *     install(new ScanningJpaRepositoryModule("com.mycorp.repo", "persistence-unit1") {
+ *                     protected void bindRepositories(RepositoryBinder binder) {
+ *                           super.bindRepositories(binder);
+ *                           // manual bind specific repositories
+ *                           binder.bind(MyRepository.class).withSelfDefinition();
+ *                     }
+ *               });
  * </pre>
  *
  * @author Alexey Krylov
- * @version 1.0.0
  * @since 10.04.2012
  */
 @SuppressWarnings("CollectionContainsUrl")
@@ -74,6 +87,8 @@ public class ScanningJpaRepositoryModule extends JpaRepositoryModule {
         this.repositoriesGroups = Lists.newArrayList(repositoriesGroups);
     }
 
+    /*===========================================[ CLASS METHODS ]==============*/
+
     private static String[] extractPersistenceUnitsNames(Collection<RepositoriesGroup> repositoriesGroups) {
         Collection<String> persistenceUnitsNames = new ArrayList<String>();
         for (RepositoriesGroup repositoriesGroup : repositoriesGroups) {
@@ -82,8 +97,6 @@ public class ScanningJpaRepositoryModule extends JpaRepositoryModule {
 
         return persistenceUnitsNames.toArray(new String[persistenceUnitsNames.size()]);
     }
-
-    /*===========================================[ CLASS METHODS ]==============*/
 
     @Override
     protected void bindRepositories(RepositoryBinder binder) {

@@ -18,6 +18,7 @@
 
 package com.google.code.guice.repository.spi;
 
+import com.google.code.guice.repository.configuration.JpaRepositoryModule;
 import com.google.code.guice.repository.configuration.PersistenceUnitConfiguration;
 import com.google.code.guice.repository.configuration.PersistenceUnitsConfigurationManager;
 import com.google.inject.Inject;
@@ -28,9 +29,14 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttributeSource;
 
 /**
- * CompositeTransactionInterceptor - TODO: description
+ * Interceptor for all Guice-instantiated entities with @Transactional methods. Binding process performs in {@link
+ * JpaRepositoryModule#configure()}. Interceptor named Composite because it supports multiple persistence units.
+ * Actual one determined from invocation method annotations. After that it delegates invocation to interceptor bound
+ * to persistence unit. Interceptor, bound to persistence unit, contains all nesessary information to handle passed
+ * invocation - transaction manager, transaction attribute source, bean factory and so on.
  *
- * @author Alexey Krylov (AleX)
+ * @author Alexey Krylov
+ * @see JpaRepositoryModule#createApplicationContext(PersistenceUnitsConfigurationManager)
  * @since 07.12.12
  */
 public class CompositeTransactionInterceptor implements MethodInterceptor {
@@ -43,7 +49,7 @@ public class CompositeTransactionInterceptor implements MethodInterceptor {
     /*===========================================[ CONSTRUCTORS ]=================*/
 
     @Inject
-    public void init(PersistenceUnitsConfigurationManager configurationManager, TransactionAttributeSource transactionAttributeSource){
+    protected void init(PersistenceUnitsConfigurationManager configurationManager, TransactionAttributeSource transactionAttributeSource) {
         this.configurationManager = configurationManager;
         this.transactionAttributeSource = transactionAttributeSource;
     }

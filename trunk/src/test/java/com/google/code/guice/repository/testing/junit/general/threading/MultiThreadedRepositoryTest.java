@@ -42,7 +42,7 @@ public class MultiThreadedRepositoryTest extends RepoTestBase {
 
     /*===========================================[ CLASS METHODS ]==============*/
 
-    @SuppressWarnings({"MagicNumber"})
+    @SuppressWarnings("MagicNumber")
     @Test
     public void testConcurrentAccess() throws InterruptedException {
         Assert.assertEquals("Repo is not empty", 0, injector.getInstance(UserRepository.class).count());
@@ -51,6 +51,7 @@ public class MultiThreadedRepositoryTest extends RepoTestBase {
         final Set<Integer> repoHashes = new ConcurrentSkipListSet<Integer>();
 
         Runnable producer = new Runnable() {
+            @Override
             public void run() {
                 UserRepository instance = injector.getInstance(UserRepository.class);
                 try{

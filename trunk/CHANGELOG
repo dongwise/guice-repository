@@ -1,6 +1,15 @@
-        // TODO: http://blog.springsource.org/2011/04/26/advanced-spring-data-jpa-specifications-and-querydsl/#comment-198835
-        // TODO http://blog.springsource.org/2011/04/26/advanced-spring-data-jpa-specifications-and-querydsl/#comment-198835
-        // TODO: https://github.com/SpringSource/spring-data-jpa/blob/master/src/test/resources/multiple-entity-manager-integration-context.xml
+[2.0.0]
+ [+] Full support for @Transactional methods for all Guice-instantiated entities;
+ [+] PersistFilter as implementation of "Open EntityManager in View"/"session-in-view"/"session-per-http-request" pattern;
+ [+] Support for multiple persistence units
+ [+] Support for direct injection of EntityManager/EntityManagerFactory with @PersistenceContext/@PersistenceUnit/@Inject&@Named annotations;
+ [+] Support for injections in repositories/custom implementations;
+ [+] More natural way of Repository binding process;
+ [+] Highly tunable ScanningJpaRepositoryModule: RepositoriesGroup, RepositoriesGroupBuilder, RepositoriesGroupFilterPredicates, etc;
+ [+] Ability to bind interceptor to catch Repository methods with @Transactional;
+ [+] Significant performance improvements;
+ [+] Support for all settable properties of JpaRepositoryFactoryBean: namedQueries & queryLookupStrategyKey (see RepositoryBindingBuilder).
 
-Current
-Initial Revision
+[1.0.0]
+ Current
+ Initial Revision

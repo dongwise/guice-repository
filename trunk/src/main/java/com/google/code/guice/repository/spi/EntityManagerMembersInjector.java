@@ -21,12 +21,18 @@ package com.google.code.guice.repository.spi;
 import com.google.inject.MembersInjector;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.lang.reflect.Field;
 
 /**
- * EntityManagerMembersInjector - TODO: description
+ * EntityManager injector for fields, annotated with {@link PersistenceContext} with {@link
+ * PersistenceContext#unitName()}:
+ * <pre>
+ *    {@literal @}PersistenceContext(unitName="persistence-unit1")
+ *     private EntityManager entityManager;
+ * </pre>
  *
- * @author Alexey Krylov (lexx)
+ * @author Alexey Krylov
  * @since 07.12.12
  */
 public class EntityManagerMembersInjector<T> implements MembersInjector<T> {
@@ -36,9 +42,9 @@ public class EntityManagerMembersInjector<T> implements MembersInjector<T> {
     private Field field;
     private EntityManager entityManager;
 
-    /*=========================o==================[ CONSTRUCTORS ]=================*/
+    /*===========================================[ CONSTRUCTORS ]=================*/
 
-    public EntityManagerMembersInjector(Field field, EntityManager entityManager) {
+    protected EntityManagerMembersInjector(Field field, EntityManager entityManager) {
         this.field = field;
         this.entityManager = entityManager;
         field.setAccessible(true);

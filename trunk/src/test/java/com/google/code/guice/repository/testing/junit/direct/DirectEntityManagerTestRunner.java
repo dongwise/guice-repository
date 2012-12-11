@@ -24,9 +24,9 @@ import com.google.code.guice.repository.testing.common.GuiceTestRunner;
 import org.junit.runners.model.InitializationError;
 
 /**
- * DirectEntityManagerTestRunner - TODO: description
+ * Only EM injections test runner.
  *
- * @author Alexey Krylov (lexx)
+ * @author Alexey Krylov
  * @since 07.12.12
  */
 public class DirectEntityManagerTestRunner extends GuiceTestRunner {

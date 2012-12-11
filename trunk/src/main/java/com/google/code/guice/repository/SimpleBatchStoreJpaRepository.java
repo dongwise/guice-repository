@@ -22,6 +22,7 @@ import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import net.jcip.annotations.ThreadSafe;
+import org.aopalliance.intercept.MethodInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
@@ -36,11 +37,12 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * JpaRepository with batch save support. It's a default implementation for all JPA repositories based on
- * guice-repository.
+ * Implementation of Repository with batch save support. It's a default implementation for all JPA repositories based
+ * on
+ * guice-repository. This class constructed by Guice with <a href="http://code.google.com/p/google-guice/wiki/AssistedInject">assisted-inject</a>
+ * extension - it's possible to bind {@link MethodInterceptor} for this class/extensions.
  *
  * @author Alexey Krylov
- * @version 1.0.0
  * @see SimpleJpaRepository
  * @since 10.04.2012
  */
@@ -74,6 +76,7 @@ public class SimpleBatchStoreJpaRepository<T, ID extends Serializable> extends S
 
     /*===========================================[ CLASS METHODS ]==============*/
 
+    @Override
     public void saveInBatch(Iterable<T> entities) {
         List<T> list = Lists.newArrayList(entities);
         Assert.notEmpty(list);
@@ -84,6 +87,7 @@ public class SimpleBatchStoreJpaRepository<T, ID extends Serializable> extends S
         }
     }
 
+    @Override
     public void saveInBatch(Iterable<T> entities, int batchSize) {
         List<T> list = Lists.newArrayList(entities);
         Assert.notEmpty(list);
@@ -122,6 +126,7 @@ public class SimpleBatchStoreJpaRepository<T, ID extends Serializable> extends S
         logger.info(String.format("batch for [%d] of [%s] stored", list.size(), entityClassName));
     }
 
+    @Override
     public EntityManager getEntityManager() {
         return entityManager;
     }

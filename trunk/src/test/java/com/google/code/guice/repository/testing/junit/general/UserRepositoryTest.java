@@ -24,7 +24,6 @@ import com.google.code.guice.repository.testing.repo.UserRepository;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -41,7 +40,7 @@ import java.util.concurrent.Executors;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-@SuppressWarnings({"MagicNumber"})
+@SuppressWarnings("MagicNumber")
 public class UserRepositoryTest extends RepoTestBase {
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
@@ -87,6 +86,7 @@ public class UserRepositoryTest extends RepoTestBase {
 
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.invokeAll(Arrays.asList(Executors.callable(new Runnable() {
+            @Override
             public void run() {
                 try {
                     logger.info("Start concurrent thread");

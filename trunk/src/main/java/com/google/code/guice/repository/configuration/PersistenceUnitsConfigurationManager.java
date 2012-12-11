@@ -18,6 +18,8 @@
 
 package com.google.code.guice.repository.configuration;
 
+import com.google.code.guice.repository.filter.PersistFilter;
+import com.google.code.guice.repository.spi.JpaRepositoryProvider;
 import net.jcip.annotations.ThreadSafe;
 import org.springframework.util.Assert;
 
@@ -28,9 +30,15 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * PersistenceUnitDescriptor - TODO: description
+ * Represents Manager of persistence units configurations. Used to register/retrieve configurations in various project
+ * aspects. Manager instantiates at {@link JpaRepositoryModule#createPersistenceUnitsConfigurationManager(String...)}.
+ * Each manager contains one default configuration. Default configuration used for all untargeted (without direct
+ * persistence unit name specification) binds/requests.
  *
- * @author Alexey Krylov (lexx)
+ * @author Alexey Krylov
+ * @see PersistFilter
+ * @see JpaRepositoryProvider
+ * @see JpaRepositoryModule
  * @since 06.12.12
  */
 @ThreadSafe
@@ -49,8 +57,18 @@ public class PersistenceUnitsConfigurationManager {
 
     /*===========================================[ CLASS METHODS ]================*/
 
+    /**
+     * Registers new configuration.
+     *
+     * @param persistenceUnitConfiguration configuration to register
+     * @param asDefault                    should be set to {@code true} for registering specified configuration as
+     *                                     default. Previous default configuration will be overwritten.
+     */
     public void registerConfiguration(PersistenceUnitConfiguration persistenceUnitConfiguration, boolean asDefault) {
         if (asDefault) {
+            if (defaultConfiguration != null) {
+                defaultConfiguration.setDefault(false);
+            }
             defaultConfiguration = persistenceUnitConfiguration;
             defaultConfiguration.setDefault(true);
         }
@@ -58,6 +76,21 @@ public class PersistenceUnitsConfigurationManager {
         configurations.put(persistenceUnitConfiguration.getPersistenceUnitName(), persistenceUnitConfiguration);
     }
 
+    /**
+     * Searches in registered configurations and returns configuration related to specified {@code
+     * persistenceUnitName}.
+     * <p>
+     * <b>NOTE:</b> default configuration will always be returned for null/empty {@code persistenceUnitName}.
+     * </p>
+     *
+     * @param persistenceUnitName name of persistence unit. Can be {@code null}.
+     *
+     * @return configuration related to specified {@code persistenceUnitName} or default configuration for case of
+     *         null/empty parameter
+     *
+     * @throws IllegalStateException if specified {@code persistenceUnitName} is not null/empty, but configuration is
+     *                               not registered
+     */
     public PersistenceUnitConfiguration getConfiguration(String persistenceUnitName) {
         if (persistenceUnitName == null || persistenceUnitName.isEmpty()) {
             return defaultConfiguration;
@@ -74,17 +107,19 @@ public class PersistenceUnitsConfigurationManager {
         return defaultConfiguration;
     }
 
-    public boolean containsSpecificConfiguration(String persistenceUnitName) {
-        if (persistenceUnitName == null || persistenceUnitName.isEmpty()) {
-            return true;
-        }
-        return configurations.get(persistenceUnitName) != null;
-    }
-
     public Collection<PersistenceUnitConfiguration> getConfigurations() {
         return configurations.values();
     }
 
+    /**
+     * Changes EntityManager bound to specified configuration.
+     *
+     * @param persistenceUnitName persistence unit name
+     * @param entityManager       new entity manager
+     *
+     * @throws IllegalArgumentException if specified {@code entityManager} is null
+     * @see PersistFilter
+     */
     public void changeEntityManager(String persistenceUnitName, EntityManager entityManager) {
         Assert.notNull(entityManager);
         getConfiguration(persistenceUnitName).setEntityManager(entityManager);

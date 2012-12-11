@@ -35,6 +35,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 
     /*===========================================[ CLASS METHODS ]==============*/
 
+    @Override
     @Transactional
     public void someCustomMethod(User user) {
         Assert.assertNotNull("User is null", user);

@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@SuppressWarnings({"MagicNumber"})
+@SuppressWarnings("MagicNumber")
 public class BatchStoreRepositoryTest extends RepoTestBase {
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
@@ -67,7 +67,7 @@ public class BatchStoreRepositoryTest extends RepoTestBase {
         timer.cancel();
     }
 
-    @SuppressWarnings({"CallToSystemGC"})
+    @SuppressWarnings("CallToSystemGC")
     @Test
     public void testDefaultBatchSave() throws Exception {
         long initialMemory = Runtime.getRuntime().freeMemory();

@@ -28,7 +28,6 @@ import javax.persistence.EntityManager;
  * required for custom methods.
  *
  * @author Alexey Krylov
- * @version 1.0.0
  * @since 10.04.2012
  */
 @ThreadSafe

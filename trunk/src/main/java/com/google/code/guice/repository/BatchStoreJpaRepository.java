@@ -24,12 +24,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.io.Serializable;
 
 /**
- * Jpa Repository with batch save support. Some theory can be found <a href="http://www.objectdb.com/java/jpa/persistence/store#Batch_Store_">here</a>.
+ * Repository with batch save support. Some theory can be found <a href="http://www.objectdb.com/java/jpa/persistence/store#Batch_Store_">here</a>.
  *
  * @param <T> entity type.
  *
  * @author Alexey Krylov
- * @version 1.0.0
  * @since 10.04.2012
  */
 @ThreadSafe
@@ -38,7 +37,8 @@ public interface BatchStoreJpaRepository<T, ID extends Serializable> extends Jpa
     /*===========================================[ INTERFACE METHODS ]==============*/
 
     /**
-     * Saves all given entities in one batch. This method will detach saved enities from PersistentContext (L1 cache) to
+     * Saves all given entities in one batch. This method will detach saved enities from PersistentContext (L1 cache)
+     * to
      * prevent OutOfMemoryException.
      *
      * @param entities entities to save. Should be not null and not empty.
@@ -46,7 +46,7 @@ public interface BatchStoreJpaRepository<T, ID extends Serializable> extends Jpa
     void saveInBatch(Iterable<T> entities);
 
     /**
-     * Saves given entities in N batch iterations. Each batch contains <code>batchSize</code> elements. This method will
+     * Saves given entities in N batch iterations. Each batch contains {@code batchSize} elements. This method will
      * detach saved enities from PersistentContext (L1 cache) to prevent OutOfMemoryException.
      *
      * @param entities  entities to save. Should be not null and not empty.

@@ -18,12 +18,13 @@
 
 package com.google.code.guice.repository.spi;
 
+import com.google.code.guice.repository.configuration.JpaRepositoryModule;
 import com.google.code.guice.repository.configuration.PersistenceUnitConfiguration;
 import com.google.code.guice.repository.configuration.PersistenceUnitsConfigurationManager;
-import com.google.code.guice.repository.configuration.ScanningJpaRepositoryModule;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.ImmutableBiMap;
-import com.google.inject.*;
+import com.google.code.guice.repository.configuration.RepositoryBinding;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+import com.google.inject.Provider;
 import net.jcip.annotations.ThreadSafe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,37 +32,13 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.data.repository.Repository;
-import org.springframework.util.Assert;
 
 import javax.persistence.EntityManager;
 
 /**
- * Creates an instance of JpaRepository. Bind all your repositories to this provider. Examples:
- * <pre>
- *  bind(UserRepository.class).toProvider(new JpaRepositoryProvider&lt;UserRepository&gt;());
- *  bind(AccountRepository.class).toProvider(new JpaRepositoryProvider&lt;AccountRepository&gt;());
- * </pre>
- * In case when custom implementation class is a SimpleXXXRepository subclass - it should be passed as a constructor
- * parameter.
- * <pre>
- *  bind(CustomerRepository.class).toProvider(new JpaRepositoryProvider&lt;CustomerRepository&gt;(CustomerRepositoryImpl.class));
- * </pre>
- * Note, that all Repositories is not thread-safe, because they works directly with EntityManager, which is also not
- * thread-safe. Here is a valid example for concurrent Repository usage:
- * <pre>
- *     &#64;Inject
- *     private Provider&lt;UserRepository&gt; userRepositoryProvider;
- *     ...
- *     // this method can be used concurrently
- *     public void threadSafeRepoUsageMethod(){
- *         UserRepository repo = userRepositoryProvider.get();
- *         repo.save(new User("login", "password"));
- *         repo.someOtherRepoMethod();
- *     }
- * </pre>
+ * Provides an instance of JpaRepository. Used in {@link JpaRepositoryModule#configure()}
  *
  * @author Alexey Krylov
- * @version 1.0.0
  * @since 10.04.2012
  */
 @SuppressWarnings({"SynchronizeOnThis", "FieldAccessedSynchronizedAndUnsynchronized"})
@@ -74,53 +51,27 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/
 
-    private Class<R> repositoryClass;
+    private RepositoryBinding binding;
     private String persistenceUnitName;
-    private Class domainClass;
+
+    private Class<R> repositoryClass;
     private Class customImplementationClass;
 
-    private ApplicationContext context;
-    private volatile R repository;
     private PersistenceUnitsConfigurationManager configurationManager;
     private Injector injector;
+    private Class domainClass;
+    private ApplicationContext context;
+
+    private volatile R repository;
 
     /*===========================================[ CONSTRUCTORS ]===============*/
 
     /**
-     * Default constructor.
+     * @param binding             repository binding parameters container
+     * @param persistenceUnitName persistence unit
      */
-    public JpaRepositoryProvider() {
-    }
-
-    public JpaRepositoryProvider(String persistenceUnitName) {
-        this.persistenceUnitName = persistenceUnitName;
-    }
-
-    /**
-     * Constructor for auto-binding.
-     *
-     * @param repositoryClass           class of Repository.
-     * @param customImplementationClass custom implementation class of Repository.
-     *
-     * @see ScanningJpaRepositoryModule
-     */
-    public JpaRepositoryProvider(Class<R> repositoryClass, Class customImplementationClass, String persistenceUnitName) {
-        Assert.notNull(repositoryClass);
-        this.repositoryClass = repositoryClass;
-        this.customImplementationClass = customImplementationClass;
-        this.persistenceUnitName = persistenceUnitName;
-    }
-
-    /**
-     * @param customImplementationClass custom implementation class of Repository. Can't be null.
-     */
-    public JpaRepositoryProvider(Class customImplementationClass) {
-        Assert.notNull(customImplementationClass);
-        this.customImplementationClass = customImplementationClass;
-    }
-
-    public JpaRepositoryProvider(Class customImplementationClass, String persistenceUnitName) {
-        this(customImplementationClass);
+    public JpaRepositoryProvider(RepositoryBinding binding, String persistenceUnitName) {
+        this.binding = binding;
         this.persistenceUnitName = persistenceUnitName;
     }
 
@@ -131,11 +82,11 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
                      CustomRepositoryImplementationResolver implementationResolver,
                      ApplicationContext context,
                      PersistenceUnitsConfigurationManager configurationManager) {
-        this.injector = injector;
-        if (repositoryClass == null) {
-            repositoryClass = extractRepositoryClass(injector);
-        }
 
+        repositoryClass = binding.getRepositoryClass();
+        customImplementationClass = binding.getCustomRepositoryClass();
+
+        this.injector = injector;
         domainClass = TypeUtil.getFirstTypeParameterClass(repositoryClass);
         this.context = context;
 
@@ -147,33 +98,6 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
             logger.info(String.format("Custom repository implementation class for [%s] set to [%s]", repositoryClass.getName(), customImplementationClass.getName()));
         }
         this.configurationManager = configurationManager;
-    }
-
-    /**
-     * Extracts repository class from Guice-bindings (it's a type paramater).
-     *
-     * @param injector Google Guice injector.
-     *
-     * @return repository class.
-     */
-    protected Class<R> extractRepositoryClass(Injector injector) {
-        Class repositoryClass;
-        Key<R> key = null;
-        BiMap<Key<?>, Binding<?>> biMap = ImmutableBiMap.copyOf(injector.getBindings());
-        String currentProvider = toString();
-        for (Binding<?> value : biMap.values()) {
-            if (value.getProvider().toString().equals(currentProvider)) {
-                key = (Key<R>) biMap.inverse().get(value);
-                break;
-            }
-        }
-
-        if (key == null) {
-            throw new IllegalStateException(String.format("Unable to find provider binding for [%s]", toString()));
-        }
-
-        repositoryClass = key.getTypeLiteral().getRawType();
-        return repositoryClass;
     }
 
     @Override
@@ -194,6 +118,8 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
                     jpaRepositoryFactoryBean.setBeanFactory(context);
                     jpaRepositoryFactoryBean.setEntityManager(entityManager);
                     jpaRepositoryFactoryBean.setRepositoryInterface(repositoryClass);
+                    jpaRepositoryFactoryBean.setNamedQueries(binding.getNamedQueries());
+                    jpaRepositoryFactoryBean.setQueryLookupStrategyKey(binding.getQueryLookupStrategyKey());
 
                     if (customImplementationClass != null) {
                         Object customRepositoryImplementation = instantiateCustomRepository(entityManager);

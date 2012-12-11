@@ -30,9 +30,9 @@ import javax.persistence.PersistenceContext;
 import java.util.List;
 
 /**
- * DirectEntityManagerAccessTest - TODO: description
+ * EntityManager injections and usage test.
  *
- * @author Alexey Krylov (lexx)
+ * @author Alexey Krylov
  * @since 06.12.12
  */
 @RunWith(DirectEntityManagerTestRunner.class)

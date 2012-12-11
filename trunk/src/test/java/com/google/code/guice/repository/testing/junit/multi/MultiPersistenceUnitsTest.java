@@ -38,7 +38,7 @@ import java.util.UUID;
 /**
  * MultiDatasourceTest -
  *
- * @author Alexey Krylov (AleX)
+ * @author Alexey Krylov
  * @since 02.12.12
  */
 @RunWith(MultiPersistenceUnitsTestRunner.class)

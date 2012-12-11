@@ -18,6 +18,7 @@
 
 package com.google.code.guice.repository.configuration;
 
+import com.google.code.guice.repository.SimpleQueryDslJpaRepository;
 import com.google.code.guice.repository.filter.PersistFilter;
 import com.google.code.guice.repository.spi.*;
 import com.google.inject.AbstractModule;
@@ -31,6 +32,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.data.jpa.repository.support.JpaEntityInformation;
+import org.springframework.data.querydsl.QueryDslUtils;
 import org.springframework.data.repository.Repository;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -53,31 +56,39 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * Guice module with Repository support. Repository bindings should be made in {@code configureRepositories}
- * method. Module uses JpaPersistModule from guice-persist, which is requires persistence-unit name as an input
- * parameter. There is three options to specify persistence-unit name: <ol> <li> constructor parameter. For example:
- * new
- * JpaRepositoryModule("my-persistence-unit") </li> <li> system property 'persistence-unit-name'. For example: launch
- * an
- * application with -Dpersistence-unit-name=my-persistence-unit </li> <li>override {@code getPersistenceUnitName}
- * method. For example:
+ * Guice module with Repository support. Repository bindings should be made in {@link
+ * #bindRepositories(RepositoryBinder)}
+ * method. Module requires array of persistence units as an constructor parameter.
+ * There is three options to specify persistence units names:
+ * <ol>
+ * <li>constructor parameter. For example:
+ * <pre>new JpaRepositoryModule("persistence-unit1", "persistence-unit2")</pre>
+ * </li>
+ * <p/>
+ * <li>override {@link #getPersistenceUnitsNames} method. For example:
  * <pre>
  *          new JpaRepositoryModule(){
- *               protected String getPersistenceUnitName() {
- *                    return "my-persistence-unit";
+ *                 protected Collection<String> getPersistenceUnitsNames() {
+ *                     return Arrays.asList("persistence-unit1", "persistence-unit2");
  *               }
  *          }
  *       </pre>
- * </li> </ol>
- *
+ * </li>
+ * <li>system property 'persistence-units' splitted by symbol ',' or ';' .
+ * For example: -Dpersistence-units=persistence-unit1,persistence-unit2</li>
+ * </ol>
+ * <p>
  * It is very useful to separate ORM specifics from persistence.xml. This technique gives you possibilities to pack
- * your
- * persistence.xml with mappings/specification-driven aspects to artifact. Module will look for this specifics in
+ * your persistence.xml with mappings/specification-driven aspects to artifact. Module will look for this specifics in
  * ${persistence-unit-name}.properties file placed in the classpath. Also you can define all ORM specifics in
- * persistence.xml, there is no problem with it.
+ * persistence.xml.
+ * </p>
+ * <p>
+ * NOTE: first persistence unit name will be treated as <b>default</b>. In the example above persistence unit with name
+ * "persistence-unit1" will be registered as default persistence unit.
+ * </p>
  *
  * @author Alexey Krylov
- * @version 1.0.0
  * @since 10.04.2012
  */
 public abstract class JpaRepositoryModule extends AbstractModule {
@@ -114,7 +125,7 @@ public abstract class JpaRepositoryModule extends AbstractModule {
             if (cPersistenceUnits == null) {
                 String pPersistenceUnits = System.getProperty(P_PERSISTENCE_UNITS);
                 if (pPersistenceUnits == null) {
-                    throw new IllegalStateException("Unable to instantiate JpaRepositoryModule: no persistence-unit-name specified");
+                    throw new IllegalStateException("Unable to instantiate JpaRepositoryModule: no persistence units specified");
                 } else {
                     String[] splittedPersistenceUnits = pPersistenceUnits.split(PERSISTENCE_UNITS_SPLIT_REGEX);
                     if (splittedPersistenceUnits.length > 0) {
@@ -152,22 +163,21 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         bind(PersistenceUnitsConfigurationManager.class).toInstance(configurationManager);
 
         // Only Spring @Transactional annotation is supported
-        AnnotationTransactionAttributeSource tas = new AnnotationTransactionAttributeSource(new SpringTransactionAnnotationParser());
+        TransactionAttributeSource tas = createTransactionAttributeSource();
         bind(TransactionAttributeSource.class).toInstance(tas);
 
         // Initializing Spring Context
-        ApplicationContext applicationContext = createApplicationContext(configurationManager.getConfigurations(), tas);
+        ApplicationContext applicationContext = createApplicationContext(configurationManager);
         bind(ApplicationContext.class).toInstance(applicationContext);
 
         // Initializing interceptor for components created by Guice and marked with @Transactional
         CompositeTransactionInterceptor transactionInterceptor = new CompositeTransactionInterceptor();
         requestInjection(transactionInterceptor);
         bindInterceptor(Matchers.any(), Matchers.annotatedWith(Transactional.class), transactionInterceptor);
-        //bindInterceptor(Matchers.annotatedWith(Transactional.class), Matchers.any(), transactionInterceptor);
 
         install(new FactoryModuleBuilder().build(SimpleBatchStoreJpaRepositoryFactory.class));
-        install(new FactoryModuleBuilder().build(SimpleQueryDslJpaRepositoryFactory.class));
         install(new FactoryModuleBuilder().build(CustomJpaRepositoryFactoryCreator.class));
+        enableQueryDSLSupport();
 
         // Support for EntityManager and EntityManagerFactory injections
         bindPersistence(configurationManager);
@@ -194,7 +204,7 @@ public abstract class JpaRepositoryModule extends AbstractModule {
                         repositoryClass.getName(), persistenceUnitName));
             }
 
-            bind(repositoryClass).toProvider(new JpaRepositoryProvider(repositoryClass, customRepositoryClass, persistenceUnitName));
+            bind(repositoryClass).toProvider(new JpaRepositoryProvider(binding, persistenceUnitName));
 
             logger.info(String.format("[%s] %s attached to [%s] and available for injection",
                     repositoryClass.getName(),
@@ -205,6 +215,29 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         logger.info(String.format("[%s] configured", moduleName));
     }
 
+    /**
+     * Enables <a href="http://www.querydsl.com/"/> support if required dependencies is in classpath.
+     */
+    protected void enableQueryDSLSupport() {
+        if (QueryDslUtils.QUERY_DSL_PRESENT) {
+            install(new FactoryModuleBuilder().build(SimpleQueryDslJpaRepositoryFactory.class));
+        } else {
+            logger.info("QueryDSL is disabled");
+            bind(SimpleQueryDslJpaRepositoryFactory.class).toInstance(new SimpleQueryDslJpaRepositoryFactory() {
+                @Override
+                public SimpleQueryDslJpaRepository create(JpaEntityInformation jpaEntityInformation, EntityManager entityManager) {
+                    throw new IllegalStateException("QueryDSL is disabled, but used in your project! Please add QueryDSL support libraries!");
+                }
+            });
+        }
+    }
+
+    /**
+     * Binds EntityManagers/EntityManagerFactories to current injector context.
+     * Required for later direct EntityManager/EntityManagerFactory injections.
+     *
+     * @param configurationManager configuration manager instance
+     */
     protected void bindPersistence(PersistenceUnitsConfigurationManager configurationManager) {
         // Support for EntityManager with @PersistenceContext injections
         PersistenceContextTypeListener persistenceContextTypeListener = new PersistenceContextTypeListener();
@@ -249,6 +282,13 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         bind(EntityManagerFactory.class).toInstance(defaultConfiguration.getEntityManagerFactory());
     }
 
+    /**
+     * Extracts {@code persistenceUnitName} from Repository annotations if no direct binding has been specified.
+     *
+     * @param repositoryClass repository class
+     *
+     * @return located persistenceUnitName or <i>null</i> if nothing has been found
+     */
     protected String extractAnnotationsPersistenceUnitName(Class<? extends Repository> repositoryClass) {
         String persistenceUnitName = null;
         PersistenceContext persistenceContext = repositoryClass.getAnnotation(PersistenceContext.class);
@@ -272,19 +312,45 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         }
 
         if (persistenceUnitNameFound) {
-            logger.info(String.format("[%s] contains specified persistenceUnitName [%s] in %s annotation",
+            logger.info(String.format("[%s] contains specified persistenceUnitName [%s] in @%s annotation",
                     repositoryClass.getName(),
                     persistenceUnitName,
-                    persistenceContextBased ? "@PersistenceContext" : "@Transactional"));
+                    persistenceContextBased ? PersistenceContext.class.getName() : Transactional.class.getName()));
         }
 
         return persistenceUnitName;
     }
 
-    protected RepositoryBinder createRepositoryBinder() {
-        return new AccessibleRepositoryBinder();
+    /**
+     * Creates {@link Transactional} annotation source with annotation parser.
+     *
+     * @return parser instance.
+     *
+     * @see AnnotationTransactionAttributeSource
+     * @see SpringTransactionAnnotationParser
+     */
+    protected TransactionAttributeSource createTransactionAttributeSource() {
+        return new AnnotationTransactionAttributeSource(new SpringTransactionAnnotationParser());
     }
 
+    /**
+     * Creates repository binder instance. This binder will be passed into {@link #bindRepositories(RepositoryBinder)}.
+     *
+     * @return repository binder instance
+     */
+    protected RepositoryBinder createRepositoryBinder() {
+        return new DefaultRepositoryBinder();
+    }
+
+    /**
+     * Creates configuration manager which contains all required information about specified persistence units and
+     * their
+     * properties.
+     *
+     * @param persistenceUnits specified persistence units names
+     *
+     * @return initialized configuration manger instance
+     */
     protected PersistenceUnitsConfigurationManager createPersistenceUnitsConfigurationManager(String... persistenceUnits) {
         PersistenceUnitsConfigurationManager manager = new PersistenceUnitsConfigurationManager();
         for (int i = 0; i < persistenceUnits.length; i++) {
@@ -298,7 +364,17 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         return manager;
     }
 
-    protected ApplicationContext createApplicationContext(Collection<PersistenceUnitConfiguration> persistenceUnits, TransactionAttributeSource tas) {
+    /**
+     * Creates Spring application context based on found persistence units. Context will be initialized with multiple
+     * persistence units support.
+     *
+     * @param configurationManager configuration manager with persistence units configurations.
+     *
+     * @return initialized Spring context
+     *
+     * @see <a href="https://github.com/SpringSource/spring-data-jpa/blob/master/src/test/resources/multiple-entity-manager-integration-context.xml"/>
+     */
+    protected ApplicationContext createApplicationContext(PersistenceUnitsConfigurationManager configurationManager) {
         GenericApplicationContext context = new GenericApplicationContext();
 
         String abstractEMFBeanName = "abstractEntityManagerFactory";
@@ -306,7 +382,8 @@ public abstract class JpaRepositoryModule extends AbstractModule {
                 genericBeanDefinition(LocalContainerEntityManagerFactoryBean.class).
                 setAbstract(true).getBeanDefinition());
 
-        for (PersistenceUnitConfiguration configuration : persistenceUnits) {
+        Collection<PersistenceUnitConfiguration> configurations = configurationManager.getConfigurations();
+        for (PersistenceUnitConfiguration configuration : configurations) {
             String persistenceUnitName = configuration.getPersistenceUnitName();
             logger.info(String.format("Processing persistence unit: [%s]", persistenceUnitName));
             Properties props = configuration.getProperties();
@@ -337,7 +414,7 @@ public abstract class JpaRepositoryModule extends AbstractModule {
                             addPropertyReference("entityManagerFactory", entityManagerFactoryName).getBeanDefinition());
 
             PlatformTransactionManager transactionManager = context.getBean(persistenceUnitName, PlatformTransactionManager.class);
-            TransactionInterceptor transactionInterceptor = new TransactionInterceptor(transactionManager, tas);
+            TransactionInterceptor transactionInterceptor = new TransactionInterceptor(transactionManager, createTransactionAttributeSource());
             transactionInterceptor.setBeanFactory(context);
 
             // Wiring components
@@ -359,6 +436,28 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         return context;
     }
 
+    /**
+     * Provide additional EntityManagerFactory properties for related {@link LocalContainerEntityManagerFactoryBean}
+     * initialization.
+     * Some of this properties: jpaDialect, jpaVendorAdapter, dataSource, etc.
+     * <p/>
+     * NOTE: Overriding of this method requires detailed knowledge of Spring Data specifics.
+     * Example:
+     * <pre>
+     *     protected Map<String, Object> getAdditionalEMFProperties(String persistenceUnitName) {
+     *         Map<String, Object> properties = new HashMap<String, Object>();
+     *         if ("persistence-unit1".equals(persistenceUnitName)) {
+     *             properties.put("jpaDialect", new MySpecificHibernateJpaDialect());
+     *             return properties;
+     *         }
+     *         return properties;
+     *     }
+     * </pre>
+     *
+     * @param persistenceUnitName current configurable persistence unit
+     *
+     * @return additional configuration properties map
+     */
     protected Map<String, Object> getAdditionalEMFProperties(String persistenceUnitName) {
         return null;
     }
@@ -395,6 +494,16 @@ public abstract class JpaRepositoryModule extends AbstractModule {
 
     /**
      * Bind your repositories here.
+     * Example:
+     * <pre>
+     *    protected void bindRepositories(RepositoryBinder binder) {
+     *        binder.bind(UserRepository.class).to("test-h2");
+     *        binder.bind(AccountRepository.class).withSelfDefinition();
+     *        binder.bind(CustomerRepository.class).withCustomImplementation(CustomerRepositoryImpl.class).withSelfDefinition();
+     *    }
+     * </pre>
+     *
+     * @param binder repository binder instance
      */
     protected abstract void bindRepositories(RepositoryBinder binder);
 

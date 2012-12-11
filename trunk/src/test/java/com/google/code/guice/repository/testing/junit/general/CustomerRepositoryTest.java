@@ -27,7 +27,7 @@ import org.springframework.data.domain.PageRequest;
 
 import static org.junit.Assert.assertEquals;
 
-@SuppressWarnings({"MagicNumber"})
+@SuppressWarnings("MagicNumber")
 public class CustomerRepositoryTest extends RepoTestBase {
 
     /*===========================================[ INSTANCE VARIABLES ]=========*/

@@ -29,7 +29,7 @@ import org.junit.runners.model.InitializationError;
 /**
  * MultiUnitsTestRunner -
  *
- * @author Alexey Krylov (AleX)
+ * @author Alexey Krylov
  * @since 03.12.12
  */
 public class MultiPersistenceUnitsTestRunner extends GuiceTestRunner {

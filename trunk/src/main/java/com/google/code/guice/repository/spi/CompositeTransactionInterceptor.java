@@ -61,7 +61,11 @@ public class CompositeTransactionInterceptor implements MethodInterceptor {
         // persistence unit name detection
         Class<?> targetClass = invocation.getThis() != null ? AopUtils.getTargetClass(invocation.getThis()) : null;
         TransactionAttribute txAttr = transactionAttributeSource.getTransactionAttribute(invocation.getMethod(), targetClass);
-        String persistenceUnitName = txAttr.getQualifier();
+        String persistenceUnitName = null;
+
+        if (txAttr != null) {
+            persistenceUnitName = txAttr.getQualifier();
+        }
 
         PersistenceUnitConfiguration configuration = configurationManager.getConfiguration(persistenceUnitName);
         return configuration.getTransactionInterceptor().invoke(invocation);

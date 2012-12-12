@@ -23,7 +23,7 @@ install(new JpaRepositoryModule() {
        );
 }}}
 
-Known properties: _jpaDialect, jpaVendorAdapter, dataSource) (with theoretical multitanency support).
+Known properties: _jpaDialect, jpaVendorAdapter, dataSource (with theoretical multitanency support).
 
 == Configuring [http://static.springsource.org/spring-data/data-jpa/docs/1.2.x/api/org/springframework/data/jpa/repository/support/JpaRepositoryFactoryBean.html JpaRepositoryFactoryBean] ==
 

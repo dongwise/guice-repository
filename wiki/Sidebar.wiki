@@ -4,7 +4,7 @@
   * [DevGuide Developer guide]
      * [Transactions Transactions]
      * [MultiplePersistenceUnits Multiple Persistence Units]
-     * [Persistence Injections Persistence Injections]
+     * [PersistenceInjections Persistence Injections]
      * [ImplementationSpecifics ORM Implementation Specifics]
      * [BatchStore Batch Store]
      * [AutoBind Repository Auto-bind]

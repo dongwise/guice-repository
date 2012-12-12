@@ -24,6 +24,8 @@ Guice-repository is an adapter for _[http://www.springsource.org/spring-data/jpa
  * Repository auto-bind possibilities with exclusion/inclusion filters - see [AutoBind];
  * Ability to bind interceptor to catch Repository methods with @Transactional.
 
+*NOTE:* _guice-repository_ is not compatible with _guice-persist_ extension and can't coexist in one _pom.xml_.
+
 ==How did this work?==
 
 There is a three main steps:
@@ -109,8 +111,5 @@ Project is mavenized and published in Central Maven repository.
 }}}
 
 This project is depends on many other 3rd party libraries which is required to work. So, _without_ Maven you should manually add actual versions of this 3rd party libraries. Actual list of them can be viewed in _dependencies_ section of [http://code.google.com/p/guice-repository/source/browse/trunk/pom.xml pom.xml].
-
-*NOTE:* _guice-repository_ is not compatible with _guice-persist_ extension and can't coexist in one _pom.xml_.
-
 
 Actual project version will be always on top of this page.

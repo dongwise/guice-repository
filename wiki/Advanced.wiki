@@ -36,3 +36,9 @@ new JpaRepositoryModule() {
     }
 }
 }}}
+
+== API design ==
+
+Main principles that has been used to _guice-repository_ API design is simplicity and flexibility.
+
+All JpaRepositoryModule methods has _protected_ modifier, so you can easily create your own variation of this module. 

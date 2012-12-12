@@ -15,11 +15,11 @@ For my opinion it is very useful project that helps developer to work hard on bu
 Guice-repository is an adapter for _[http://www.springsource.org/spring-data/jpa Spring Data-JPA]_ project which brings all known functionality of _[http://code.google.com/p/google-guice/wiki/GuicePersist Guice-Persist]_ with many additional features:
  * Support for [http://www.objectdb.com/java/jpa/persistence/store#Batch_Store_ batch store] (see [BatchStore this] page);
  * Allow access to EntityManager from Repository (see [http://code.google.com/p/guice-repository/source/browse/trunk/src/main/java/com/google/code/guice/repository/EntityManagerProvider.java EntityManagerProvider]);
- * Full support for @Transactional methods for all Guice-instantiated entities;
- * Support for multiple persistence units;
- * Support for direct injection of EntityManager/EntityManagerFactory with @PersistenceContext/@PersistenceUnit/@Inject&@Named annotations;
+ * Full support for @Transactional methods for all Guice-instantiated entities (see [Transactional this] page;
+ * Support for [MultiplePersistenceUnits multiple] persistence units;
+ * Support for [PersistenceInjections direct injection] of EntityManager/EntityManagerFactory with @PersistenceContext/@PersistenceUnit/@Inject&@Named annotations;
  * Support for injections in repositories/custom implementations;
- * PersistFilter as implementation of "Open EntityManager in View"/"session-in-view"/"session-per-http-request" pattern;
+ * [WebPersistFilter PersistFilter] as implementation of "Open EntityManager in View"/"session-in-view"/"session-per-http-request" pattern;
  * Offers natural way of Repository binding process; 
  * Repository auto-bind possibilities with exclusion/inclusion filters - see [AutoBind];
  * Ability to bind interceptor to catch Repository methods with @Transactional.

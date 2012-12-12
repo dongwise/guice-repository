@@ -20,7 +20,7 @@ Guice-repository is an adapter for _[http://www.springsource.org/spring-data/jpa
  * Support for direct injection of EntityManager/EntityManagerFactory with @PersistenceContext/@PersistenceUnit/@Inject&@Named annotations;
  * Support for injections in repositories/custom implementations;
  * PersistFilter as implementation of "Open EntityManager in View"/"session-in-view"/"session-per-http-request" pattern;
- * More natural way of Repository binding process; 
+ * Offers natural way of Repository binding process; 
  * Repository auto-bind possibilities with exclusion/inclusion filters - see [AutoBind];
  * Ability to bind interceptor to catch Repository methods with @Transactional.
 

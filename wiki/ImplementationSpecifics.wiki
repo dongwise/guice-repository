@@ -5,39 +5,41 @@
 As you can see from documentation earlier there is an constructor parameter for JpaRepositoryModule named "my-persistence-unit", for example:
 {{{
 install(new JpaRepositoryModule("my-persistence-unit") {
-            protected void configureRepositories() {
-                bind(AccountRepository.class).toProvider(new JpaRepositoryProvider<AccountRepository>());
+            @Override
+            protected void bindRepositories(RepositoryBinder binder) {
+                binder.bind(AccountRepository.class).to("my-persistence-unit");
             }
         });
 }}}
 
-This parameter is a persistence-unit name which will be used for _EntityManagerFactory_ creation. This parameter is required by underlying _guice-persist_ module and it is mandatory to pass them to _JpaPersistModule_.
+This parameter is a persistence unit name which will be used for _EntityManagerFactory_ creation. This parameter is required by underlying _Spring Data-JPA_ subsystem and it is mandatory to pass them to _JpaPersistModule_.
 
 _guice-repository_ allows you three options to specify persistence-unit name:
  # Specify it directly during module instantiation
- # Create your own persistence-unit resolving method, just override _getPersistenceUnitName_ of JpaRepositoryModule:
+ # Create your own persistence units resolving method, just override _getPersistenceUnitNames_ of JpaRepositoryModule:
  {{{
    install(new JpaRepositoryModule() {
-            protected void configureRepositories() {
-                bind(UserRepository.class).toProvider(new JpaRepositoryProvider<UserRepository>());
+            @Override
+            protected void bindRepositories(RepositoryBinder binder) {
+                binder.bind(AccountRepository.class).to("my-persistence-unit");
             }
 
-            protected String getPersistenceUnitName() {
+            protected Collection<String> getPersistenceUnitsNames() {
                 // use your own detection mechanisms, but remember - Guice doesn't allow injection in modules during construction
-                return "my-persistence-unit";
+                return Arrays.asList("my-persistence-unit");
             }
         });
  }}}
- # Specify system property named "persistence-unit-name" on/before application startup
+ # Specify system property named "persistence-units" splitted by symbol ',' or ';'
 
-For all options you should have *META-INF/persistence.xml* in your classpath. This configuration file should contain persistence-unit used by your application.
+For all options you should have *META-INF/persistence.xml* in your classpath. This configuration file should contain all persistence units used by your application.
 
 ===ORM Implemenation Specifics Separation===
 
 _guice-repository_ allows you to separate ORM-specific properties from *persistence.xml* configuration file. 
 
 This is very useful approach in situations where you don't know your application consumer ORM-specifics and/or physical database type and/or location. In this case you provide two artifacts to your customer:
- * application artifact with generic _persistence.xml_ which contains mappings only
+ * application artifact with generic _persistence.xml_ which contains mappings and persistence unit definitions only
  * artifact with possible database configurations and configuration manual
 
 *How to begin?*
@@ -74,7 +76,7 @@ First of all you should define your generic _persistence.xml_, here is an exampl
 </persistence>
 }}}
 
-As you can see there is three persistence-unit defined with no DB specifics - only mappings. It's important thing - if you need better portability of your mappings you should not choose annotation-based mappings. For example - identity sequences 
+As you can see there is three persistence units defined with no DB specifics - only mappings. It's important thing - if you need better portability of your mappings you should not choose annotation-based mappings. For example - identity sequences 
 is only choice for Oracle, but it's not supported in Microsoft SQL Server.
 
 Second thing - you need to create set of ORM-specifics configuration files.
@@ -125,8 +127,9 @@ hibernate.jdbc.batch_size=500
 
 Also you can define your own ORM-specifics separation by overriding _getPersistenceUnitProperties_ method in _JparepositoryModule_:
 {{{
-   install(new JpaRepositoryModule() {
-            protected Properties getPersistenceUnitProperties() {
+   install(new JpaRepositoryModule("my-persistence-unit") {
+            @Override
+            protected Properties getPersistenceUnitProperties(String persistenceUnitName) {
               // define your own Properties for JPA persistence provider
             }
    }

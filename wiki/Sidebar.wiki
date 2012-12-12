@@ -2,11 +2,15 @@
   * ----
   * [ReleaseNotes Release notes]
   * [DevGuide Developer guide]
-     * [Concurrency Repository and Concurrency aspects]
-     * [BatchStore Batch Store]
+     * [Transactions Transactions]
+     * [MultiplePersistenceUnits Multiple Persistence Units]
+     * [Persistence Injections Persistence Injections]
      * [ImplementationSpecifics ORM Implementation Specifics]
-     * [CustomRepositoryImplementations Custom Repository Implementations]
+     * [BatchStore Batch Store]
      * [AutoBind Repository Auto-bind]
+     * [CustomRepositoryImplementations Custom Repository Implementations]
+     * [Concurrency Repository and Concurrency aspects]
+     * [WebPersistFilter Web: PersistFilter]
      * [Advanced Advanced Topics]
   * ----
   * [http://groups.google.com/group/guice-repository Guice-Repository users' group]

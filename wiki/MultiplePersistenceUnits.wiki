@@ -27,3 +27,21 @@ public interface UserDataRepository extends BatchStoreJpaRepository<UserData, Lo
 This process based on Spring Data JPA default way for multiple persistence units resolution, you can see related docs/examples here:
  * [http://blog.springsource.org/2011/04/26/advanced-spring-data-jpa-specifications-and-querydsl/#comment-198835]
  * [https://github.com/SpringSource/spring-data-jpa/blob/master/src/test/resources/multiple-entity-manager-integration-context.xml]
+
+*NOTE:* all specified persistence units will be managed by [http://code.google.com/p/guice-repository/source/browse/trunk/src/main/java/com/google/code/guice/repository/configuration/PersistenceUnitsConfigurationManager.java PersistenceUnitConfigurationsManager]. It always has at least one configuration - default configuration. Default configuration is used for all cases when you have no direct specification to persistence unit name:
+{{{
+@Inject
+private EntityManager entityManager;
+
+@PersistenceContext
+private EntityManager entityManager;
+
+@PersistenceUnit
+private EntityManagerFactory entityManagerFactory;
+
+@Transactional
+public defaultPersistenceUnitTransactionalMethod(){
+}
+...
+bind(Repository.class).withSelfDefinition();
+}}}

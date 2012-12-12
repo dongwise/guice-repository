@@ -3,7 +3,11 @@ Since 2.0.0 it's possible to work with multiple persistence units.
 This process is quite simple:
  #. Define persistence units and entities in META-INF/persistence.xml;
  #. Define names of persistence units in JpaRepositoryModule/ScanningJpaRepositoryModule constructor;
- # Define persistence unit name during repository binding process with RepositoryBinder:
+ # Define persistence unit name during repository binding process with RepositoryBinder or with annotating Repository interface with @Transactional(value="persistence-unit-name") 
+or with @PersistenceContext(unitName="persistence-unit-name"):
+ #. Mark method, which operates with Repository, with @Transactional(value="persistence-unit-name")
+
+Example for RepositoryBinder:
 {{{
 install(new JpaRepositoryModule() {
             @Override
@@ -11,17 +15,15 @@ install(new JpaRepositoryModule() {
                 binder.bind(UserDataRepository.class).to("test-h2-secondary");
             }
        );
-}}}
+}}} 
 
-or with annotating Repository interface with @Transactional(value="persistence-unit-name") or with @PersistenceContext(unitName="persistence-unit-name"):
+Example for Repository annotation:
 {{{
 @Transactional(value = "test-h2-secondary", readOnly = true)
 public interface UserDataRepository extends BatchStoreJpaRepository<UserData, Long>,
         EntityManagerProvider {
 }
 }}}
-
- #. Mark method, which operates with Repository, with @Transactional(value="persistence-unit-name")
 
 This process based on Spring Data JPA default way for multiple persistence units resolution, you can see related docs/examples here:
  * [http://blog.springsource.org/2011/04/26/advanced-spring-data-jpa-specifications-and-querydsl/#comment-198835]

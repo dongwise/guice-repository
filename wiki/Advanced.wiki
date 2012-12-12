@@ -1,11 +1,11 @@
-= Bind interceptor for all @Transactional methods =
+== Bind interceptor for all @Transactional methods ==
 
 To bind interceptor for all @Transactional methods (including such methods in Repositories) you need to do something like this:
 {{{
    bindInterceptor(Matchers.any(), Matchers.annotatedWith(Transactional.class), new MyTransactionalInterceptor());
 }}}
 
-= Using specific JPA dialect =
+== Using specific JPA dialect ==
 
 You can specify specific properties for [http://static.springsource.org/spring/docs/3.0.x/api/org/springframework/orm/jpa/LocalContainerEntityManagerFactoryBean.html LocalContainerEntityManagerFactoryBean]  bean creation by overriding _getAdditionalEMFProperties in JpaRepositoryModule:
 {{{
@@ -25,7 +25,7 @@ install(new JpaRepositoryModule() {
 
 Known properties: _jpaDialect, jpaVendorAdapter, dataSource) (with theoretical multitanency support).
 
-= Configuring [http://static.springsource.org/spring-data/data-jpa/docs/1.2.x/api/org/springframework/data/jpa/repository/support/JpaRepositoryFactoryBean.html JpaRepositoryFactoryBean] = 
+== Configuring [http://static.springsource.org/spring-data/data-jpa/docs/1.2.x/api/org/springframework/data/jpa/repository/support/JpaRepositoryFactoryBean.html JpaRepositoryFactoryBean] ==
 
 See all available [http://code.google.com/p/guice-repository/source/browse/trunk/src/main/java/com/google/code/guice/repository/configuration/RepositoryBindingBuilder.java RepositoryBindingBuilder] methods:
 {{{

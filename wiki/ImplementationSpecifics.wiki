@@ -12,7 +12,7 @@ install(new JpaRepositoryModule("my-persistence-unit") {
         });
 }}}
 
-This parameter is a persistence unit name which will be used for _EntityManagerFactory_ creation. This parameter is required by underlying _Spring Data-JPA_ subsystem and it is mandatory to pass them to _JpaPersistModule_.
+Constructor parameter is a persistence unit name which will be used for _EntityManagerFactory_ creation. This parameter is required by underlying _Spring Data-JPA_ subsystem and it is mandatory to pass them to _JpaPersistModule_.
 
 _guice-repository_ allows you three options to specify persistence-unit name:
  # Specify it directly during module instantiation

@@ -30,7 +30,10 @@ _guice-repository_ allows you three options to specify persistence-unit name:
             }
         });
  }}}
- # Specify system property named "persistence-units" splitted by symbol ',' or ';'
+ # Specify system property named "persistence-units" splitted by symbol ',' or ';':
+ {{{
+    -Dpersistence-units=unit1,unit2,unit3
+ }}}
 
 For all options you should have *META-INF/persistence.xml* in your classpath. This configuration file should contain all persistence units used by your application.
 

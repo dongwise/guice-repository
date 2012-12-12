@@ -5,9 +5,9 @@ To bind interceptor for all @Transactional methods (including such methods in Re
    bindInterceptor(Matchers.any(), Matchers.annotatedWith(Transactional.class), new MyTransactionalInterceptor());
 }}}
 
-== Using specific JPA dialect ==
+== Using custom JPA dialect ==
 
-You can specify specific properties for [http://static.springsource.org/spring/docs/3.0.x/api/org/springframework/orm/jpa/LocalContainerEntityManagerFactoryBean.html LocalContainerEntityManagerFactoryBean]  bean creation by overriding _getAdditionalEMFProperties in JpaRepositoryModule:
+You can specify custom properties for [http://static.springsource.org/spring/docs/3.0.x/api/org/springframework/orm/jpa/LocalContainerEntityManagerFactoryBean.html LocalContainerEntityManagerFactoryBean]  bean creation by overriding _getAdditionalEMFProperties in JpaRepositoryModule:
 {{{
 install(new JpaRepositoryModule() {
             @Override

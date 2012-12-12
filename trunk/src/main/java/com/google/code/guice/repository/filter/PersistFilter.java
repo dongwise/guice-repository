@@ -73,7 +73,6 @@ import javax.servlet.http.HttpServletRequest;
 public class PersistFilter extends OpenEntityManagerInViewFilter {
 
 
-
     /**
      * This HttpServletRequest parameter describes persistence unit to use.
      * Use means EntityManager opening/closing in doFilter try/finally.
@@ -89,7 +88,7 @@ public class PersistFilter extends OpenEntityManagerInViewFilter {
 
     @Override
     protected EntityManagerFactory lookupEntityManagerFactory(HttpServletRequest request) {
-/*===========================================[ STATIC VARIABLES ]=============*/        // check for Filter configuration parameter presence
+        // check for Filter configuration parameter presence
         String persistenceUnitName = getPersistenceUnitName();
         if (persistenceUnitName == null) {
             persistenceUnitName = request.getParameter(P_PERSISTENCE_UNIT_NAME);

@@ -3,9 +3,8 @@ Since 2.0.0 it's possible to work with multiple persistence units.
 This process is quite simple:
  #. Define persistence units and entities in META-INF/persistence.xml;
  #. Define names of persistence units in JpaRepositoryModule/ScanningJpaRepositoryModule constructor;
- # Define persistence unit name during repository binding process with RepositoryBinder or with annotating Repository interface with @Transactional(value="persistence-unit-name") 
-or with @PersistenceContext(unitName="persistence-unit-name"):
- #. Mark method, which operates with Repository, with @Transactional(value="persistence-unit-name")
+ # Define persistence unit name during repository binding process with RepositoryBinder or with annotating Repository interface with @Transactional(value="persistence-unit-name") or with @PersistenceContext(unitName="persistence-unit-name");
+ #. Mark method, which operates with Repository, with @Transactional(value="persistence-unit-name").
 
 Example for RepositoryBinder:
 {{{

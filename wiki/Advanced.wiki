@@ -5,7 +5,13 @@
 Add your content here.
 
 
-= Details =
+= Bind interceptor for all @Transactional methods =
+
+To bind interceptor for all @Transactional methods (including such methods in Repositories) you need to do something like this:
+
+{{{
+   bindInterceptor(Matchers.any(), Matchers.annotatedWith(Transactional.class), new MyTransactionalInterceptor());
+}}}
 
 Add your content here.  Format your content with:
   * Text in *bold* or _italic_

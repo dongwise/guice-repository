@@ -11,7 +11,7 @@ CompositeTransactionInterceptor is a bridge between _guice-repository_ environme
 Some related examples can be found here:
 [http://code.google.com/p/guice-repository/source/browse/trunk/src/test/java/com/google/code/guice/repository/testing/junit/transaction/]
 
-Come code example:
+Code example:
 {{{
     @Transactional(timeout = 1, rollbackFor = Exception.class)
     public void testTimeoutedTransaction() throws Exception {

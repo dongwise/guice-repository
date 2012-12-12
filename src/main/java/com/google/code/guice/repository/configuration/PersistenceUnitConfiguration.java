@@ -53,6 +53,7 @@ public class PersistenceUnitConfiguration {
         this.persistenceUnitName = persistenceUnitName;
         this.properties = (Properties) properties.clone();
     }
+
     /*===========================================[ CLASS METHODS ]================*/
 
     public String getPersistenceUnitName() {

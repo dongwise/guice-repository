@@ -1,13 +1,37 @@
-#summary One-sentence summary of this page.
+Since 2.0.0 it's possible to inject EntityManager/EntityManagerFactory in Guice-instantiated entities.
 
-= Introduction =
+Injections for EntityManager/EntityManagerFactory related to different persistence unit is also supported - just specify "unitName" property.
 
-Add your content here.
+Use @PersistenceContext/@Inject&@Named annotation to inject EnityManager:
+{{{
+// injection of EntityManager related to default persistence unit
+@Inject
+private EntityManager entityManager;
 
+@Inject
+@Named("test-h2-secondary")
+private EntityManager entityManager;
 
-= Details =
+@PersistenceContext
+private EntityManager secondaryEntityManager;
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+@PersistenceContext(unitName = "test-h2-secondary")
+private EntityManager secondaryEntityManager;
+}}}
+
+Use @PersistenceUnit/@Inject&@Named annotation to inject EnityManagerFactory:
+{{{
+// injection of EntityManagerFactory related to default persistence unit
+@Inject
+private EntityManagerFactory entityManagerFactory;
+
+@Inject
+@Named("test-h2-secondary")
+private EntityManagerFactory entityManagerFactory;
+
+@PersistenceUnit
+private EntityManagerFactory secondaryEntityManagerFactory;
+
+@PersistenceUnit(unitName = "test-h2-secondary")
+private EntityManagerFactory secondaryEntityManagerFactory;
+}}}

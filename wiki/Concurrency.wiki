@@ -1,20 +1,6 @@
 #labels thread-safe,EntityManager
 ==Repository and Concurrency aspects==
-Note, that all Repositories is not thread-safe, because they works directly with EntityManager instance, which is also not thread-safe. 
-
-Here is an example of concurrent Repository usage:
-{{{
-   @Inject
-   private Provider<UserRepository> userRepositoryProvider;
-
-       // this method can be used concurrently
-       public void threadSafeRepoUsageMethod() {
-           // use personal instance per Thread via .get()
-           UserRepository repo = userRepositoryProvider.get();
-           repo.save(new User("login", "password"));
-           repo.someOtherRepoMethod();
-       }
-}}}
+All Repositories is thread-safe except case, when you use [http://code.google.com/p/guice-repository/source/browse/trunk/src/main/java/com/google/code/guice/repository/filter/PersistFilter.java PersistFilter] and ignores prohibition of threads manual management related to Java EE. In this case you need to synchronize Repository access code.
 
 Some theory regarding to this JPA aspect can be found here:
  * [http://docs.oracle.com/javaee/6/tutorial/doc/bnbqw.html]

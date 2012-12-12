@@ -1,3 +1,4 @@
+=Injections=
 Since 2.0.0 it's possible to inject EntityManager/EntityManagerFactory in Guice-instantiated entities.
 
 Injections for EntityManager/EntityManagerFactory related to different persistence unit is also supported - just specify "unitName" property.
@@ -34,4 +35,21 @@ private EntityManagerFactory secondaryEntityManagerFactory;
 
 @PersistenceUnit(unitName = "test-h2-secondary")
 private EntityManagerFactory secondaryEntityManagerFactory;
+}}}
+
+=Transactions=
+
+To use injected EntityManager for entity modifications you should annotate your method with @Transactional. If EntityManager related to some persistence unit (except default) - you should specify persistence unit name in @Transactional annotation:
+
+{{{
+@Transactional
+public void usePrimaryEntityManager() {
+   entityManager.persist(new User());
+}
+
+@Transactional("test-h2-secondary")
+public void testSecondaryEntityManager() {
+   secondaryEntityManager.persist(new UserData());
+   List resultList = secondaryEntityManager.createQuery("from UserData").getResultList();
+}
 }}}

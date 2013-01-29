@@ -114,7 +114,7 @@ public class TypeUtil {
     public static <T> Class<T> getTypeParameterClass(Class aClass, Class<T> genericParameterClass) {
         Assert.noNullElements(new Object[]{aClass, genericParameterClass});
 
-        List<Type> types = new ArrayList<Type>();
+        Collection<Type> types = new ArrayList<Type>();
 
         // check interfaces
         getGenericInterfacesActualTypes(types, aClass);
@@ -128,7 +128,7 @@ public class TypeUtil {
         return findAppropriateType(types, genericParameterClass);
     }
 
-    private static <T> Class<T> findAppropriateType(Collection<Type> types, Class<T> genericParameterClass) {
+    private static <T> Class<T> findAppropriateType(Iterable<Type> types, Class<T> genericParameterClass) {
         for (Type type : types) {
             if (type instanceof Class && genericParameterClass.isAssignableFrom((Class<?>) type)) {
                 return (Class) type;

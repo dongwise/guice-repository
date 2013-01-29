@@ -98,8 +98,12 @@ public class PersistFilter extends OpenEntityManagerInViewFilter {
 
     @Override
     protected EntityManager createEntityManager(EntityManagerFactory emf) {
+        //TODO shared emf
+        //EntityManager entityManager = SharedEntityManagerCreator.createSharedEntityManager(emf, props);
+
         EntityManager entityManager = super.createEntityManager(emf);
         configurationManager.changeEntityManager(getPersistenceUnitName(), entityManager);
+        //TODO Repository needs to be recreated, but it cached
         return entityManager;
     }
 }

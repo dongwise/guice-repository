@@ -69,7 +69,7 @@ public class CustomRepositoryImplementationResolver {
 
     /*===========================================[ CLASS METHODS ]================*/
 
-    protected void addExclusions(Set<Class> exclusions) {
+    protected void addExclusions(Collection<Class> exclusions) {
         exclusions.addAll(Arrays.asList(BatchStoreJpaRepository.class, EntityManagerProvider.class));
     }
 
@@ -93,7 +93,7 @@ public class CustomRepositoryImplementationResolver {
         if (!superTypes.isEmpty()) {
             Class customRepositoryClass = superTypes.iterator().next();
             Reflections reflections = new Reflections(customRepositoryClass.getPackage().getName());
-            Set<Class> subTypesOf = reflections.getSubTypesOf(customRepositoryClass);
+            Iterable<Class> subTypesOf = reflections.getSubTypesOf(customRepositoryClass);
             for (Class aClass : subTypesOf) {
                 if (!aClass.isInterface()) {
                     customRepository = aClass;

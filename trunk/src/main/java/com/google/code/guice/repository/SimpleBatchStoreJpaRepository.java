@@ -34,6 +34,7 @@ import org.springframework.util.Assert;
 
 import javax.persistence.EntityManager;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -78,9 +79,9 @@ public class SimpleBatchStoreJpaRepository<T, ID extends Serializable> extends S
 
     @Override
     public void saveInBatch(Iterable<T> entities) {
-        List<T> list = Lists.newArrayList(entities);
+        Collection<T> list = Lists.newArrayList(entities);
         Assert.notEmpty(list);
-        List<T> saved = save(list);
+        Iterable<T> saved = save(list);
         flush();
         for (T t : saved) {
             entityManager.detach(t);
@@ -105,7 +106,7 @@ public class SimpleBatchStoreJpaRepository<T, ID extends Serializable> extends S
                 endIndex = count;
             }
 
-            List<T> batch = list.subList(startIndex, endIndex);
+            Iterable<T> batch = list.subList(startIndex, endIndex);
             try {
                 logger.info(String.format("Storing elements: [%d - %d]", startIndex, endIndex));
                 saveInBatch(batch);

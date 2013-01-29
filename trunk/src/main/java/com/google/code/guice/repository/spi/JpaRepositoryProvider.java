@@ -28,6 +28,7 @@ import com.google.inject.Provider;
 import net.jcip.annotations.ThreadSafe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
@@ -60,7 +61,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
     private PersistenceUnitsConfigurationManager configurationManager;
     private Injector injector;
     private Class domainClass;
-    private ApplicationContext context;
+    private BeanFactory context;
 
     private volatile R repository;
 

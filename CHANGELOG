@@ -1,3 +1,10 @@
+[2.0.2]
+ [*] PersistFilter related bugfixes - it's now possible to direct Repository injection instead of Provider<Repository>
+     in web-environments.
+
+[2.0.1]
+ [*] PersistFilter related bugfixes.
+
 [2.0.0]
  [+] Full support for @Transactional methods for all Guice-instantiated entities;
  [+] Support for multiple persistence units;

@@ -89,7 +89,7 @@ public class ScanningJpaRepositoryModule extends JpaRepositoryModule {
 
     /*===========================================[ CLASS METHODS ]================*/
 
-    private static String[] extractPersistenceUnitsNames(Collection<RepositoriesGroup> repositoriesGroups) {
+    private static String[] extractPersistenceUnitsNames(Iterable<RepositoriesGroup> repositoriesGroups) {
         Collection<String> persistenceUnitsNames = new ArrayList<String>();
         for (RepositoriesGroup repositoriesGroup : repositoriesGroups) {
             persistenceUnitsNames.add(repositoriesGroup.getPersistenceUnitName());
@@ -111,7 +111,7 @@ public class ScanningJpaRepositoryModule extends JpaRepositoryModule {
                 urls.addAll(ClasspathHelper.forPackage(packageName));
             }
 
-            Set<Class<?>> repositoryClasses = findRepositories(urls);
+            Collection<Class<?>> repositoryClasses = findRepositories(urls);
 
             // Extraction of real Repository implementations (Classes)
             Collection<Class<?>> implementations = filter(repositoryClasses, new Predicate<Class<?>>() {
@@ -153,7 +153,7 @@ public class ScanningJpaRepositoryModule extends JpaRepositoryModule {
         return repositoryClasses;
     }
 
-    protected Reflections createReflections(Set<URL> urls) {
+    protected Reflections createReflections(Collection<URL> urls) {
         ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
         configurationBuilder.setUrls(urls);
         configurationBuilder.setScanners(new TypeAnnotationsScanner(), new SubTypesScanner());

@@ -27,6 +27,7 @@ import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.name.Names;
+import com.google.inject.spi.TypeListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -185,7 +186,7 @@ public abstract class JpaRepositoryModule extends AbstractModule {
         RepositoryBinder repositoryBinder = createRepositoryBinder();
         logger.info("Binding repositories...");
         bindRepositories(repositoryBinder);
-        Collection<RepositoryBinding> bindings = repositoryBinder.getBindings();
+        Iterable<RepositoryBinding> bindings = repositoryBinder.getBindings();
         for (RepositoryBinding binding : bindings) {
             Class<? extends Repository> repositoryClass = binding.getRepositoryClass();
             Class customRepositoryClass = binding.getCustomRepositoryClass();
@@ -240,16 +241,16 @@ public abstract class JpaRepositoryModule extends AbstractModule {
      */
     protected void bindPersistence(PersistenceUnitsConfigurationManager configurationManager) {
         // Support for EntityManager with @PersistenceContext injections
-        PersistenceContextTypeListener persistenceContextTypeListener = new PersistenceContextTypeListener();
+        TypeListener persistenceContextTypeListener = new PersistenceContextTypeListener();
         requestInjection(persistenceContextTypeListener);
         bindListener(Matchers.any(), persistenceContextTypeListener);
 
         // Support for EntityManagerFactory with @PersistenceUnit injections
-        PersistenceUnitTypeListener persistenceUnitTypeListener = new PersistenceUnitTypeListener();
+        TypeListener persistenceUnitTypeListener = new PersistenceUnitTypeListener();
         requestInjection(persistenceUnitTypeListener);
         bindListener(Matchers.any(), persistenceUnitTypeListener);
 
-        Collection<PersistenceUnitConfiguration> configurations = configurationManager.getConfigurations();
+        Iterable<PersistenceUnitConfiguration> configurations = configurationManager.getConfigurations();
 
         for (final PersistenceUnitConfiguration configuration : configurations) {
             /**
@@ -382,11 +383,11 @@ public abstract class JpaRepositoryModule extends AbstractModule {
                 genericBeanDefinition(LocalContainerEntityManagerFactoryBean.class).
                 setAbstract(true).getBeanDefinition());
 
-        Collection<PersistenceUnitConfiguration> configurations = configurationManager.getConfigurations();
+        Iterable<PersistenceUnitConfiguration> configurations = configurationManager.getConfigurations();
         for (PersistenceUnitConfiguration configuration : configurations) {
             String persistenceUnitName = configuration.getPersistenceUnitName();
             logger.info(String.format("Processing persistence unit: [%s]", persistenceUnitName));
-            Properties props = configuration.getProperties();
+            Map props = configuration.getProperties();
 
             String entityManagerFactoryName = "entityManagerFactory#" + persistenceUnitName;
 

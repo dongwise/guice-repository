@@ -133,7 +133,7 @@ public class RepositoriesGroup {
         return matches;
     }
 
-    private boolean isInclusionPatternMatches(String className) {
+    private boolean isInclusionPatternMatches(CharSequence className) {
         return inclusionPattern == null || inclusionPattern.matcher(className).matches();
     }
 
@@ -141,7 +141,7 @@ public class RepositoriesGroup {
         return inclusionPredicate == null || inclusionPredicate.apply(repositoryClass);
     }
 
-    private boolean isExclusionPatternMatches(String className) {
+    private boolean isExclusionPatternMatches(CharSequence className) {
         return exclusionPattern != null && exclusionPattern.matcher(className).matches();
     }
 

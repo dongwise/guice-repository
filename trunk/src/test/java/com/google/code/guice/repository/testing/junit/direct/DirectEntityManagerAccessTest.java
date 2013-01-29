@@ -38,7 +38,7 @@ import java.util.List;
 @RunWith(DirectEntityManagerTestRunner.class)
 public class DirectEntityManagerAccessTest {
 
-    /*===========================================[ INSTANCE VARIABLES ]===========*/
+	/*===========================================[ INSTANCE VARIABLES ]===========*/
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -46,7 +46,7 @@ public class DirectEntityManagerAccessTest {
     @PersistenceContext(unitName = "test-h2-secondary")
     private EntityManager secondaryEntityManager;
 
-    /*===========================================[ CLASS METHODS ]================*/
+	/*===========================================[ CLASS METHODS ]================*/
 
     @Test
     @Transactional

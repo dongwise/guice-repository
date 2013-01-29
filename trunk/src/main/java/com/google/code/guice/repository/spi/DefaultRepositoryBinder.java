@@ -37,17 +37,17 @@ import java.util.Collections;
  */
 public class DefaultRepositoryBinder implements RepositoryBinder {
 
-    /*===========================================[ INSTANCE VARIABLES ]===========*/
+	/*===========================================[ INSTANCE VARIABLES ]===========*/
 
     private Collection<RepositoryBinding> bindings;
 
-    /*===========================================[ CONSTRUCTORS ]=================*/
+	/*===========================================[ CONSTRUCTORS ]=================*/
 
     public DefaultRepositoryBinder() {
         bindings = new ArrayList<RepositoryBinding>();
     }
 
-    /*===========================================[ CLASS METHODS ]================*/
+	/*===========================================[ INTERFACE METHODS ]============*/
 
     @Override
     public RepositoryBindingBuilder bind(Class repositoryClass) {

@@ -73,18 +73,20 @@ import javax.servlet.http.HttpServletRequest;
 @ThreadSafe
 public class PersistFilter extends OpenEntityManagerInViewFilter {
 
+	/*===========================================[ STATIC VARIABLES ]=============*/
+
     /**
      * This HttpServletRequest parameter describes persistence unit to use.
      * Use means EntityManager opening/closing in doFilter try/finally.
      */
     public static final String P_PERSISTENCE_UNIT_NAME = "persistenceUnitName";
 
-    /*===========================================[ INSTANCE VARIABLES ]===========*/
+	/*===========================================[ INSTANCE VARIABLES ]===========*/
 
     @Inject
     private PersistenceUnitsConfigurationManager configurationManager;
 
-    /*===========================================[ CLASS METHODS ]================*/
+	/*===========================================[ CLASS METHODS ]================*/
 
     @Override
     protected EntityManagerFactory lookupEntityManagerFactory(HttpServletRequest request) {

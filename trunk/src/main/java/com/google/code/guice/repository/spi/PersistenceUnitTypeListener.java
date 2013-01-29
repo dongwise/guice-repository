@@ -43,12 +43,12 @@ import java.lang.reflect.Field;
  */
 public class PersistenceUnitTypeListener implements TypeListener {
 
-    /*===========================================[ INSTANCE VARIABLES ]===========*/
+	/*===========================================[ INSTANCE VARIABLES ]===========*/
 
     @Inject
     private PersistenceUnitsConfigurationManager configurationManager;
 
-    /*===========================================[ CLASS METHODS ]================*/
+	/*===========================================[ INTERFACE METHODS ]============*/
 
     @Override
     public <T> void hear(TypeLiteral<T> type, TypeEncounter<T> encounter) {

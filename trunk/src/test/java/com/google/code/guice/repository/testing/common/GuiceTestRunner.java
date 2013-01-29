@@ -33,8 +33,12 @@ import java.util.List;
  * @since 10.04.2012
  */
 public class GuiceTestRunner extends BlockJUnit4ClassRunner {
+
+	/*===========================================[ INSTANCE VARIABLES ]===========*/
+
     private final Injector injector;
 
+	/*===========================================[ CONSTRUCTORS ]=================*/
 
     /**
      * Creates a new GuiceTestRunner.
@@ -49,6 +53,8 @@ public class GuiceTestRunner extends BlockJUnit4ClassRunner {
         injector = Guice.createInjector(modules);
     }
 
+	/*===========================================[ CLASS METHODS ]================*/
+
     @Override
     public Object createTest() {
         return injector.getInstance(getTestClass().getJavaClass());
@@ -58,6 +64,8 @@ public class GuiceTestRunner extends BlockJUnit4ClassRunner {
     protected void validateZeroArgConstructor(List<Throwable> errors) {
         // Guice can inject constructors with parameters so we don't want this method to trigger an error
     }
+
+	/*===========================================[ GETTER/SETTER ]================*/
 
     /**
      * Returns the Guice injector.

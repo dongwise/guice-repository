@@ -37,12 +37,12 @@ import java.lang.reflect.Field;
  */
 public class EntityManagerFactoryMembersInjector<T> implements MembersInjector<T> {
 
-    /*===========================================[ INSTANCE VARIABLES ]===========*/
+	/*===========================================[ INSTANCE VARIABLES ]===========*/
 
     private Field field;
     private EntityManagerFactory entityManagerFactory;
 
-    /*===========================================[ CONSTRUCTORS ]=================*/
+	/*===========================================[ CONSTRUCTORS ]=================*/
 
     protected EntityManagerFactoryMembersInjector(Field field, EntityManagerFactory entityManagerFactory) {
         this.field = field;
@@ -50,7 +50,7 @@ public class EntityManagerFactoryMembersInjector<T> implements MembersInjector<T
         field.setAccessible(true);
     }
 
-    /*===========================================[ CLASS METHODS ]================*/
+	/*===========================================[ INTERFACE METHODS ]============*/
 
     @Override
     public void injectMembers(T instance) {

@@ -54,15 +54,14 @@ import java.util.List;
 public class SimpleBatchStoreJpaRepository<T, ID extends Serializable> extends SimpleJpaRepository<T, ID> implements
         BatchStoreJpaRepository<T, ID>, EntityManagerProvider {
 
-    /*===========================================[ STATIC VARIABLES ]=============*/
+	/*===========================================[ INSTANCE VARIABLES ]===========*/
 
     private Logger logger;
 
-    /*===========================================[ INSTANCE VARIABLES ]===========*/
 
     private EntityManager entityManager;
 
-    /*===========================================[ CONSTRUCTORS ]=================*/
+	/*===========================================[ CONSTRUCTORS ]=================*/
 
     public SimpleBatchStoreJpaRepository(Class<T> domainClass, EntityManager entityManager) {
         this(JpaEntityInformationSupport.getMetadata(domainClass, entityManager), entityManager);
@@ -75,7 +74,7 @@ public class SimpleBatchStoreJpaRepository<T, ID extends Serializable> extends S
         logger = LoggerFactory.getLogger(getClass());
     }
 
-    /*===========================================[ CLASS METHODS ]================*/
+	/*===========================================[ INTERFACE METHODS ]============*/
 
     @Override
     public void saveInBatch(Iterable<T> entities) {

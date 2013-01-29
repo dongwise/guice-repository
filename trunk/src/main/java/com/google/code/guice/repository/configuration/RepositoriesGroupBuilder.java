@@ -52,7 +52,7 @@ import java.util.Collection;
 @NotThreadSafe
 public class RepositoriesGroupBuilder {
 
-    /*===========================================[ INSTANCE VARIABLES ]===========*/
+	/*===========================================[ INSTANCE VARIABLES ]===========*/
 
     private String persistenceUnitName;
     private Collection<String> repositoriesPackages;
@@ -61,13 +61,13 @@ public class RepositoriesGroupBuilder {
     private Predicate<Class> inclusionPredicate;
     private Predicate<Class> exclusionPredicate;
 
-    /*===========================================[ CONSTRUCTORS ]=================*/
+	/*===========================================[ CONSTRUCTORS ]=================*/
 
     protected RepositoriesGroupBuilder(Collection<String> repositoriesPackages) {
         this.repositoriesPackages = new ArrayList<String>(repositoriesPackages);
     }
 
-    /*===========================================[ CLASS METHODS ]================*/
+	/*===========================================[ CLASS METHODS ]================*/
 
     public static RepositoriesGroupBuilder forPackage(String packageName) {
         Assert.notNull(packageName);

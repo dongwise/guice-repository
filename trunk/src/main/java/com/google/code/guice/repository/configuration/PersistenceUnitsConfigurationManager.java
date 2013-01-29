@@ -44,18 +44,18 @@ import java.util.Map;
 @ThreadSafe
 public class PersistenceUnitsConfigurationManager {
 
-    /*===========================================[ INSTANCE VARIABLES ]===========*/
+	/*===========================================[ INSTANCE VARIABLES ]===========*/
 
     private Map<String, PersistenceUnitConfiguration> configurations;
     private PersistenceUnitConfiguration defaultConfiguration;
 
-    /*===========================================[ CONSTRUCTORS ]=================*/
+	/*===========================================[ CONSTRUCTORS ]=================*/
 
     protected PersistenceUnitsConfigurationManager() {
         configurations = Collections.synchronizedMap(new LinkedHashMap<String, PersistenceUnitConfiguration>());
     }
 
-    /*===========================================[ CLASS METHODS ]================*/
+	/*===========================================[ CLASS METHODS ]================*/
 
     /**
      * Registers new configuration.
@@ -103,10 +103,6 @@ public class PersistenceUnitsConfigurationManager {
         }
     }
 
-    public PersistenceUnitConfiguration getDefaultConfiguration() {
-        return defaultConfiguration;
-    }
-
     public Collection<PersistenceUnitConfiguration> getConfigurations() {
         return configurations.values();
     }
@@ -123,5 +119,11 @@ public class PersistenceUnitsConfigurationManager {
     public void changeEntityManager(String persistenceUnitName, EntityManager entityManager) {
         Assert.notNull(entityManager);
         getConfiguration(persistenceUnitName).setEntityManager(entityManager);
+    }
+
+	/*===========================================[ GETTER/SETTER ]================*/
+
+    public PersistenceUnitConfiguration getDefaultConfiguration() {
+        return defaultConfiguration;
     }
 }

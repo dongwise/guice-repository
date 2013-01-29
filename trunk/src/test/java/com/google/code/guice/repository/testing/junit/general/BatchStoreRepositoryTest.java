@@ -99,7 +99,7 @@ public class BatchStoreRepositoryTest extends RepoTestBase {
         assertEquals("Invalid stored entities count", totalSize, accountRepository.count());
     }
 
-    private List<Account> generateBatch(int batchSize) {
+    private static List<Account> generateBatch(int batchSize) {
         List<Account> accounts = new LinkedList<Account>();
         for (int i = 0; i < batchSize; i++) {
             accounts.add(new Account(UUID.randomUUID().toString(), String.valueOf(i)));

@@ -31,7 +31,7 @@ import org.springframework.data.repository.query.QueryLookupStrategy;
  */
 public class DefaultRepositoryBindingBuilder implements RepositoryBindingBuilder {
 
-    /*===========================================[ INSTANCE VARIABLES ]===========*/
+	/*===========================================[ INSTANCE VARIABLES ]===========*/
 
     private Class repositoryClass;
     private Class customRepositoryClass;
@@ -39,13 +39,13 @@ public class DefaultRepositoryBindingBuilder implements RepositoryBindingBuilder
     private QueryLookupStrategy.Key key;
     private String persistenceUnitName;
 
-    /*===========================================[ CONSTRUCTORS ]=================*/
+	/*===========================================[ CONSTRUCTORS ]=================*/
 
     protected DefaultRepositoryBindingBuilder(Class repositoryClass) {
         this.repositoryClass = repositoryClass;
     }
 
-    /*===========================================[ CLASS METHODS ]================*/
+	/*===========================================[ INTERFACE METHODS ]============*/
 
     @Override
     public RepositoryBindingBuilder withCustomImplementation(Class customRepositoryClass) {
@@ -71,11 +71,6 @@ public class DefaultRepositoryBindingBuilder implements RepositoryBindingBuilder
         build();
     }
 
-    @Override
-    public void withSelfDefinition() {
-        build();
-    }
-
     protected RepositoryBinding build() {
         AccessibleRepositoryBinding binding = new AccessibleRepositoryBinding(repositoryClass);
         binding.setCustomRepositoryClass(customRepositoryClass);
@@ -83,5 +78,10 @@ public class DefaultRepositoryBindingBuilder implements RepositoryBindingBuilder
         binding.setQueryLookupStrategyKey(key);
         binding.setPersistenceUnitName(persistenceUnitName);
         return binding;
+    }
+
+    @Override
+    public void withSelfDefinition() {
+        build();
     }
 }

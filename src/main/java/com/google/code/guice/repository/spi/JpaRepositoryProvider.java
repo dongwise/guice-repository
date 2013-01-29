@@ -46,11 +46,11 @@ import javax.persistence.EntityManager;
 @SuppressWarnings("FieldAccessedSynchronizedAndUnsynchronized")
 public class JpaRepositoryProvider<R extends Repository> implements Provider<R> {
 
-    /*===========================================[ STATIC VARIABLES ]=============*/
+	/*===========================================[ STATIC VARIABLES ]=============*/
 
     private static final Logger logger = LoggerFactory.getLogger(JpaRepositoryProvider.class);
 
-    /*===========================================[ INSTANCE VARIABLES ]===========*/
+	/*===========================================[ INSTANCE VARIABLES ]===========*/
 
     private RepositoryBinding binding;
     private String persistenceUnitName;
@@ -65,7 +65,7 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
 
     private volatile R repository;
 
-    /*===========================================[ CONSTRUCTORS ]=================*/
+	/*===========================================[ CONSTRUCTORS ]=================*/
 
     /**
      * Default provider constructor. Used in {@link JpaRepositoryModule#configure()}.
@@ -88,8 +88,6 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
         }
     }
 
-    /*===========================================[ CLASS METHODS ]================*/
-
     @Inject
     public void init(Injector injector,
                      ApplicationContext context,
@@ -107,6 +105,8 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
         }
         this.configurationManager = configurationManager;
     }
+
+	/*===========================================[ INTERFACE METHODS ]============*/
 
     @Override
     public R get() {

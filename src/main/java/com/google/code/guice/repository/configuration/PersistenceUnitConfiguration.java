@@ -41,7 +41,7 @@ import java.util.Properties;
  */
 public class PersistenceUnitConfiguration {
 
-    /*===========================================[ INSTANCE VARIABLES ]===========*/
+	/*===========================================[ INSTANCE VARIABLES ]===========*/
 
     private String persistenceUnitName;
     private Properties properties;
@@ -52,53 +52,17 @@ public class PersistenceUnitConfiguration {
     private boolean isDefault;
     private TransactionInterceptor transactionInterceptor;
 
-    /*===========================================[ CONSTRUCTORS ]=================*/
+	/*===========================================[ CONSTRUCTORS ]=================*/
 
     public PersistenceUnitConfiguration(String persistenceUnitName, Properties properties) {
         this.persistenceUnitName = persistenceUnitName;
         this.properties = (Properties) properties.clone();
     }
 
-    /*===========================================[ CLASS METHODS ]================*/
-
-    public String getPersistenceUnitName() {
-        return persistenceUnitName;
-    }
+	/*===========================================[ CLASS METHODS ]================*/
 
     public Properties getProperties() {
         return (Properties) properties.clone();
-    }
-
-    public EntityManager getEntityManager() {
-        return entityManager;
-    }
-
-    protected void setEntityManager(EntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
-
-    public EntityManagerFactory getEntityManagerFactory() {
-        return entityManagerFactory;
-    }
-
-    protected void setEntityManagerFactory(EntityManagerFactory entityManagerFactory) {
-        this.entityManagerFactory = entityManagerFactory;
-    }
-
-    public String getTransactionManagerName() {
-        return transactionManagerName;
-    }
-
-    protected void setTransactionManagerName(String transactionManagerName) {
-        this.transactionManagerName = transactionManagerName;
-    }
-
-    public PlatformTransactionManager getTransactionManager() {
-        return transactionManager;
-    }
-
-    protected void setTransactionManager(PlatformTransactionManager transactionManager) {
-        this.transactionManager = transactionManager;
     }
 
     public boolean isDefault() {
@@ -107,14 +71,6 @@ public class PersistenceUnitConfiguration {
 
     protected void setDefault(boolean isDefault) {
         this.isDefault = isDefault;
-    }
-
-    public TransactionInterceptor getTransactionInterceptor() {
-        return transactionInterceptor;
-    }
-
-    protected void setTransactionInterceptor(TransactionInterceptor transactionInterceptor) {
-        this.transactionInterceptor = transactionInterceptor;
     }
 
     /**
@@ -174,5 +130,51 @@ public class PersistenceUnitConfiguration {
         sb.append(", properties=").append(properties);
         sb.append('}');
         return sb.toString();
+    }
+
+	/*===========================================[ GETTER/SETTER ]================*/
+
+    public String getPersistenceUnitName() {
+        return persistenceUnitName;
+    }
+
+    public EntityManager getEntityManager() {
+        return entityManager;
+    }
+
+    protected void setEntityManager(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+
+    public EntityManagerFactory getEntityManagerFactory() {
+        return entityManagerFactory;
+    }
+
+    protected void setEntityManagerFactory(EntityManagerFactory entityManagerFactory) {
+        this.entityManagerFactory = entityManagerFactory;
+    }
+
+    public String getTransactionManagerName() {
+        return transactionManagerName;
+    }
+
+    protected void setTransactionManagerName(String transactionManagerName) {
+        this.transactionManagerName = transactionManagerName;
+    }
+
+    public PlatformTransactionManager getTransactionManager() {
+        return transactionManager;
+    }
+
+    protected void setTransactionManager(PlatformTransactionManager transactionManager) {
+        this.transactionManager = transactionManager;
+    }
+
+    public TransactionInterceptor getTransactionInterceptor() {
+        return transactionInterceptor;
+    }
+
+    protected void setTransactionInterceptor(TransactionInterceptor transactionInterceptor) {
+        this.transactionInterceptor = transactionInterceptor;
     }
 }

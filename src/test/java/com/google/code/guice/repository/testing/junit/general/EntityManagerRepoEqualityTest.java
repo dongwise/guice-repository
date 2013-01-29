@@ -26,7 +26,7 @@ import org.junit.Test;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Compares EntityManager equality between injected one and repository's internal.
@@ -47,6 +47,6 @@ public class EntityManagerRepoEqualityTest extends RepoTestBase {
 
     @Test
     public void testRepo() throws Exception {
-        assertTrue("EntityManager's is not equal", accountRepository.getEntityManager().equals(entityManager));
+        assertEquals("EntityManager's is not equal", accountRepository.getEntityManager(), entityManager);
     }
 }

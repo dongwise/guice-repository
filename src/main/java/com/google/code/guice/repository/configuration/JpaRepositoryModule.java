@@ -109,10 +109,11 @@ public abstract class JpaRepositoryModule extends AbstractModule {
      */
     public static final String PERSISTENCE_UNITS_SPLIT_REGEX = ",|;";
 
-    /*===========================================[ INSTANCE VARIABLES ]===========*/
+	/*===========================================[ INSTANCE VARIABLES ]===========*/
+
+    protected String[] persistenceUnitsNames;
 
     private Logger logger;
-    protected String[] persistenceUnitsNames;
 
     /*===========================================[ CONSTRUCTORS ]=================*/
 
@@ -151,6 +152,8 @@ public abstract class JpaRepositoryModule extends AbstractModule {
     protected Collection<String> getPersistenceUnitsNames() {
         return null;
     }
+
+	/*===========================================[ INTERFACE METHODS ]============*/
 
     @Override
     protected void configure() {
@@ -217,133 +220,6 @@ public abstract class JpaRepositoryModule extends AbstractModule {
     }
 
     /**
-     * Enables <a href="http://www.querydsl.com/"/> support if required dependencies is in classpath.
-     */
-    protected void enableQueryDSLSupport() {
-        if (QueryDslUtils.QUERY_DSL_PRESENT) {
-            install(new FactoryModuleBuilder().build(SimpleQueryDslJpaRepositoryFactory.class));
-        } else {
-            logger.info("QueryDSL is disabled");
-            bind(SimpleQueryDslJpaRepositoryFactory.class).toInstance(new SimpleQueryDslJpaRepositoryFactory() {
-                @Override
-                public SimpleQueryDslJpaRepository create(JpaEntityInformation jpaEntityInformation, EntityManager entityManager) {
-                    throw new IllegalStateException("QueryDSL is disabled, but used in your project! Please add QueryDSL support libraries!");
-                }
-            });
-        }
-    }
-
-    /**
-     * Binds EntityManagers/EntityManagerFactories to current injector context.
-     * Required for later direct EntityManager/EntityManagerFactory injections.
-     *
-     * @param configurationManager configuration manager instance
-     */
-    protected void bindPersistence(PersistenceUnitsConfigurationManager configurationManager) {
-        // Support for EntityManager with @PersistenceContext injections
-        TypeListener persistenceContextTypeListener = new PersistenceContextTypeListener();
-        requestInjection(persistenceContextTypeListener);
-        bindListener(Matchers.any(), persistenceContextTypeListener);
-
-        // Support for EntityManagerFactory with @PersistenceUnit injections
-        TypeListener persistenceUnitTypeListener = new PersistenceUnitTypeListener();
-        requestInjection(persistenceUnitTypeListener);
-        bindListener(Matchers.any(), persistenceUnitTypeListener);
-
-        Iterable<PersistenceUnitConfiguration> configurations = configurationManager.getConfigurations();
-
-        for (final PersistenceUnitConfiguration configuration : configurations) {
-            /**
-             * Provider bindings for EM needed for Web-mode - EM can be recreated
-             * (& re-registered in PersistenceUnitConfiguration)
-             * in {@link PersistFilter}
-             * */
-            bind(EntityManager.class).annotatedWith(Names.named(configuration.getPersistenceUnitName())).toProvider(new Provider<EntityManager>() {
-                @Override
-                public EntityManager get() {
-                    return configuration.getEntityManager();
-                }
-            });
-            bind(EntityManagerFactory.class).annotatedWith(Names.named(configuration.getPersistenceUnitName())).toInstance(configuration.getEntityManagerFactory());
-        }
-
-        // binding default EntityManager & EntityManagerFactory
-        final PersistenceUnitConfiguration defaultConfiguration = configurationManager.getDefaultConfiguration();
-        /**
-         * Provider bindings for EM needed for Web-mode - EM can be recreated
-         * (& re-registered in PersistenceUnitConfiguration)
-         * in {@link PersistFilter}
-         * */
-        bind(EntityManager.class).toProvider(new Provider<EntityManager>() {
-            @Override
-            public EntityManager get() {
-                return defaultConfiguration.getEntityManager();
-            }
-        });
-        bind(EntityManagerFactory.class).toInstance(defaultConfiguration.getEntityManagerFactory());
-    }
-
-    /**
-     * Extracts {@code persistenceUnitName} from Repository annotations if no direct binding has been specified.
-     *
-     * @param repositoryClass repository class
-     *
-     * @return located persistenceUnitName or <i>null</i> if nothing has been found
-     */
-    protected String extractAnnotationsPersistenceUnitName(Class<? extends Repository> repositoryClass) {
-        String persistenceUnitName = null;
-        PersistenceContext persistenceContext = repositoryClass.getAnnotation(PersistenceContext.class);
-        if (persistenceContext != null) {
-            persistenceUnitName = persistenceContext.unitName();
-        }
-
-        boolean persistenceUnitNameFound = false;
-        boolean persistenceContextBased = false;
-        if (persistenceUnitName == null || persistenceUnitName.isEmpty()) {
-            Transactional annotation = repositoryClass.getAnnotation(Transactional.class);
-            if (annotation != null) {
-                persistenceUnitName = annotation.value();
-                if (!persistenceUnitName.isEmpty()) {
-                    persistenceUnitNameFound = true;
-                }
-            }
-        } else {
-            persistenceUnitNameFound = true;
-            persistenceContextBased = true;
-        }
-
-        if (persistenceUnitNameFound) {
-            logger.info(String.format("[%s] contains specified persistenceUnitName [%s] in @%s annotation",
-                    repositoryClass.getName(),
-                    persistenceUnitName,
-                    persistenceContextBased ? PersistenceContext.class.getName() : Transactional.class.getName()));
-        }
-
-        return persistenceUnitName;
-    }
-
-    /**
-     * Creates {@link Transactional} annotation source with annotation parser.
-     *
-     * @return parser instance.
-     *
-     * @see AnnotationTransactionAttributeSource
-     * @see SpringTransactionAnnotationParser
-     */
-    protected TransactionAttributeSource createTransactionAttributeSource() {
-        return new AnnotationTransactionAttributeSource(new SpringTransactionAnnotationParser());
-    }
-
-    /**
-     * Creates repository binder instance. This binder will be passed into {@link #bindRepositories(RepositoryBinder)}.
-     *
-     * @return repository binder instance
-     */
-    protected RepositoryBinder createRepositoryBinder() {
-        return new DefaultRepositoryBinder();
-    }
-
-    /**
      * Creates configuration manager which contains all required information about specified persistence units and
      * their
      * properties.
@@ -363,6 +239,48 @@ public abstract class JpaRepositoryModule extends AbstractModule {
                     new PersistenceUnitConfiguration(persistenceUnitName, persistenceUnitProperties), isDefaultConfiguration);
         }
         return manager;
+    }
+
+    /**
+     * Custom persistence-unit properties - for example it can consist Hibernate/EclipseLink specific parameters.
+     * By-default this properties loaded from file named ${persistence-unit-name}.properties located in the classpath.
+     *
+     * @return initialized java.util.Properties or null.
+     */
+    protected Properties getPersistenceUnitProperties(String persistenceUnitName) {
+        Properties props = null;
+        String propFileName = persistenceUnitName + ".properties";
+
+        InputStream pStream = getClass().getClassLoader().getResourceAsStream(propFileName);
+        try {
+            props = new Properties();
+            if (pStream != null) {
+                props.load(pStream);
+            }
+        } catch (Exception e) {
+            logger.error(String.format("Unable to load properties for persistence-unit: [%s]", persistenceUnitName), e);
+        } finally {
+            if (pStream != null) {
+                try {
+                    pStream.close();
+                } catch (IOException e) {
+                    logger.error("Error", e);
+                }
+            }
+        }
+        return props;
+    }
+
+    /**
+     * Creates {@link Transactional} annotation source with annotation parser.
+     *
+     * @return parser instance.
+     *
+     * @see AnnotationTransactionAttributeSource
+     * @see SpringTransactionAnnotationParser
+     */
+    protected TransactionAttributeSource createTransactionAttributeSource() {
+        return new AnnotationTransactionAttributeSource(new SpringTransactionAnnotationParser());
     }
 
     /**
@@ -464,33 +382,79 @@ public abstract class JpaRepositoryModule extends AbstractModule {
     }
 
     /**
-     * Custom persistence-unit properties - for example it can consist Hibernate/EclipseLink specific parameters.
-     * By-default this properties loaded from file named ${persistence-unit-name}.properties located in the classpath.
-     *
-     * @return initialized java.util.Properties or null.
+     * Enables <a href="http://www.querydsl.com/"/> support if required dependencies is in classpath.
      */
-    protected Properties getPersistenceUnitProperties(String persistenceUnitName) {
-        Properties props = null;
-        String propFileName = persistenceUnitName + ".properties";
-
-        InputStream pStream = getClass().getClassLoader().getResourceAsStream(propFileName);
-        try {
-            props = new Properties();
-            if (pStream != null) {
-                props.load(pStream);
-            }
-        } catch (Exception e) {
-            logger.error(String.format("Unable to load properties for persistence-unit: [%s]", persistenceUnitName), e);
-        } finally {
-            if (pStream != null) {
-                try {
-                    pStream.close();
-                } catch (IOException e) {
-                    logger.error("Error", e);
+    protected void enableQueryDSLSupport() {
+        if (QueryDslUtils.QUERY_DSL_PRESENT) {
+            install(new FactoryModuleBuilder().build(SimpleQueryDslJpaRepositoryFactory.class));
+        } else {
+            logger.info("QueryDSL is disabled");
+            bind(SimpleQueryDslJpaRepositoryFactory.class).toInstance(new SimpleQueryDslJpaRepositoryFactory() {
+                @Override
+                public SimpleQueryDslJpaRepository create(JpaEntityInformation jpaEntityInformation, EntityManager entityManager) {
+                    throw new IllegalStateException("QueryDSL is disabled, but used in your project! Please add QueryDSL support libraries!");
                 }
-            }
+            });
         }
-        return props;
+    }
+
+    /**
+     * Binds EntityManagers/EntityManagerFactories to current injector context.
+     * Required for later direct EntityManager/EntityManagerFactory injections.
+     *
+     * @param configurationManager configuration manager instance
+     */
+    protected void bindPersistence(PersistenceUnitsConfigurationManager configurationManager) {
+        // Support for EntityManager with @PersistenceContext injections
+        TypeListener persistenceContextTypeListener = new PersistenceContextTypeListener();
+        requestInjection(persistenceContextTypeListener);
+        bindListener(Matchers.any(), persistenceContextTypeListener);
+
+        // Support for EntityManagerFactory with @PersistenceUnit injections
+        TypeListener persistenceUnitTypeListener = new PersistenceUnitTypeListener();
+        requestInjection(persistenceUnitTypeListener);
+        bindListener(Matchers.any(), persistenceUnitTypeListener);
+
+        Iterable<PersistenceUnitConfiguration> configurations = configurationManager.getConfigurations();
+
+        for (final PersistenceUnitConfiguration configuration : configurations) {
+            /**
+             * Provider bindings for EM needed for Web-mode - EM can be recreated
+             * (& re-registered in PersistenceUnitConfiguration)
+             * in {@link PersistFilter}
+             * */
+            bind(EntityManager.class).annotatedWith(Names.named(configuration.getPersistenceUnitName())).toProvider(new Provider<EntityManager>() {
+                @Override
+                public EntityManager get() {
+                    return configuration.getEntityManager();
+                }
+            });
+            bind(EntityManagerFactory.class).annotatedWith(Names.named(configuration.getPersistenceUnitName())).toInstance(configuration.getEntityManagerFactory());
+        }
+
+        // binding default EntityManager & EntityManagerFactory
+        final PersistenceUnitConfiguration defaultConfiguration = configurationManager.getDefaultConfiguration();
+        /**
+         * Provider bindings for EM needed for Web-mode - EM can be recreated
+         * (& re-registered in PersistenceUnitConfiguration)
+         * in {@link PersistFilter}
+         * */
+        bind(EntityManager.class).toProvider(new Provider<EntityManager>() {
+            @Override
+            public EntityManager get() {
+                return defaultConfiguration.getEntityManager();
+            }
+        });
+        bind(EntityManagerFactory.class).toInstance(defaultConfiguration.getEntityManagerFactory());
+    }
+
+    /**
+     * Creates repository binder instance. This binder will be passed into {@link #bindRepositories(RepositoryBinder)}.
+     *
+     * @return repository binder instance
+     */
+    protected RepositoryBinder createRepositoryBinder() {
+        return new DefaultRepositoryBinder();
     }
 
     /**
@@ -507,6 +471,47 @@ public abstract class JpaRepositoryModule extends AbstractModule {
      * @param binder repository binder instance
      */
     protected abstract void bindRepositories(RepositoryBinder binder);
+
+    /**
+     * Extracts {@code persistenceUnitName} from Repository annotations if no direct binding has been specified.
+     *
+     * @param repositoryClass repository class
+     *
+     * @return located persistenceUnitName or <i>null</i> if nothing has been found
+     */
+    protected String extractAnnotationsPersistenceUnitName(Class<? extends Repository> repositoryClass) {
+        String persistenceUnitName = null;
+        PersistenceContext persistenceContext = repositoryClass.getAnnotation(PersistenceContext.class);
+        if (persistenceContext != null) {
+            persistenceUnitName = persistenceContext.unitName();
+        }
+
+        boolean persistenceUnitNameFound = false;
+        boolean persistenceContextBased = false;
+        if (persistenceUnitName == null || persistenceUnitName.isEmpty()) {
+            Transactional annotation = repositoryClass.getAnnotation(Transactional.class);
+            if (annotation != null) {
+                persistenceUnitName = annotation.value();
+                if (!persistenceUnitName.isEmpty()) {
+                    persistenceUnitNameFound = true;
+                }
+            }
+        } else {
+            persistenceUnitNameFound = true;
+            persistenceContextBased = true;
+        }
+
+        if (persistenceUnitNameFound) {
+            logger.info(String.format("[%s] contains specified persistenceUnitName [%s] in @%s annotation",
+                    repositoryClass.getName(),
+                    persistenceUnitName,
+                    persistenceContextBased ? PersistenceContext.class.getName() : Transactional.class.getName()));
+        }
+
+        return persistenceUnitName;
+    }
+
+	/*===========================================[ GETTER/SETTER ]================*/
 
     protected Logger getLogger() {
         return logger;

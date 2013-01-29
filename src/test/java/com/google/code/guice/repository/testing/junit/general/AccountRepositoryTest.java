@@ -56,7 +56,7 @@ public class AccountRepositoryTest extends RepoTestBase {
         try {
             accountRepository.save(accounts);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error", e);
         }
         assertEquals("Invalid repository size", count, accountRepository.count());
         assertNotNull("Account not found by name", accountRepository.findAccountByName(String.valueOf(1)));

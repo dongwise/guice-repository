@@ -48,17 +48,17 @@ import java.util.Set;
  */
 public class CustomRepositoryImplementationResolver {
 
-    /*===========================================[ STATIC VARIABLES ]=============*/
+	/*===========================================[ STATIC VARIABLES ]=============*/
 
     private static final Logger logger = LoggerFactory.getLogger(CustomRepositoryImplementationResolver.class);
     private static final String SPRING_DATA_PACKAGE = "org.springframework.data";
 
-    /*===========================================[ INSTANCE VARIABLES ]===========*/
+	/*===========================================[ INSTANCE VARIABLES ]===========*/
 
     private Injector injector;
     private Set<Class> exclusions;
 
-    /*===========================================[ CONSTRUCTORS ]=================*/
+	/*===========================================[ CONSTRUCTORS ]=================*/
 
     @Inject
     protected void init(Injector injector) {
@@ -67,7 +67,7 @@ public class CustomRepositoryImplementationResolver {
         addExclusions(exclusions);
     }
 
-    /*===========================================[ CLASS METHODS ]================*/
+	/*===========================================[ CLASS METHODS ]================*/
 
     protected void addExclusions(Collection<Class> exclusions) {
         exclusions.addAll(Arrays.asList(BatchStoreJpaRepository.class, EntityManagerProvider.class));

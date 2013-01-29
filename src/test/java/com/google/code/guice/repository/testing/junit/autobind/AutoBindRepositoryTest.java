@@ -79,7 +79,7 @@ public class AutoBindRepositoryTest {
     @Test
     public void testCustomerRepository() {
         customerRepository.save(new Customer("name", "surname"));
-        customerRepository.sharedCustomMethod((long) 42);
+        customerRepository.sharedCustomMethod(42L);
         assertEquals("Invalid repository size", 1, customerRepository.count());
         customerRepository.deleteAll();
         assertEquals("Invalid repository size", 0, customerRepository.count());

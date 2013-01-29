@@ -44,10 +44,12 @@ import static org.springframework.data.querydsl.QueryDslUtils.QUERY_DSL_PRESENT;
  */
 public class CustomJpaRepositoryFactory extends JpaRepositoryFactory {
 
+	/*===========================================[ INSTANCE VARIABLES ]===========*/
+
     private SimpleQueryDslJpaRepositoryFactory queryDslJpaRepositoryFactory;
     private SimpleBatchStoreJpaRepositoryFactory batchRepositoryFactory;
 
-    /*===========================================[ CONSTRUCTORS ]=================*/
+	/*===========================================[ CONSTRUCTORS ]=================*/
 
     @Inject
     protected CustomJpaRepositoryFactory(@Assisted EntityManager entityManager,
@@ -58,7 +60,7 @@ public class CustomJpaRepositoryFactory extends JpaRepositoryFactory {
         this.queryDslJpaRepositoryFactory = queryDslJpaRepositoryFactory;
     }
 
-    /*===========================================[ CLASS METHODS ]================*/
+	/*===========================================[ CLASS METHODS ]================*/
 
     @Override
     protected JpaRepository<?, ?> getTargetRepository(RepositoryMetadata metadata, EntityManager entityManager) {
@@ -75,6 +77,11 @@ public class CustomJpaRepositoryFactory extends JpaRepositoryFactory {
         return repo;
     }
 
+    @SuppressWarnings({"MethodOverridesPrivateMethodOfSuperclass", "OverloadedMethodsWithSameNumberOfParameters"})
+    private static boolean isQueryDslExecutor(Class<?> repositoryInterface) {
+        return QUERY_DSL_PRESENT && QueryDslPredicateExecutor.class.isAssignableFrom(repositoryInterface);
+    }
+
     @Override
     protected Class<?> getRepositoryBaseClass(RepositoryMetadata metadata) {
         if (isQueryDslExecutor(metadata.getRepositoryInterface())) {
@@ -82,10 +89,5 @@ public class CustomJpaRepositoryFactory extends JpaRepositoryFactory {
         } else {
             return SimpleBatchStoreJpaRepository.class;
         }
-    }
-
-    @SuppressWarnings({"MethodOverridesPrivateMethodOfSuperclass", "OverloadedMethodsWithSameNumberOfParameters"})
-    private static boolean isQueryDslExecutor(Class<?> repositoryInterface) {
-        return QUERY_DSL_PRESENT && QueryDslPredicateExecutor.class.isAssignableFrom(repositoryInterface);
     }
 }

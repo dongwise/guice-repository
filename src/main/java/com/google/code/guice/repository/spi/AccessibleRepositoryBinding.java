@@ -31,7 +31,7 @@ import org.springframework.data.repository.query.QueryLookupStrategy;
  */
 public class AccessibleRepositoryBinding implements RepositoryBinding {
 
-    /*===========================================[ INSTANCE VARIABLES ]===========*/
+	/*===========================================[ INSTANCE VARIABLES ]===========*/
 
     private Class repositoryClass;
     private Class customRepositoryClass;
@@ -39,50 +39,13 @@ public class AccessibleRepositoryBinding implements RepositoryBinding {
     private QueryLookupStrategy.Key key;
     private String persistenceUnitName;
 
-    /*===========================================[ CONSTRUCTORS ]=================*/
+	/*===========================================[ CONSTRUCTORS ]=================*/
 
     protected AccessibleRepositoryBinding(Class repositoryClass) {
         this.repositoryClass = repositoryClass;
     }
 
-    /*===========================================[ CLASS METHODS ]================*/
-
-    @Override
-    public Class getRepositoryClass() {
-        return repositoryClass;
-    }
-
-    @Override
-    public Class getCustomRepositoryClass() {
-        return customRepositoryClass;
-    }
-
-    protected void setCustomRepositoryClass(Class customRepositoryClass) {
-        this.customRepositoryClass = customRepositoryClass;
-    }
-
-    @Override
-    public String getPersistenceUnitName() {
-        return persistenceUnitName;
-    }
-
-    protected void setPersistenceUnitName(String persistenceUnitName) {
-        this.persistenceUnitName = persistenceUnitName;
-    }
-
-    @Override
-    public NamedQueries getNamedQueries() {
-        return namedQueries;
-    }
-
-    protected void setNamedQueries(NamedQueries namedQueries) {
-        this.namedQueries = namedQueries;
-    }
-
-    @Override
-    public QueryLookupStrategy.Key getQueryLookupStrategyKey() {
-        return key;
-    }
+	/*===========================================[ CLASS METHODS ]================*/
 
     protected void setQueryLookupStrategyKey(QueryLookupStrategy.Key key) {
         this.key = key;
@@ -130,5 +93,46 @@ public class AccessibleRepositoryBinding implements RepositoryBinding {
         sb.append(", persistenceUnitName='").append(persistenceUnitName).append('\'');
         sb.append('}');
         return sb.toString();
+    }
+
+	/*===========================================[ INTERFACE METHODS ]============*/
+
+    @Override
+    public Class getRepositoryClass() {
+        return repositoryClass;
+    }
+
+    @Override
+    public Class getCustomRepositoryClass() {
+        return customRepositoryClass;
+    }
+
+    @Override
+    public String getPersistenceUnitName() {
+        return persistenceUnitName;
+    }
+
+    @Override
+    public NamedQueries getNamedQueries() {
+        return namedQueries;
+    }
+
+    @Override
+    public QueryLookupStrategy.Key getQueryLookupStrategyKey() {
+        return key;
+    }
+
+	/*===========================================[ GETTER/SETTER ]================*/
+
+    protected void setCustomRepositoryClass(Class customRepositoryClass) {
+        this.customRepositoryClass = customRepositoryClass;
+    }
+
+    protected void setPersistenceUnitName(String persistenceUnitName) {
+        this.persistenceUnitName = persistenceUnitName;
+    }
+
+    protected void setNamedQueries(NamedQueries namedQueries) {
+        this.namedQueries = namedQueries;
     }
 }

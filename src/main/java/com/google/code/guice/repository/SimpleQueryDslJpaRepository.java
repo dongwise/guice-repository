@@ -37,7 +37,7 @@ import java.io.Serializable;
  */
 public class SimpleQueryDslJpaRepository<T, ID extends Serializable> extends QueryDslJpaRepository<T, ID> {
 
-    /*===========================================[ CONSTRUCTORS ]=================*/
+	/*===========================================[ CONSTRUCTORS ]=================*/
 
     @Inject
     public SimpleQueryDslJpaRepository(@Assisted JpaEntityInformation entityInformation, @Assisted EntityManager entityManager) {

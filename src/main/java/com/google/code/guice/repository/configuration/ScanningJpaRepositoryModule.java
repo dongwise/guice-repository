@@ -67,11 +67,25 @@ import static com.google.common.collect.Collections2.filter;
 @SuppressWarnings("CollectionContainsUrl")
 public class ScanningJpaRepositoryModule extends JpaRepositoryModule {
 
-    /*===========================================[ INSTANCE VARIABLES ]===========*/
+	/*===========================================[ INSTANCE VARIABLES ]===========*/
 
     private Collection<RepositoriesGroup> repositoriesGroups;
 
-    /*===========================================[ CONSTRUCTORS ]=================*/
+	/*===========================================[ CONSTRUCTORS ]=================*/
+
+    public ScanningJpaRepositoryModule(Collection<RepositoriesGroup> repositoriesGroups) {
+        super(extractPersistenceUnitsNames(repositoriesGroups));
+        this.repositoriesGroups = Lists.newArrayList(repositoriesGroups);
+    }
+
+    private static String[] extractPersistenceUnitsNames(Iterable<RepositoriesGroup> repositoriesGroups) {
+        Collection<String> persistenceUnitsNames = new ArrayList<String>();
+        for (RepositoriesGroup repositoriesGroup : repositoriesGroups) {
+            persistenceUnitsNames.add(repositoriesGroup.getPersistenceUnitName());
+        }
+
+        return persistenceUnitsNames.toArray(new String[persistenceUnitsNames.size()]);
+    }
 
     /**
      * @param targetScanPackage package to scan for repositories.
@@ -82,21 +96,7 @@ public class ScanningJpaRepositoryModule extends JpaRepositoryModule {
         repositoriesGroups.add(new RepositoriesGroup(targetScanPackage, persistenceUnitsNames[0]));
     }
 
-    public ScanningJpaRepositoryModule(Collection<RepositoriesGroup> repositoriesGroups) {
-        super(extractPersistenceUnitsNames(repositoriesGroups));
-        this.repositoriesGroups = Lists.newArrayList(repositoriesGroups);
-    }
-
-    /*===========================================[ CLASS METHODS ]================*/
-
-    private static String[] extractPersistenceUnitsNames(Iterable<RepositoriesGroup> repositoriesGroups) {
-        Collection<String> persistenceUnitsNames = new ArrayList<String>();
-        for (RepositoriesGroup repositoriesGroup : repositoriesGroups) {
-            persistenceUnitsNames.add(repositoriesGroup.getPersistenceUnitName());
-        }
-
-        return persistenceUnitsNames.toArray(new String[persistenceUnitsNames.size()]);
-    }
+	/*===========================================[ INTERFACE METHODS ]============*/
 
     @Override
     protected void bindRepositories(RepositoryBinder binder) {

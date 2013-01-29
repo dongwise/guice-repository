@@ -41,12 +41,12 @@ import org.springframework.transaction.interceptor.TransactionAttributeSource;
  */
 public class CompositeTransactionInterceptor implements MethodInterceptor {
 
-    /*===========================================[ INSTANCE VARIABLES ]===========*/
+	/*===========================================[ INSTANCE VARIABLES ]===========*/
 
     private PersistenceUnitsConfigurationManager configurationManager;
     private TransactionAttributeSource transactionAttributeSource;
 
-    /*===========================================[ CONSTRUCTORS ]=================*/
+	/*===========================================[ CONSTRUCTORS ]=================*/
 
     @Inject
     protected void init(PersistenceUnitsConfigurationManager configurationManager, TransactionAttributeSource transactionAttributeSource) {
@@ -54,7 +54,7 @@ public class CompositeTransactionInterceptor implements MethodInterceptor {
         this.transactionAttributeSource = transactionAttributeSource;
     }
 
-    /*===========================================[ CLASS METHODS ]================*/
+	/*===========================================[ INTERFACE METHODS ]============*/
 
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {

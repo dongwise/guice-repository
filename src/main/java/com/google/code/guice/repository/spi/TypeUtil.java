@@ -40,12 +40,12 @@ import java.util.List;
 @ThreadSafe
 public class TypeUtil {
 
-    /*===========================================[ CONSTRUCTORS ]=================*/
+	/*===========================================[ CONSTRUCTORS ]=================*/
 
     private TypeUtil() {
     }
 
-    /*===========================================[ CLASS METHODS ]================*/
+	/*===========================================[ CLASS METHODS ]================*/
 
     /**
      * Finds and returns class of first parametrization parameter.
@@ -87,6 +87,37 @@ public class TypeUtil {
             getGenericSuperclassActualTypes(types, aClass);
         }
         return findAppropriateType(types, parameterIndex);
+    }
+
+    public static void getGenericInterfacesActualTypes(Collection<Type> types, Class aClass) {
+        if (aClass != null && types != null) {
+            Type[] interfaces = aClass.getGenericInterfaces();
+            for (Type anInterface : interfaces) {
+                if (anInterface instanceof ParameterizedType) {
+                    ParameterizedType parameterizedType = (ParameterizedType) anInterface;
+                    Type[] actualTypes = parameterizedType.getActualTypeArguments();
+                    types.addAll(Arrays.asList(actualTypes));
+                } else if (anInterface instanceof Class) {
+                    Class typeClass = (Class) anInterface;
+                    getGenericInterfacesActualTypes(types, typeClass);
+                }
+            }
+        }
+    }
+
+    public static void getGenericSuperclassActualTypes(Collection<Type> types, Class aClass) {
+        if (aClass != null && types != null) {
+            Type superclass = aClass.getGenericSuperclass();
+            if (superclass instanceof ParameterizedType) {
+                ParameterizedType parameterizedType = (ParameterizedType) superclass;
+                Type[] interfaces = parameterizedType.getActualTypeArguments();
+                types.addAll(Arrays.asList(interfaces));
+            } else if (superclass instanceof Class) {
+                Class sClass = (Class) superclass;
+                getGenericInterfacesActualTypes(types, sClass);
+                getGenericSuperclassActualTypes(types, aClass.getSuperclass());
+            }
+        }
     }
 
     private static Class findAppropriateType(List<Type> types, int parameterIndex) {
@@ -135,36 +166,5 @@ public class TypeUtil {
             }
         }
         return null;
-    }
-
-    public static void getGenericInterfacesActualTypes(Collection<Type> types, Class aClass) {
-        if (aClass != null && types != null) {
-            Type[] interfaces = aClass.getGenericInterfaces();
-            for (Type anInterface : interfaces) {
-                if (anInterface instanceof ParameterizedType) {
-                    ParameterizedType parameterizedType = (ParameterizedType) anInterface;
-                    Type[] actualTypes = parameterizedType.getActualTypeArguments();
-                    types.addAll(Arrays.asList(actualTypes));
-                } else if (anInterface instanceof Class) {
-                    Class typeClass = (Class) anInterface;
-                    getGenericInterfacesActualTypes(types, typeClass);
-                }
-            }
-        }
-    }
-
-    public static void getGenericSuperclassActualTypes(Collection<Type> types, Class aClass) {
-        if (aClass != null && types != null) {
-            Type superclass = aClass.getGenericSuperclass();
-            if (superclass instanceof ParameterizedType) {
-                ParameterizedType parameterizedType = (ParameterizedType) superclass;
-                Type[] interfaces = parameterizedType.getActualTypeArguments();
-                types.addAll(Arrays.asList(interfaces));
-            } else if (superclass instanceof Class) {
-                Class sClass = (Class) superclass;
-                getGenericInterfacesActualTypes(types, sClass);
-                getGenericSuperclassActualTypes(types, aClass.getSuperclass());
-            }
-        }
     }
 }

@@ -37,7 +37,7 @@ import java.util.regex.Pattern;
  */
 public class RepositoriesGroup {
 
-    /*===========================================[ INSTANCE VARIABLES ]===========*/
+	/*===========================================[ INSTANCE VARIABLES ]===========*/
 
     private String persistenceUnitName;
     private Collection<String> repositoriesPackages;
@@ -46,7 +46,7 @@ public class RepositoriesGroup {
     private Predicate<Class> inclusionPredicate;
     private Predicate<Class> exclusionPredicate;
 
-    /*===========================================[ CLASS METHODS ]================*/
+	/*===========================================[ CONSTRUCTORS ]=================*/
 
     protected RepositoriesGroup(String repositoriesPackage, String persistenceUnitName) {
         this(Arrays.asList(repositoriesPackage), persistenceUnitName);
@@ -57,14 +57,10 @@ public class RepositoriesGroup {
         this.persistenceUnitName = persistenceUnitName;
     }
 
-    /*===========================================[ CONSTRUCTORS ]=================*/
+	/*===========================================[ CLASS METHODS ]================*/
 
     public Collection<String> getRepositoriesPackages() {
         return Collections.unmodifiableCollection(repositoriesPackages);
-    }
-
-    public String getPersistenceUnitName() {
-        return persistenceUnitName;
     }
 
     protected void setIncusionPattern(String inclusionPattern) {
@@ -97,14 +93,6 @@ public class RepositoriesGroup {
         if (exclusionPredicate != null) {
             this.exclusionPredicate = exclusionPredicate;
         }
-    }
-
-    public Pattern getInclusionPattern() {
-        return inclusionPattern;
-    }
-
-    public Pattern getExclusionPattern() {
-        return exclusionPattern;
     }
 
     public Predicate<Class> getInclusionFilterPredicate() {
@@ -193,7 +181,6 @@ public class RepositoriesGroup {
         return result;
     }
 
-
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -204,5 +191,19 @@ public class RepositoriesGroup {
         sb.append(", exclusionPattern=").append(exclusionPattern);
         sb.append('}');
         return sb.toString();
+    }
+
+	/*===========================================[ GETTER/SETTER ]================*/
+
+    public String getPersistenceUnitName() {
+        return persistenceUnitName;
+    }
+
+    public Pattern getInclusionPattern() {
+        return inclusionPattern;
+    }
+
+    public Pattern getExclusionPattern() {
+        return exclusionPattern;
     }
 }

@@ -3,7 +3,7 @@
 
 === 2.0.2 ===
 
- * PersistFilter related bugfixes - it's now possible to direct Repository injection instead of Provider<Repository> in web-environments.
+ * PersistFilter related bugfixes - it's now possible to direct Repository injection instead of Provider&lt;Repository&gt; in web-environments.
 
 === 2.0.1 ===
 

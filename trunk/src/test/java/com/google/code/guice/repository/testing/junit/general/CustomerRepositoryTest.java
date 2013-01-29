@@ -41,6 +41,7 @@ public class CustomerRepositoryTest extends RepoTestBase {
     public void testRepo() throws Exception {
         customerRepository.save(new Customer("name", "surname"));
         customerRepository.sharedCustomMethod((long) 42);
+
         assertEquals("Invalid repository size", 1, customerRepository.count());
         assertEquals("Invalid repository size", 1, customerRepository.findAll(new PageRequest(0, 10)).getContent().size());
     }

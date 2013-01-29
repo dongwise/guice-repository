@@ -72,7 +72,6 @@ import javax.servlet.http.HttpServletRequest;
 @ThreadSafe
 public class PersistFilter extends OpenEntityManagerInViewFilter {
 
-
     /**
      * This HttpServletRequest parameter describes persistence unit to use.
      * Use means EntityManager opening/closing in doFilter try/finally.

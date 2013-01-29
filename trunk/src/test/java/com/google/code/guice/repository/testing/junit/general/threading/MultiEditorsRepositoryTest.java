@@ -31,9 +31,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * MultiEditorsRepositoryTest - TODO: description
+ * Multi-editors entity modification test.
  *
- * @author Alexey Krylov (AleX)
+ * @author Alexey Krylov
  * @since 30.01.13
  */
 public class MultiEditorsRepositoryTest extends RepoTestBase{

@@ -119,7 +119,8 @@ public class JpaRepositoryProvider<R extends Repository> implements Provider<R> 
                     JpaRepositoryFactoryBean jpaRepositoryFactoryBean = createJpaRepositoryFactoryBean();
                     PersistenceUnitConfiguration configuration = configurationManager.getConfiguration(persistenceUnitName);
 
-                    EntityManager entityManager = configuration.getEntityManager();
+                    // Repository will hold a link to Configuration and if underlying EM will be changed - repo instance will get it
+                    EntityManager entityManager = configuration.asEntityManagerProxy();
                     // Needs to be set first
                     jpaRepositoryFactoryBean.setTransactionManager(configuration.getTransactionManagerName());
                     // Attaching to Spring's context

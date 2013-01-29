@@ -18,11 +18,16 @@
 
 package com.google.code.guice.repository.configuration;
 
+import com.google.code.guice.repository.filter.PersistFilter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.Properties;
 
 /**
@@ -110,6 +115,34 @@ public class PersistenceUnitConfiguration {
 
     protected void setTransactionInterceptor(TransactionInterceptor transactionInterceptor) {
         this.transactionInterceptor = transactionInterceptor;
+    }
+
+    /**
+     * Represents current configuration as an EntityManager proxy. This is required for cases where
+     * Configuration's EM can be changed at runtime - such as in Web-environments (see {@link PersistFilter}.
+     *
+     * @return proxy with EntityManager interface bound to current EM instance
+     *
+     * @see PersistenceUnitsConfigurationManager#changeEntityManager(String, EntityManager)
+     * @see PersistFilter
+     */
+    public EntityManager asEntityManagerProxy() {
+        return (EntityManager) Proxy.newProxyInstance(getClass().getClassLoader(),
+                new Class[]{EntityManager.class}, new InvocationHandler() {
+            @Override
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                try {
+                    return method.invoke(getEntityManager(), args);
+                } catch (InvocationTargetException e) {
+                    Throwable t = e.getCause();
+                    if (t != null) {
+                        throw t;
+                    } else {
+                        throw e;
+                    }
+                }
+            }
+        });
     }
 
     @Override

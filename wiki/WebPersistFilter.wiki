@@ -17,3 +17,13 @@ For multiple persistence units, you should register your custom filter before th
 This filter requires the [http://code.google.com/p/google-guice/wiki/Servlets Guice Servlet] extension.
 
 Also it's recommended to read about [http://code.google.com/p/google-guice/wiki/JPA original PersistFilter] from _guice-persist extension_.
+
+*NOTE: * Since Hibernate 4.1.7 you can do lazy-load even if original EntityManager is closed. 
+Use property:
+{{{
+hibernate.enable_lazy_load_no_trans=true
+}}}
+
+More details here: 
+http://stackoverflow.com/questions/578433/how-to-solve-lazy-initialization-exception-using-jpa-and-hibernate-as-provider
+https://hibernate.onjira.com/browse/HHH-7457

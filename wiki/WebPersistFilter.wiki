@@ -25,5 +25,5 @@ hibernate.enable_lazy_load_no_trans=true
 }}}
 
 More details here: 
-http://stackoverflow.com/questions/578433/how-to-solve-lazy-initialization-exception-using-jpa-and-hibernate-as-provider
-https://hibernate.onjira.com/browse/HHH-7457
+ * http://stackoverflow.com/questions/578433/how-to-solve-lazy-initialization-exception-using-jpa-and-hibernate-as-provider
+ * https://hibernate.onjira.com/browse/HHH-7457

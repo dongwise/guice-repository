@@ -84,7 +84,7 @@ public class PersistFilter extends OpenEntityManagerInViewFilter {
 	/*===========================================[ INSTANCE VARIABLES ]===========*/
 
     @Inject
-    private PersistenceUnitsConfigurationManager configurationManager;
+    protected PersistenceUnitsConfigurationManager configurationManager;
 
 	/*===========================================[ CLASS METHODS ]================*/
 

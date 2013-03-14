@@ -62,7 +62,7 @@
 
         <!-- Spring stuff -->
 
-        <version.spring>3.1.2.RELEASE</version.spring>
+        <version.spring>3.1.4.RELEASE</version.spring>
 
         <!-- Spring-Data JPA -->
 

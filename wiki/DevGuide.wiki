@@ -2,7 +2,7 @@
 ==Developer Guide==
 Welcome to the developer documentation of guice-repository project - a Google Guice adapted version of [http://static.springsource.org/spring-data/data-jpa/docs/current/reference/html/#preface Spring Data-JPA] project with some additional features.
 
-Current project version is: *2.0.2*
+Current project version is: *2.1.0*
 
 ==What are Spring Data-JPA?==
 Here is description from Spring Data-JPA authors:
